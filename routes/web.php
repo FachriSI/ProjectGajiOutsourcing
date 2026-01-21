@@ -11,6 +11,16 @@ use App\Http\Controllers\PaketController;
 use App\Http\Controllers\UmpController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartemenController;
+use App\Http\Controllers\FungsiController;
+use App\Http\Controllers\JabatanController;
+use App\Http\Controllers\LokasiController;
+use App\Http\Controllers\ResikoController;
+use App\Http\Controllers\HarianshiftController;
+use App\Http\Controllers\KuotajamController;
+use App\Http\Controllers\MasakerjaController;
+use App\Http\Controllers\PakaianController;
+use App\Http\Controllers\PenyesuaianController;
 
 use App\Models\Penempatan;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
@@ -52,6 +62,76 @@ Route::post('/tambah-perusahaan', [PerusahaanController::class, 'setTambah']);
 Route::get('/getupdate-perusahaan/{id}', [PerusahaanController::class, 'getUpdate']);
 Route::post('/update-perusahaan/{id}', [PerusahaanController::class, 'setUpdate']);
 Route::get('/delete-perusahaan/{id}', [PerusahaanController::class, 'destroy']);
+
+Route::get('/departemen', [DepartemenController::class, 'index']);
+Route::get('/gettambah-departemen', [DepartemenController::class, 'getTambah']);
+Route::post('/tambah-departemen', [DepartemenController::class, 'setTambah']);
+Route::get('/getupdate-departemen/{id}', [DepartemenController::class, 'getUpdate']);
+Route::post('/update-departemen/{id}', [DepartemenController::class, 'setUpdate']);
+Route::get('/delete-departemen/{id}', [DepartemenController::class, 'destroy']);
+
+Route::get('/fungsi', [FungsiController::class, 'index']);
+Route::get('/gettambah-fungsi', [FungsiController::class, 'getTambah']);
+Route::post('/tambah-fungsi', [FungsiController::class, 'setTambah']);
+Route::get('/getupdate-fungsi/{id}', [FungsiController::class, 'getUpdate']);
+Route::post('/update-fungsi/{id}', [FungsiController::class, 'setUpdate']);
+Route::get('/delete-fungsi/{id}', [FungsiController::class, 'destroy']);
+
+Route::get('/jabatan', [JabatanController::class, 'index']);
+Route::get('/gettambah-jabatan', [JabatanController::class, 'getTambah']);
+Route::post('/tambah-jabatan', [JabatanController::class, 'setTambah']);
+Route::get('/getupdate-jabatan/{id}', [JabatanController::class, 'getUpdate']);
+Route::post('/update-jabatan/{id}', [JabatanController::class, 'setUpdate']);
+Route::get('/delete-jabatan/{id}', [JabatanController::class, 'destroy']);
+
+Route::get('/lokasi', [LokasiController::class, 'index']);
+Route::get('/gettambah-lokasi', [LokasiController::class, 'getTambah']);
+Route::post('/tambah-lokasi', [LokasiController::class, 'setTambah']);
+Route::get('/getupdate-lokasi/{id}', [LokasiController::class, 'getUpdate']);
+Route::post('/update-lokasi/{id}', [LokasiController::class, 'setUpdate']);
+Route::get('/delete-lokasi/{id}', [LokasiController::class, 'destroy']);
+
+Route::get('/resiko', [ResikoController::class, 'index']);
+Route::get('/gettambah-resiko', [ResikoController::class, 'getTambah']);
+Route::post('/tambah-resiko', [ResikoController::class, 'setTambah']);
+Route::get('/getupdate-resiko/{id}', [ResikoController::class, 'getUpdate']);
+Route::post('/update-resiko/{id}', [ResikoController::class, 'setUpdate']);
+Route::get('/delete-resiko/{id}', [ResikoController::class, 'destroy']);
+
+Route::get('/harianshift', [HarianshiftController::class, 'index']);
+Route::get('/gettambah-harianshift', [HarianshiftController::class, 'getTambah']);
+Route::post('/tambah-harianshift', [HarianshiftController::class, 'setTambah']);
+Route::get('/getupdate-harianshift/{id}', [HarianshiftController::class, 'getUpdate']);
+Route::post('/update-harianshift/{id}', [HarianshiftController::class, 'setUpdate']);
+Route::get('/delete-harianshift/{id}', [HarianshiftController::class, 'destroy']);
+
+Route::get('/kuotajam', [KuotajamController::class, 'index']);
+Route::get('/gettambah-kuotajam', [KuotajamController::class, 'getTambah']);
+Route::post('/tambah-kuotajam', [KuotajamController::class, 'setTambah']);
+Route::get('/getupdate-kuotajam/{id}', [KuotajamController::class, 'getUpdate']);
+Route::post('/update-kuotajam/{id}', [KuotajamController::class, 'setUpdate']);
+Route::get('/delete-kuotajam/{id}', [KuotajamController::class, 'destroy']);
+
+Route::get('/masakerja', [MasakerjaController::class, 'index']);
+Route::get('/gettambah-masakerja', [MasakerjaController::class, 'getTambah']);
+Route::post('/tambah-masakerja', [MasakerjaController::class, 'setTambah']);
+Route::get('/getupdate-masakerja/{id}', [MasakerjaController::class, 'getUpdate']);
+Route::post('/update-masakerja/{id}', [MasakerjaController::class, 'setUpdate']);
+Route::get('/delete-masakerja/{id}', [MasakerjaController::class, 'destroy']);
+
+Route::get('/pakaian', [PakaianController::class, 'index']);
+Route::get('/gettambah-pakaian', [PakaianController::class, 'getTambah']);
+Route::post('/tambah-pakaian', [PakaianController::class, 'setTambah']);
+Route::get('/getupdate-pakaian/{id}', [PakaianController::class, 'getUpdate']);
+Route::post('/update-pakaian/{id}', [PakaianController::class, 'setUpdate']);
+Route::get('/delete-pakaian/{id}', [PakaianController::class, 'destroy']);
+
+Route::get('/penyesuaian', [PenyesuaianController::class, 'index']);
+Route::get('/gettambah-penyesuaian', [PenyesuaianController::class, 'getTambah']);
+Route::post('/tambah-penyesuaian', [PenyesuaianController::class, 'setTambah']);
+Route::get('/getupdate-penyesuaian/{id}', [PenyesuaianController::class, 'getUpdate']);
+Route::post('/update-penyesuaian/{id}', [PenyesuaianController::class, 'setUpdate']);
+Route::get('/delete-penyesuaian/{id}', [PenyesuaianController::class, 'destroy']);
 
 Route::get('/unit-kerja', [UnitKerjaController::class, 'index']);
 Route::get('/gettambah-unit', [UnitKerjaController::class, 'getTambah']);

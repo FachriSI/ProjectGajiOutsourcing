@@ -1,23 +1,33 @@
 @extends('layouts.main')
 
-@section('title', 'Vendor/Perusahaan')
+@section('title', 'Fungsi')
 
 @section('content')
 
-    <h3 class="mt-4">Vendor/Perusahaan</h3>
-    <a href="/gettambah-perusahaan " class="btn btn-primary mb-3">Tambah Data</a>
+    <h3 class="mt-4">Fungsi</h3>
+    <a href="/gettambah-fungsi" class="btn btn-primary mb-3">Tambah Data</a>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <table class="table datatable">
         <thead>
             <tr>
                 <th>No.</th>
-                <th>Perusahaan</th>
+                <th>Fungsi</th>
+                <th>Keterangan</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
                 <th>No.</th>
-                <th>Perusahaan</th>
+                <th>Fungsi</th>
+                <th>Keterangan</th>
                 <th>Action</th>
             </tr>
         </tfoot>
@@ -25,13 +35,14 @@
             @foreach ($data as $item)
                 <tr>
                     <td>{{ $loop->iteration }}.</td>
-                    <td>{{ $item->perusahaan }}</td>
+                    <td>{{ $item->fungsi }}</td>
+                    <td>{{ $item->keterangan }}</td>
                     <td>
-                        <a href="/getupdate-perusahaan/{{ $item->perusahaan_id }}" class="btn btn-sm btn-warning"
+                        <a href="/getupdate-fungsi/{{ $item->kode_fungsi }}" class="btn btn-sm btn-warning"
                             data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="{{ url('delete-perusahaan', $item->perusahaan_id) }}" class="btn btn-sm btn-danger btn-delete"
+                        <a href="{{ url('delete-fungsi', $item->kode_fungsi) }}" class="btn btn-sm btn-danger btn-delete"
                             data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                             <i class="fas fa-trash"></i>
                         </a>
@@ -45,7 +56,6 @@
             $('.datatable').each(function () {
                 if (!$.fn.DataTable.isDataTable(this)) {
                     $(this).DataTable({
-                        // Semua fitur default: search, sort, paging aktif
                         processing: true,
                         serverSide: false
                     });
