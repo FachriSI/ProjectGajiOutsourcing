@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
-use Laravolt\Indonesia\Models\Province;
 use Illuminate\Http\Request;
 use App\Models\Karyawan;
 use App\Models\Paketkaryawan;
@@ -22,9 +21,9 @@ class KaryawanController extends Controller
         //     ->get();
 
         $data = Karyawan::with([
-                'perusahaan',
-                'pakaianTerakhir',
-            ])->get();
+            'perusahaan',
+            'pakaianTerakhir',
+        ])->get();
 
         $paketList = DB::table('paket')->get();
 
@@ -43,7 +42,7 @@ class KaryawanController extends Controller
             ->get()
             ->keyBy('karyawan_id');
 
-       
+
         // $harianShift = DB::table('karyawan as k')
         //     ->select('k.*', 'rs.kode_harianshift', 'hs.harianshift')
         //     ->leftJoin(DB::raw('riwayat_shift as rs'), function($join) {
@@ -79,7 +78,7 @@ class KaryawanController extends Controller
             ->select('rj1.karyawan_id', 'jabatan.jabatan as jabatan')
             ->get()
             ->keyBy('karyawan_id');
-        
+
         $jabatanList = DB::table('jabatan')->get();
 
         $area = DB::table('karyawan')
@@ -87,7 +86,7 @@ class KaryawanController extends Controller
             ->select('karyawan.karyawan_id', 'area.area')
             ->get()
             ->keyBy('karyawan_id');
-        
+
         // $pakaian = Karyawan::with('pakaianTerakhir')->get();
         //  dd($pakaian[0]->pakaianTerakhir->nilai_jatah);
 
@@ -97,9 +96,9 @@ class KaryawanController extends Controller
             'paketList' => $paketList,
             'paketKaryawan' => $paketKaryawan,
             'harianShift' => $harianShift,
-            'jabatan'  => $jabatan,
+            'jabatan' => $jabatan,
             'jabatanList' => $jabatanList,
-            'area'        => $area,
+            'area' => $area,
             // 'pakaian'      => $pakaian
         ]);
     }
@@ -108,14 +107,14 @@ class KaryawanController extends Controller
     public function detail($id)
     {
         $dataM = DB::table('karyawan')
-            ->where('karyawan_id','=', $id)
+            ->where('karyawan_id', '=', $id)
             ->first();
         $dataP = DB::table('perusahaan')
             ->get();
         $dataU = Db::table('unit_kerja')
             ->get();
 
-        return view('detail-karyawan', ['dataM'=>$dataM, 'dataP' =>$dataP, 'dataU' => $dataU]);
+        return view('detail-karyawan', ['dataM' => $dataM, 'dataP' => $dataP, 'dataU' => $dataU]);
     }
 
     public function getTambah()
@@ -124,8 +123,8 @@ class KaryawanController extends Controller
             ->get();
         $dataU = Db::table('unit_kerja')
             ->get();
-        
-        return view('tambah-karyawan', ['dataP'=>$dataP, 'dataU' =>$dataU]);
+
+        return view('tambah-karyawan', ['dataP' => $dataP, 'dataU' => $dataU]);
     }
 
     public function setTambah(Request $request)
@@ -141,25 +140,25 @@ class KaryawanController extends Controller
             'status' => 'required',
             'alamat' => 'required',
             'asal' => 'nullable',
-        ]); 
-       $tanggal_lahir = Carbon::parse($request->tanggal_lahir);
-       $tanggal_umur56 = $tanggal_lahir->copy()->addYears(56);
-       $tanggal_pensiun = $tanggal_umur56->addMonth()->startOfMonth();
-       $tahun_pensiun = $tanggal_umur56->format('Y-m-d');
+        ]);
+        $tanggal_lahir = Carbon::parse($request->tanggal_lahir);
+        $tanggal_umur56 = $tanggal_lahir->copy()->addYears(56);
+        $tanggal_pensiun = $tanggal_umur56->addMonth()->startOfMonth();
+        $tahun_pensiun = $tanggal_umur56->format('Y-m-d');
 
         Karyawan::create([
             'osis_id' => $request->osis_id,
             'ktp' => $request->ktp,
             'nama_tk' => $request->nama,
-            'perusahaan_id' =>$request->perusahaan,
-            'tanggal_lahir' =>$request->tanggal_lahir,
-            'jenis_kelamin' =>$request->jenis_kelamin,
-            'agama' =>$request->agama,
-            'status' =>$request->status,
-            'alamat' =>$request->alamat,
-            'asal' =>$request->asal ?: null,
-            'tahun_pensiun' =>$tahun_pensiun,
-            'tanggal_pensiun' =>$tanggal_pensiun,
+            'perusahaan_id' => $request->perusahaan,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'agama' => $request->agama,
+            'status' => $request->status,
+            'alamat' => $request->alamat,
+            'asal' => $request->asal ?: null,
+            'tahun_pensiun' => $tahun_pensiun,
+            'tanggal_pensiun' => $tanggal_pensiun,
         ]);
 
         return redirect('/karyawan')->with('success', 'Data Berhasil Tersimpan');
@@ -168,20 +167,20 @@ class KaryawanController extends Controller
     public function getUpdate($id)
     {
         $dataM = DB::table('karyawan')
-            ->where('karyawan_id','=', $id)
+            ->where('karyawan_id', '=', $id)
             ->first();
         $dataP = DB::table('perusahaan')
             ->get();
         $dataU = Db::table('unit_kerja')
             ->get();
 
-        return view('update-karyawan', ['dataM'=>$dataM, 'dataP' =>$dataP, 'dataU' => $dataU]);
+        return view('update-karyawan', ['dataM' => $dataM, 'dataP' => $dataP, 'dataU' => $dataU]);
     }
 
     public function setUpdate(Request $request, $id)
     {
         $request->validate([
-            'osis_id' =>'required',
+            'osis_id' => 'required',
             'ktp' => 'required',
             'nama' => 'required',
             'perusahaan' => 'required',
@@ -189,23 +188,23 @@ class KaryawanController extends Controller
             'alamat' => 'required',
             'jenis_kelamin' => 'required',
             'agama' => 'required',
-        ]); 
+        ]);
 
         // dd($request);
-        
+
         Karyawan::where('karyawan_id', $id)
-        ->update([
-            'osis_id' => $request->osis_id,
-            'ktp' => $request->ktp,
-            'nama_tk' => $request->nama,
-            'perusahaan_id' =>$request->perusahaan,
-            'tanggal_lahir' =>$request->tanggal_lahir,
-            'alamat' =>$request->alamat,
-            'jenis_kelamin' =>$request->jenis_kelamin,
-            'agama' =>$request->agama,
-            'status' => $request->status,
-            'asal' =>$request->asal
-        ]);
+            ->update([
+                'osis_id' => $request->osis_id,
+                'ktp' => $request->ktp,
+                'nama_tk' => $request->nama,
+                'perusahaan_id' => $request->perusahaan,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'alamat' => $request->alamat,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'agama' => $request->agama,
+                'status' => $request->status,
+                'asal' => $request->asal
+            ]);
 
         return redirect('/karyawan')->with('success', 'Data Berhasil Tersimpan');
     }
@@ -244,7 +243,7 @@ class KaryawanController extends Controller
             'kode_harianshift' => 'required',
             'beg_date' => 'required',
         ]);
-       
+
 
         // Simpan mutasi dengan tanggal sekarang
         DB::table('riwayat_shift')->insert([
@@ -282,16 +281,16 @@ class KaryawanController extends Controller
             'karyawan_id' => 'required',
             'area_id' => 'required',
         ]);
-       
+
 
         Karyawan::where('karyawan_id', $request->karyawan_id)
-        ->update([
-            'area_id' => $request->area_id,
-        ]);
+            ->update([
+                'area_id' => $request->area_id,
+            ]);
 
         return redirect()->back()->with('success', 'Pergantian Area berhasil disimpan.');
     }
-    
+
     public function simpanPakaian(Request $request)
     {
         // Validasi input
@@ -301,7 +300,7 @@ class KaryawanController extends Controller
             'ukuran_celana' => 'required',
             'beg_date' => 'required',
         ]);
-       
+
 
         DB::table('pakaian')->insert([
             'karyawan_id' => $request->karyawan_id,

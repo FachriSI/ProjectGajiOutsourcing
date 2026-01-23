@@ -184,4 +184,10 @@ Route::get('/delete-ump/{id}', [UmpController::class, 'destroy']);
 
 
 
+
 Route::get('/kota/{provinsi_id}', [WilayahController::class, 'getKota']);
+
+// Routes untuk Tagihan
+Route::get('/paket/{id}/tagihan', [PaketController::class, 'lihatTagihan'])->name('paket.tagihan');
+Route::get('/paket/{id}/pdf', [PaketController::class, 'generatePDF'])->name('paket.pdf.download');
+Route::get('/verify-tagihan/{token}', [PaketController::class, 'verifyTagihan'])->name('tagihan.verify');
