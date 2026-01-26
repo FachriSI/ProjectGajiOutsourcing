@@ -8,42 +8,81 @@
   <div class="d-flex align-items-center mb-3 gap-2">
     <a href="/gettambah-karyawan" class="btn btn-primary">Tambah Data</a>
 
-    <!-- Tombol Ikon Excel -->
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importMutasiModal"
-      title="Upload Mutasi Promosi Kolektif">
-      <i class="fas fa-file-excel fa-lg"></i>
+    <!-- Button Template & Import -->
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#templateModal" title="Template & Import Data">
+        <i class="fas fa-file-excel fa-lg"></i>
     </button>
-
-    <!-- Tombol Download Template -->
-    <a href="{{ asset('templates/templateMutasiPromosi_import.xlsx') }}" class="btn btn-outline-success" download>
-      <i class="fas fa-download"></i> Template
-    </a>
   </div>
 
-  <!-- Modal Import Excel -->
-  <div class="modal fade" id="importMutasiModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+  <!-- Modal Template & Import -->
+  <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
         <div class="modal-header bg-success text-white">
-          <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Import Mutasi Karyawan</h5>
+          <h5 class="modal-title" id="templateModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import Data</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="{{ url('/import-mutasi') }}" method="POST" enctype="multipart/form-data">
-          @csrf
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="file" class="form-label">Pilih File Excel</label>
-              <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv" required>
-              <div class="form-text">Format yang didukung: .xlsx, .xls, .csv</div>
+        <div class="modal-body">
+            <ul class="nav nav-tabs" id="importTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="mutasi-tab" data-bs-toggle="tab" data-bs-target="#mutasi" type="button" role="tab" aria-controls="mutasi" aria-selected="true">Mutasi & Promosi</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pakaian-tab" data-bs-toggle="tab" data-bs-target="#pakaian" type="button" role="tab" aria-controls="pakaian" aria-selected="false">Update Pakaian</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0 rounded-bottom" id="importTabsContent">
+                <!-- Tab Mutasi -->
+                <div class="tab-pane fade show active" id="mutasi" role="tabpanel" aria-labelledby="mutasi-tab">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk melakukan mutasi atau promosi karyawan secara massal.
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>1. Download Template Mutasi:</span>
+                        <a href="{{ asset('templates/templateMutasiPromosi_import.xlsx') }}" class="btn btn-outline-success btn-sm" download>
+                            <i class="fas fa-download"></i> Download Template
+                        </a>
+                    </div>
+                    <hr>
+                    <form action="{{ url('/import-mutasi') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="fileMutasi" class="form-label">2. Upload File Mutasi (Excel):</label>
+                            <input type="file" name="file" id="fileMutasi" class="form-control" accept=".xlsx, .xls, .csv" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import Mutasi</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tab Pakaian -->
+                <div class="tab-pane fade" id="pakaian" role="tabpanel" aria-labelledby="pakaian-tab">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk mengupdate ukuran pakaian karyawan secara massal.
+                        <br><strong>Note:</strong> Pastikan ukuran baju sesuai dengan Master Data (S, M, L, XL, etc.)
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>1. Download Template Pakaian:</span>
+                        <!-- Anda perlu menyediakan file template ini -->
+                        <a href="{{ asset('templates/templatePakaian_import.xlsx') }}" class="btn btn-outline-success btn-sm" download>
+                            <i class="fas fa-download"></i> Download Template
+                        </a>
+                    </div>
+                    <hr>
+                    <form action="{{ url('/import-pakaian') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="filePakaian" class="form-label">2. Upload File Pakaian (Excel):</label>
+                            <input type="file" name="file" id="filePakaian" class="form-control" accept=".xlsx, .xls, .csv" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import Pakaian</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success">
-              <i class="fas fa-upload"></i> Import
-            </button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>
@@ -272,11 +311,9 @@
               <label class="form-label">Ukuran Baju:</label>
               <select name="ukuran_baju" class="form-select" required>
                 <option value="">-- Pilih --</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-                <option value="XXL">XXL</option>
+                @foreach ($masterUkuran as $ukuran)
+                    <option value="{{ $ukuran->nama_ukuran }}">{{ $ukuran->nama_ukuran }}</option>
+                @endforeach
               </select>
             </div>
             <div class="mb-3">

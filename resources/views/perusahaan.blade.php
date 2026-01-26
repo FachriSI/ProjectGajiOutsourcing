@@ -8,16 +8,10 @@
     <div class="d-flex align-items-center mb-3 gap-2">
         <a href="/gettambah-perusahaan " class="btn btn-primary">Tambah Data</a>
 
-        <!-- Tombol Import Template Baru -->
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importTemplateBaruModal"
-            title="Import Excel">
+        <!-- Button Template & Import -->
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importTemplateBaruModal" title="Template & Import Data">
             <i class="fas fa-file-excel fa-lg"></i>
         </button>
-
-        <!-- Tombol Download Template -->
-        <a href="{{ asset('templates/templatePerusahaan_import.xlsx') }}" class="btn btn-outline-success" download>
-            <i class="fas fa-download"></i> Template
-        </a>
     </div>
 
     <!-- Modal Import Excel Template Baru -->
@@ -34,12 +28,20 @@
                 <form action="{{ url('/import-template-baru') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk mengimport data perusahaan baru.
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span>1. Download Template Perusahaan:</span>
+                            <a href="{{ asset('templates/templatePerusahaan_import.xlsx') }}" class="btn btn-outline-success btn-sm" download>
+                                <i class="fas fa-download"></i> Download Template
+                            </a>
+                        </div>
+                        <hr>
                         <div class="mb-3">
-                            <label for="file" class="form-label">Pilih File Excel</label>
-                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv"
-                                required>
-                            <div class="form-text">Pastikan format kolom: No, Nama, Alamat, CP, CPJAB, CPTelp, CPEmail,
-                                idMesin, Deleted, TKP, NPP</div>
+                            <label for="file" class="form-label">2. Upload File Excel:</label>
+                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv" required>
+                            <div class="form-text">Pastikan format kolom: No, Nama, Alamat, CP, CPJAB, CPTelp, CPEmail, idMesin, Deleted, TKP, NPP</div>
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -135,7 +135,7 @@
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
             <div class="card bg-primary text-white mb-2">
                 <div class="card-body">Total Jml Fix Cost/Bln</div>
-                <div class="card-footer">
+                <div class="card-footer" id="sum-fix-cost">
                     Rp{{ number_format($total_jml_fix_cost, 0, ',', '.') }}
                 </div>
             </div>
@@ -143,7 +143,7 @@
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
             <div class="card bg-primary text-white mb-2">
                 <div class="card-body">Total Variabel Cost/Bln</div>
-                <div class="card-footer">
+                <div class="card-footer" id="sum-variabel">
                     Rp{{ number_format($total_seluruh_variabel, 0, ',', '.') }}
                 </div>
             </div>
@@ -151,7 +151,7 @@
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
             <div class="card bg-primary text-white mb-2">
                 <div class="card-body">Total Kontrak/Bln</div>
-                <div class="card-footer">
+                <div class="card-footer" id="sum-kontrak-bln">
                     Rp{{ number_format($total_kontrak_all, 0, ',', '.') }}
                 </div>
             </div>
@@ -159,7 +159,7 @@
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
             <div class="card bg-primary text-white mb-2">
                 <div class="card-body">Total Kontrak/Thn</div>
-                <div class="card-footer">
+                <div class="card-footer" id="sum-kontrak-thn">
                     Rp{{ number_format($total_kontrak_tahunan_all, 0, ',', '.') }}
                 </div>
             </div>
@@ -167,7 +167,7 @@
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
             <div class="card bg-primary text-white mb-2">
                 <div class="card-body">Total THR/Bln</div>
-                <div class="card-footer">
+                <div class="card-footer" id="sum-thr-bln">
                     Rp{{ number_format($total_thr_bln, 0, ',', '.') }}
                 </div>
             </div>
@@ -176,7 +176,7 @@
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
             <div class="card bg-primary text-white mb-2">
                 <div class="card-body">Total THR/Thn</div>
-                <div class="card-footer">
+                <div class="card-footer" id="sum-thr-thn">
                     Rp{{ number_format($total_thr_thn, 0, ',', '.') }}
                 </div>
             </div>
@@ -184,7 +184,7 @@
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
             <div class="card bg-primary text-white mb-2">
                 <div class="card-body">Total Pakaian/Thn</div>
-                <div class="card-footer">
+                <div class="card-footer" id="sum-pakaian">
                     Rp{{ number_format($total_pakaian_all, 0, ',', '.') }}
                 </div>
             </div>
@@ -436,6 +436,67 @@ $(document).ready(function () {
                 }
             }
         });
+
+        // Helper function for currency parsing
+        function parseCurrency(val) {
+            if (!val) return 0;
+            // Remove everything except digits and minus sign
+            var num = parseFloat(val.toString().replace(/[^\d-]/g, ''));
+            return isNaN(num) ? 0 : num;
+        }
+
+        // Function to calculate summaries based on filtered data
+        function calculateSummaries() {
+            // Get data from the table for the current search context
+            var data = table.rows({ filter: 'applied' }).data();
+            
+            var totalFixCost = 0;
+            var totalVariabel = 0;
+            var totalKontrakBln = 0;
+            var totalKontrakThn = 0;
+            var totalThrBln = 0;
+            var totalThrThn = 0;
+            var totalPakaian = 0;
+
+            // Iterate through data rows
+            // Indices based on table header:
+            // 23: Jumlah Fix Cost
+            // 28: Total Variabel
+            // 29: Total Kontrak/Bln
+            // 30: Total Kontrak/Thn
+            // 33: THR/Bln
+            // 34: THR/Thn
+            // 35: Total Pakaian
+            
+            data.each(function(value, index) {
+                totalFixCost += parseCurrency(value[23]);
+                totalVariabel += parseCurrency(value[28]);
+                totalKontrakBln += parseCurrency(value[29]);
+                totalKontrakThn += parseCurrency(value[30]);
+                totalThrBln += parseCurrency(value[33]);
+                totalThrThn += parseCurrency(value[34]);
+                totalPakaian += parseCurrency(value[35]);
+            });
+
+            // Format numbers to Indonesian Locale
+            var formatter = new Intl.NumberFormat('id-ID');
+
+            $('#sum-fix-cost').text('Rp' + formatter.format(totalFixCost));
+            $('#sum-variabel').text('Rp' + formatter.format(totalVariabel));
+            $('#sum-kontrak-bln').text('Rp' + formatter.format(totalKontrakBln));
+            $('#sum-kontrak-thn').text('Rp' + formatter.format(totalKontrakThn));
+            $('#sum-thr-bln').text('Rp' + formatter.format(totalThrBln));
+            $('#sum-thr-thn').text('Rp' + formatter.format(totalThrThn));
+            $('#sum-pakaian').text('Rp' + formatter.format(totalPakaian));
+        }
+
+        // Trigger calculation on draw (includes filter, sort, page change)
+        table.on('draw', function() {
+            calculateSummaries();
+        });
+
+        // Initial calculation
+        calculateSummaries();
 
         $('#filterPaket').on('change', function () {
             var val = this.value;

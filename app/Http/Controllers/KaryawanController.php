@@ -9,6 +9,7 @@ use App\Models\Riwayat_shift;
 use Carbon\Carbon;
 use App\Models\Perusahaan;
 use App\Models\UnitKerja;
+use App\Models\MasterUkuran;
 
 
 class KaryawanController extends Controller
@@ -87,6 +88,8 @@ class KaryawanController extends Controller
             ->get()
             ->keyBy('karyawan_id');
 
+        $masterUkuran = MasterUkuran::all();
+
         // $pakaian = Karyawan::with('pakaianTerakhir')->get();
         //  dd($pakaian[0]->pakaianTerakhir->nilai_jatah);
 
@@ -98,7 +101,9 @@ class KaryawanController extends Controller
             'harianShift' => $harianShift,
             'jabatan' => $jabatan,
             'jabatanList' => $jabatanList,
+            'jabatanList' => $jabatanList,
             'area' => $area,
+            'masterUkuran' => $masterUkuran,
             // 'pakaian'      => $pakaian
         ]);
     }

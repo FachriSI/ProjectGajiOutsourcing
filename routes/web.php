@@ -168,6 +168,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/import-karyawan', [ImportController::class, 'import']);
     Route::post('/import-mutasi', [ImportController::class, 'importMutasi']);
+    Route::post('/import-pakaian', [ImportController::class, 'importPakaian']);
     Route::post('/import-template-baru', [ImportController::class, 'importTemplateBaru']);
 
     Route::get('/paket', [PaketController::class, 'index']);
