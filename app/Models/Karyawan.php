@@ -139,7 +139,7 @@ class Karyawan extends Model
     public function pakaianTerakhir()
     {
         return $this->hasOne(Pakaian::class, 'karyawan_id', 'karyawan_id')
-                    ->latestOfMany('beg_date');
+            ->latestOfMany('beg_date');
     }
 
 

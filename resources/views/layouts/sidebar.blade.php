@@ -5,7 +5,7 @@
 
                 <!-- Dashboard (Standalone) -->
                 <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <i class="fas fa-tachometer-alt"></i> Beranda
                 </a>
 
                 <!-- SDM & Vendor (Dropdown) -->
@@ -69,7 +69,7 @@
                         </a>
                         <a class="nav-link {{ request()->is('jabatan*') ? 'active' : '' }}"
                             href="{{ url('/jabatan') }}">
-                            <i class="fas fa-id-badge"></i> Jabatan
+                            <i class="fas fa-id-badge"></i> Tunjangan Jabatan
                         </a>
                         <a class="nav-link {{ request()->is('unit-kerja*') ? 'active' : '' }}"
                             href="{{ url('/unit-kerja') }}">
@@ -91,7 +91,7 @@
                             <i class="fas fa-map-pin"></i> Lokasi
                         </a>
                         <a class="nav-link {{ request()->is('resiko*') ? 'active' : '' }}" href="{{ url('/resiko') }}">
-                            <i class="fas fa-exclamation-triangle"></i> Resiko
+                            <i class="fas fa-exclamation-triangle"></i> Tunjangan Risiko
                         </a>
                     </nav>
                 </div>
@@ -134,7 +134,8 @@
                 </a>
 
                 <!-- Kontrak (Standalone) -->
-                <a class="nav-link {{ request()->is('kalkulator-kontrak*') ? 'active' : '' }}" href="{{ url('/kalkulator-kontrak') }}">
+                <a class="nav-link {{ request()->is('kalkulator-kontrak*') ? 'active' : '' }}"
+                    href="{{ url('/kalkulator-kontrak') }}">
                     <i class="fas fa-file-contract"></i> Kontrak
                 </a>
 

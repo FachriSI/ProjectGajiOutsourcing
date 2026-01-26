@@ -16,7 +16,7 @@
                 <th>Lokasi</th>
                 <th>UMP</th>
                 <th>Tahun</th>
-                <th>Action</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -41,17 +41,5 @@
             @endforeach
         </tbody>
     </table>
-    <script>
-        $(document).ready(function () {
-            $('.datatable').each(function () {
-                if (!$.fn.DataTable.isDataTable(this)) {
-                    $(this).DataTable({
-                        // Semua fitur default: search, sort, paging aktif
-                        processing: true,
-                        serverSide: false
-                    });
-                }
-            });
-        });
-    </script>
+
 @endsection

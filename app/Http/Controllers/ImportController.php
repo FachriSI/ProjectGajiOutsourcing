@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Imports\KaryawanImport;
 use App\Imports\MutasiImport;
+// use App\Imports\KaryawanBaruImport; // Not used anymore
+use App\Imports\PerusahaanImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
@@ -91,6 +93,39 @@ class ImportController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
         }
+
     }
+
+    public function importTemplateBaru(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        $import = new PerusahaanImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            $total = $import->getTotal();
+            $gagal = $import->getGagal();
+            $berhasil = $total - $gagal;
+            $logs = $import->getLog();
+
+            if ($berhasil > 0) {
+                // Format log message simple for now
+                $msg = "$berhasil data berhasil diupdate/import.";
+                if ($gagal > 0)
+                    $msg .= " $gagal gagal.";
+                return redirect()->back()->with('success', $msg);
+            } else {
+                return redirect()->back()->with('error', "Gagal memproses file. " . implode(', ', $logs));
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
 
 }

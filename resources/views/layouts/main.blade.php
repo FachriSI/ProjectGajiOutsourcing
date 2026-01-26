@@ -32,6 +32,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Chart JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
 </head>
 
@@ -83,7 +84,36 @@
                 width: '100%'
             });
 
-            $('.datatable').DataTable();
+            $('.datatable').each(function() {
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable({
+                        language: {
+                            "decimal":        "",
+                            "emptyTable":     "Tidak ada data yang tersedia pada tabel ini",
+                            "info":           "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                            "infoEmpty":      "Menampilkan 0 sampai 0 dari 0 entri",
+                            "infoFiltered":   "(disaring dari _MAX_ entri keseluruhan)",
+                            "infoPostFix":    "",
+                            "thousands":      ",",
+                            "lengthMenu":     "Tampilkan _MENU_ entri",
+                            "loadingRecords": "Sedang memuat...",
+                            "processing":     "Sedang memproses...",
+                            "search":         "Cari:",
+                            "zeroRecords":    "Tidak ditemukan data yang sesuai",
+                            "paginate": {
+                                "first":      "Pertama",
+                                "last":       "Terakhir",
+                                "next":       "Selanjutnya",
+                                "previous":   "Sebelumnya"
+                            },
+                            "aria": {
+                                "sortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                                "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                            }
+                        }
+                    });
+                }
+            });
         });
     </script>
 

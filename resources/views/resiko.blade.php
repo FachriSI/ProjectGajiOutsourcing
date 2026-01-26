@@ -1,7 +1,7 @@
 @extends('layouts.main')
-@section('title', 'Resiko')
+@section('title', 'Tunjangan Risiko')
 @section('content')
-    <h3 class="mt-4">Resiko</h3>
+    <h3 class="mt-4">Tunjangan Risiko</h3>
     <a href="/gettambah-resiko" class="btn btn-primary mb-3">Tambah Data</a>
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -15,7 +15,7 @@
                 <th>No.</th>
                 <th>Resiko</th>
                 <th>Tunjangan Resiko</th>
-                <th>Action</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -34,11 +34,5 @@
             @endforeach
         </tbody>
     </table>
-    <script>
-        $(document).ready(function () {
-            $('.datatable').each(function () {
-                if (!$.fn.DataTable.isDataTable(this)) { $(this).DataTable({ processing: true, serverSide: false }); }
-            });
-        });
-    </script>
+
 @endsection

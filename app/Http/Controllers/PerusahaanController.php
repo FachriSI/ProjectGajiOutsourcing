@@ -13,13 +13,13 @@ class PerusahaanController extends Controller
     {
         $data = DB::table('perusahaan')
             ->get();
-            // dd($data);
+        // dd($data);
         return view('perusahaan', ['data' => $data]);
 
     }
 
     public function getTambah()
-    {        
+    {
         return view('tambah-perusahaan');
     }
 
@@ -27,15 +27,24 @@ class PerusahaanController extends Controller
     {
         $request->validate([
             'nama' => 'required',
-        ]); 
+        ]);
 
-        // dd($request);
-        $lastPerusahaan = Perusahaan::latest('id')->first();
-        $newId = $lastPerusahaan ? $lastPerusahaan->id + 1 : 1;
+        // Fix: Use correct primary key for latest
+        $lastPerusahaan = Perusahaan::latest('perusahaan_id')->first();
+        $newId = $lastPerusahaan ? $lastPerusahaan->perusahaan_id + 1 : 1;
 
         Perusahaan::create([
-            'perusahaan_id' =>$newId,
+            'perusahaan_id' => $newId,
             'perusahaan' => $request->nama,
+            'alamat' => $request->alamat,
+            'cp' => $request->cp,
+            'cp_jab' => $request->cp_jab,
+            'cp_telp' => $request->cp_telp,
+            'cp_email' => $request->cp_email,
+            'id_mesin' => $request->id_mesin,
+            'tkp' => $request->tkp,
+            'npp' => $request->npp,
+            // 'deleted_data' default null or handled elsewhere
         ]);
 
         return redirect('/perusahaan')->with('success', 'Data Berhasil Tersimpan');
@@ -44,23 +53,32 @@ class PerusahaanController extends Controller
     public function getUpdate($id)
     {
         $dataP = DB::table('perusahaan')
-            ->where('perusahaan_id','=', $id)
+            ->where('perusahaan_id', '=', $id)
             ->first();
 
-        return view('update-perusahaan',['dataP' => $dataP]);
+        return view('update-perusahaan', ['dataP' => $dataP]);
     }
 
     public function setUpdate(Request $request, $id)
     {
         $request->validate([
             'nama' => 'required',
-        ]); 
-
-        
-        Perusahaan::where('perusahaan_id', $id)
-        ->update([
-            'perusahaan' => $request->nama,
         ]);
+
+
+        Perusahaan::where('perusahaan_id', $id)
+            ->update([
+                'perusahaan' => $request->nama,
+                'alamat' => $request->alamat,
+                'cp' => $request->cp,
+                'cp_jab' => $request->cp_jab,
+                'cp_telp' => $request->cp_telp,
+                'cp_email' => $request->cp_email,
+                'id_mesin' => $request->id_mesin,
+                'tkp' => $request->tkp,
+                'npp' => $request->npp,
+                'deleted_data' => $request->deleted_data,
+            ]);
 
         return redirect('/perusahaan')->with('success', 'Data Berhasil Tersimpan');
     }

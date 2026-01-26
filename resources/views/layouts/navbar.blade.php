@@ -17,7 +17,30 @@
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="#">Logout</a></li>
+                <li>
+                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); confirmLogout();">Logout</a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
+                    <script>
+                        function confirmLogout() {
+                            Swal.fire({
+                                title: 'Konfirmasi Logout',
+                                text: "Apakah Anda yakin ingin keluar?",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: 'rgba(11, 203, 50, 1)',
+                                confirmButtonText: 'Ya, Keluar',
+                                cancelButtonText: 'Batal'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    document.getElementById('logout-form').submit();
+                                }
+                            })
+                        }
+                    </script>
+                </li>
             </ul>
         </li>
     </ul>

@@ -58,7 +58,7 @@
         <th>KTP</th>
         <th>Nama</th>
         <th>Perusahaan</th>
-        <th>Action</th>
+        <th>Aksi</th>
       </tr>
     </thead>
     <tbody>
@@ -71,7 +71,7 @@
           <td>{{ $item->perusahaan->perusahaan }}</td>
           <td>
             <a href="/detail-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip"
-              data-bs-placement="top" title="Info">
+              data-bs-placement="top" title="Detail">
               <i class="fas fa-info-circle"></i>
             </a>
             <a href="/getupdate-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
@@ -79,13 +79,13 @@
               <i class="fas fa-edit"></i>
             </a>
             <a href="{{ url('delete-karyawan', $item->karyawan_id) }}" class="btn btn-sm btn-danger btn-delete"
-              data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+              data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
               <i class="fas fa-trash"></i>
             </a>
             <button type="button" class="btn btn-sm btn-secondary btn-mutasi" data-bs-toggle="modal"
               data-bs-target="#mutasiModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
               data-paket="{{ $paketKaryawan[$item->karyawan_id]->nama_paket ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Mutasi">
+              data-bs-placement="top" title="Paket Pekerjaan">
               <i class="fas fa-random"></i>
             </button>
             <button type="button" class="btn btn-sm btn-secondary btn-promosi" data-bs-toggle="modal"
@@ -97,13 +97,13 @@
             <button type="button" class="btn btn-sm btn-warning btn-edit-shift" data-bs-toggle="modal"
               data-bs-target="#editShiftModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
               data-shift="{{ $harianShift[$item->karyawan_id]->harianshift ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Edit Harian">
+              data-bs-placement="top" title="Jadwal Kerja">
               <i class="fas fa-clock"></i>
             </button>
             <button type="button" class="btn btn-sm btn-success btn-edit-area" data-bs-toggle="modal"
               data-bs-target="#editAreaModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
               data-area="{{ $area[$item->karyawan_id]->area ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Edit Area">
+              data-bs-placement="top" title="Penempatan">
               <i class="fas fa-map-marker-alt"></i>
             </button>
             <button type="button" class="btn btn-sm btn-primary btn-edit-pakaian" data-bs-toggle="modal"
@@ -111,7 +111,7 @@
               data-nilai="{{ $item->pakaianTerakhir->nilai_jatah ?? 'Belum ada' }}"
               data-baju="{{ $item->pakaianTerakhir->ukuran_baju ?? 'Belum ada' }}"
               data-celana="{{ $item->pakaianTerakhir->ukuran_celana ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Edit Pakaian">
+              data-bs-placement="top" title="Pakaian">
               <i class="fas fa-tshirt"></i>
             </button>
           </td>
@@ -304,26 +304,50 @@
           $(this).DataTable({
             // Semua fitur default: search, sort, paging aktif
             processing: true,
-            serverSide: false
+            serverSide: false,
+            language: {
+                "decimal":        "",
+                "emptyTable":     "Tidak ada data yang tersedia pada tabel ini",
+                "info":           "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                "infoEmpty":      "Menampilkan 0 sampai 0 dari 0 entri",
+                "infoFiltered":   "(disaring dari _MAX_ entri keseluruhan)",
+                "infoPostFix":    "",
+                "thousands":      ",",
+                "lengthMenu":     "Tampilkan _MENU_ entri",
+                "loadingRecords": "Sedang memuat...",
+                "processing":     "Sedang memproses...",
+                "search":         "Cari:",
+                "zeroRecords":    "Tidak ditemukan data yang sesuai",
+                "paginate": {
+                    "first":      "Pertama",
+                    "last":       "Terakhir",
+                    "next":       "Selanjutnya",
+                    "previous":   "Sebelumnya"
+                },
+                "aria": {
+                    "sortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                    "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                }
+            }
           });
-        }
-      });
-
-      // Initialize Bootstrap Tooltips for links
-      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-      });
-
-      // Initialize Bootstrap Tooltips for modal buttons (using title attribute)
-      var modalButtons = [].slice.call(document.querySelectorAll('.btn-mutasi, .btn-promosi, .btn-edit-shift, .btn-edit-area, .btn-edit-pakaian'));
-      modalButtons.forEach(function (btn) {
-        new bootstrap.Tooltip(btn, {
-          trigger: 'hover',
-          placement: 'top'
+    }
         });
+
+    // Initialize Bootstrap Tooltips for links
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Initialize Bootstrap Tooltips for modal buttons (using title attribute)
+    var modalButtons = [].slice.call(document.querySelectorAll('.btn-mutasi, .btn-promosi, .btn-edit-shift, .btn-edit-area, .btn-edit-pakaian'));
+    modalButtons.forEach(function (btn) {
+      new bootstrap.Tooltip(btn, {
+        trigger: 'hover',
+        placement: 'top'
       });
     });
+      });
 
     $(document).ready(function () {
       var table = $('#datatableSimple').DataTable();

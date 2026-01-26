@@ -8,7 +8,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">
                 <i class="fas fa-history me-2"></i>
-                History Perubahan Kontrak: {{ $paket->paket }}
+                Riwayat Perubahan Kontrak: {{ $paket->paket }}
             </h4>
             <div>
                 <a href="{{ route('kalkulator.index') }}" class="btn btn-secondary">
@@ -27,7 +27,7 @@
                     </div>
                     <div class="col-md-6">
                         <p class="mb-1"><strong>Kuota:</strong> {{ $paket->kuota_paket }} orang</p>
-                        <p class="mb-1"><strong>Total History:</strong> {{ $histories->total() }} perubahan</p>
+                        <p class="mb-1"><strong>Total Riwayat:</strong> {{ $histories->total() }} perubahan</p>
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                                         {{ 
                                             $history->change_type == 'ump_change' ? 'Perubahan UMP' : 
                                             ($history->change_type == 'kuota_change' ? 'Perubahan Kuota Paket' : 
-                                            ($history->change_type == 'employee_change' ? 'Perubahan Jumlah Karyawan' : 'Recalculation Manual'))
+                                            ($history->change_type == 'employee_change' ? 'Perubahan Jumlah Karyawan' : 'Hitung Ulang Manual'))
                                         }}
                                     </h6>
                                     <small>{{ $history->changed_at->format('d M Y H:i') }}</small>
@@ -148,8 +148,8 @@
                     <div class="card">
                         <div class="card-body text-center py-5">
                             <i class="fas fa-history fa-5x text-muted mb-3"></i>
-                            <h5 class="text-muted">Belum ada history perubahan</h5>
-                            <p class="text-muted">History akan muncul ketika ada perubahan UMP, kuota, atau jumlah karyawan</p>
+                            <h5 class="text-muted">Belum ada riwayat perubahan</h5>
+                            <p class="text-muted">Riwayat akan muncul ketika ada perubahan UMP, kuota, atau jumlah karyawan</p>
                         </div>
                     </div>
                 @endif

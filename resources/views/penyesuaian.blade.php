@@ -13,7 +13,7 @@
                 <th>No.</th>
                 <th>Keterangan</th>
                 <th>Tunjangan Penyesuaian</th>
-                <th>Action</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -32,5 +32,5 @@
             @endforeach
         </tbody>
     </table>
-    <script>$(document).ready(function () { $('.datatable').each(function () { if (!$.fn.DataTable.isDataTable(this)) { $(this).DataTable({ processing: true, serverSide: false }); } }); });</script>
+
 @endsection

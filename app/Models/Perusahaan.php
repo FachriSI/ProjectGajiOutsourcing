@@ -16,6 +16,15 @@ class Perusahaan extends Model
         'perusahaan_id',
         'id_pt',
         'perusahaan',
+        'cp',
+        'cp_jab',
+        'cp_telp',
+        'cp_email',
+        'id_mesin',
+        'deleted_data',
+        'tkp',
+        'npp',
+        'alamat'
     ];
 
 }

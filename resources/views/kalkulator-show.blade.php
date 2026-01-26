@@ -15,7 +15,7 @@
                     <i class="fas fa-arrow-left me-1"></i> Kembali
                 </a>
                 <a href="{{ route('paket.pdf.download', $nilaiKontrak->paket_id) }}" class="btn btn-success" target="_blank">
-                    <i class="fas fa-download me-1"></i> Download PDF
+                    <i class="fas fa-download me-1"></i> Unduh PDF
                 </a>
             </div>
         </div>
@@ -223,7 +223,7 @@
         <!-- Action Buttons -->
         <div class="mt-4 d-flex gap-2">
             <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-info">
-                <i class="fas fa-history"></i> Lihat History Perubahan
+                <i class="fas fa-history"></i> Lihat Riwayat Perubahan
             </a>
             <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-primary">
                 <i class="fas fa-file-invoice"></i> Lihat Tagihan Lengkap
@@ -231,13 +231,5 @@
         </div>
     </div>
 
-    <script>
-        $(document).ready(function () {
-            $('.datatable').DataTable({
-                processing: true,
-                serverSide: false,
-                pageLength: 25
-            });
-        });
-    </script>
+
 @endsection

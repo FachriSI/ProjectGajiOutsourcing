@@ -30,7 +30,7 @@
                 <div class="card-body">
                     <form action="{{ route('kalkulator.calculate') }}" method="POST" id="formKalkulator">
                         @csrf
-                        
+
                         <div class="mb-3">
                             <label for="paket_id" class="form-label">Pilih Paket <span class="text-danger">*</span></label>
                             <select name="paket_id" id="paket_id" class="form-select" required>
@@ -45,8 +45,8 @@
 
                         <div class="mb-3">
                             <label for="periode" class="form-label">Periode <span class="text-danger">*</span></label>
-                            <input type="month" name="periode" id="periode" class="form-control" 
-                                   value="{{ $currentPeriode }}" required>
+                            <input type="month" name="periode" id="periode" class="form-control"
+                                value="{{ $currentPeriode }}" required>
                             <small class="text-muted">Format: Bulan-Tahun</small>
                         </div>
 
@@ -62,13 +62,13 @@
 
                     <hr>
 
-                    <form action="{{ route('kalkulator.recalculate') }}" method="POST" 
-                          onsubmit="return confirm('Recalculate semua paket? Proses ini bisa memakan waktu.')">
+                    <form action="{{ route('kalkulator.recalculate') }}" method="POST"
+                        onsubmit="return confirm('Hitung ulang semua paket? Proses ini bisa memakan waktu.')">
                         @csrf
                         <input type="hidden" name="periode" value="{{ $currentPeriode }}">
                         <div class="d-grid">
                             <button type="submit" class="btn btn-warning">
-                                <i class="fas fa-sync"></i> Recalculate Semua Paket
+                                <i class="fas fa-sync"></i> Hitung Ulang Semua Paket
                             </button>
                         </div>
                     </form>
@@ -102,7 +102,7 @@
                 <div class="card-body">
                     <div id="loadingSpinner" class="text-center" style="display: none;">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Memuat...</span>
                         </div>
                         <p class="mt-2">Menghitung nilai kontrak...</p>
                     </div>
@@ -111,7 +111,7 @@
                         <!-- Total Nilai Kontrak -->
                         <div class="alert alert-success text-center">
                             <h2 class="mb-0">
-                                <i class="fas fa-money-bill-wave"></i> 
+                                <i class="fas fa-money-bill-wave"></i>
                                 Rp <span id="totalNilaiKontrak">0</span>
                             </h2>
                             <small>Total Nilai Kontrak per Bulan</small>
@@ -156,8 +156,10 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p class="mb-1"><strong>Karyawan Aktif:</strong> <span id="karyawanAktif">0</span></p>
-                                        <p class="mb-1"><strong>Total Karyawan:</strong> <span id="karyawanTotal">0</span></p>
+                                        <p class="mb-1"><strong>Karyawan Aktif:</strong> <span id="karyawanAktif">0</span>
+                                        </p>
+                                        <p class="mb-1"><strong>Total Karyawan:</strong> <span id="karyawanTotal">0</span>
+                                        </p>
                                     </div>
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Kuota Paket:</strong> <span id="kuotaPaket">0</span></p>
@@ -173,7 +175,7 @@
                                 <i class="fas fa-eye"></i> Lihat Detail
                             </a>
                             <a href="#" id="btnLihatHistory" class="btn btn-secondary">
-                                <i class="fas fa-history"></i> Lihat History
+                                <i class="fas fa-history"></i> Lihat Riwayat
                             </a>
                         </div>
                     </div>
@@ -209,7 +211,7 @@
                                     <th>Kuota</th>
                                     <th>Total Nilai Kontrak</th>
                                     <th>Periode</th>
-                                    <th>Action</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -240,29 +242,24 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="{{ route('kalkulator.show', ['paket_id' => $item->paket_id, 'periode' => $currentPeriode]) }}" 
-                                                   class="btn btn-sm btn-primary" 
-                                                   data-bs-toggle="tooltip" 
-                                                   title="Hitung & Lihat Detail">
+                                                <a href="{{ route('kalkulator.show', ['paket_id' => $item->paket_id, 'periode' => $currentPeriode]) }}"
+                                                    class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                                                    title="Hitung & Lihat Detail">
                                                     <i class="fas fa-calculator"></i>
                                                 </a>
-                                                <a href="{{ route('paket.tagihan', $item->paket_id) }}" 
-                                                   class="btn btn-sm btn-info" 
-                                                   data-bs-toggle="tooltip" 
-                                                   title="Lihat Tagihan BOQ">
+                                                <a href="{{ route('paket.tagihan', $item->paket_id) }}"
+                                                    class="btn btn-sm btn-info" data-bs-toggle="tooltip"
+                                                    title="Lihat Tagihan BOQ">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="{{ route('paket.pdf.download', $item->paket_id) }}" 
-                                                   class="btn btn-sm btn-success" 
-                                                   data-bs-toggle="tooltip" 
-                                                   title="Download PDF"
-                                                   target="_blank">
+                                                <a href="{{ route('paket.pdf.download', $item->paket_id) }}"
+                                                    class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Unduh PDF"
+                                                    target="_blank">
                                                     <i class="fas fa-download"></i>
                                                 </a>
-                                                <a href="{{ route('kalkulator.history', $item->paket_id) }}" 
-                                                   class="btn btn-sm btn-secondary" 
-                                                   data-bs-toggle="tooltip" 
-                                                   title="Lihat History">
+                                                <a href="{{ route('kalkulator.history', $item->paket_id) }}"
+                                                    class="btn btn-sm btn-secondary" data-bs-toggle="tooltip"
+                                                    title="Lihat Riwayat">
                                                     <i class="fas fa-history"></i>
                                                 </a>
                                             </div>
@@ -298,20 +295,44 @@
 
     <!-- JavaScript untuk AJAX -->
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Initialize DataTable for paket list
             $('.datatable-paket').DataTable({
                 processing: true,
                 serverSide: false,
                 pageLength: 10,
-                order: [[1, 'asc']] // Sort by paket name
+                order: [[1, 'asc']], // Sort by paket name
+                language: {
+                    "decimal": "",
+                    "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
+                    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    "infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+                    "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Tampilkan _MENU_ entri",
+                    "loadingRecords": "Sedang memuat...",
+                    "processing": "Sedang memproses...",
+                    "search": "Cari:",
+                    "zeroRecords": "Tidak ditemukan data yang sesuai",
+                    "paginate": {
+                        "first": "Pertama",
+                        "last": "Terakhir",
+                        "next": "Selanjutnya",
+                        "previous": "Sebelumnya"
+                    },
+                    "aria": {
+                        "sortAscending": ": aktifkan untuk mengurutkan kolom ke atas",
+                        "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                    }
+                }
             });
 
             // Initialize tooltips
             $('[data-bs-toggle="tooltip"]').tooltip();
 
             // AJAX Calculate
-            $('#btnCalculateAjax').click(function() {
+            $('#btnCalculateAjax').click(function () {
                 var paketId = $('#paket_id').val();
                 var periode = $('#periode').val();
 
@@ -336,7 +357,7 @@
                     url: '/api/nilai-kontrak/calculate/' + paketId,
                     method: 'GET',
                     data: { periode: periode },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             // Update UI dengan data
                             $('#totalNilaiKontrak').text(response.data.total_nilai_kontrak);
@@ -362,7 +383,7 @@
                             $('#placeholderCard').show();
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         var errorMsg = 'Terjadi kesalahan saat menghitung';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMsg = xhr.responseJSON.message;
