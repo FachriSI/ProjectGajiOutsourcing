@@ -188,33 +188,7 @@
         }
 
         // === Chart Departemen (Horizontal Bar) ===
-        makeBarChart(
-            'departemenChart',
-            {!! json_encode(array_keys($departemenCount)) !!},
-            {!! json_encode(array_map(fn($d) => (int) $d['jumlah'], $departemenCount)) !!},
-            'Jumlah',
-            {
-                indexAxis: 'y',
-                plugins: {
-                    legend: { position: 'top' },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'end',
-                        font: { size: 10 }
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1, font: { size: 10 }, precision: 0 }
-                    },
-                    y: {
-                        ticks: { font: { size: 10 } }
-                    }
-                }
-            }
-        );
-
+       umo
         // Aktif (tambahan dataset ke chart departemen)
         const departemenCanvas = document.getElementById('departemenChart');
         if (departemenCanvas && chartInstances['departemenChart']) {

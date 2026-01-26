@@ -191,3 +191,13 @@ Route::get('/kota/{provinsi_id}', [WilayahController::class, 'getKota']);
 Route::get('/paket/{id}/tagihan', [PaketController::class, 'lihatTagihan'])->name('paket.tagihan');
 Route::get('/paket/{id}/pdf', [PaketController::class, 'generatePDF'])->name('paket.pdf.download');
 Route::get('/verify-tagihan/{token}', [PaketController::class, 'verifyTagihan'])->name('tagihan.verify');
+
+// Routes untuk Kalkulator Kontrak
+Route::get('/kalkulator-kontrak', [App\Http\Controllers\NilaiKontrakController::class, 'index'])->name('kalkulator.index');
+Route::post('/kalkulator-kontrak/calculate', [App\Http\Controllers\NilaiKontrakController::class, 'calculate'])->name('kalkulator.calculate');
+Route::get('/kalkulator-kontrak/show', [App\Http\Controllers\NilaiKontrakController::class, 'show'])->name('kalkulator.show');
+Route::post('/kalkulator-kontrak/recalculate-all', [App\Http\Controllers\NilaiKontrakController::class, 'recalculateAll'])->name('kalkulator.recalculate');
+Route::get('/kalkulator-kontrak/history/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'history'])->name('kalkulator.history');
+
+// API untuk AJAX
+Route::get('/api/nilai-kontrak/calculate/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'apiCalculate'])->name('api.kalkulator.calculate');

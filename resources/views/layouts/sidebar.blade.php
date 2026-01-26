@@ -133,6 +133,11 @@
                     <i class="fas fa-coins"></i> UMP
                 </a>
 
+                <!-- Kontrak (Standalone) -->
+                <a class="nav-link {{ request()->is('kalkulator-kontrak*') ? 'active' : '' }}" href="{{ url('/kalkulator-kontrak') }}">
+                    <i class="fas fa-file-contract"></i> Kontrak
+                </a>
+
             </div>
         </div>
     </nav>

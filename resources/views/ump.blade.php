@@ -6,7 +6,7 @@
     <h3 class="mt-4">UMP</h3>
     <div class="mb-3">
         <a href="/gettambah-ump-tahunan" class="btn btn-primary">Tambah UMP tahunan</a>
-        <!-- <a href="/gettambah-ump" class="btn btn-primary">Tambah UMP </a> -->
+        <a href="/gettambah-ump" class="btn btn-primary">Tambah UMP </a>
 
     </div>
     <table class="table datatable">

@@ -908,10 +908,22 @@ class PaketController extends Controller
 
     /**
      * Lihat Tagihan - Preview BOQ sebelum download PDF
+     * UPDATED: Menyimpan data ke nilai_kontrak untuk tracking
      */
     public function lihatTagihan($id)
     {
+        // Calculate BOQ dan simpan ke nilai_kontrak
+        $calculatorService = app(\App\Services\ContractCalculatorService::class);
+        $periode = \Carbon\Carbon::now()->format('Y-m');
+        
+        // Calculate dan simpan
+        $nilaiKontrak = $calculatorService->calculateForPaket($id, $periode);
+        
+        // Tetap gunakan calculateBOQ untuk compatibility dengan view yang ada
         $boqData = $this->calculateBOQ($id);
+        
+        // Tambahkan data nilai_kontrak ke boqData
+        $boqData['nilai_kontrak'] = $nilaiKontrak;
 
         return view('lihat-tagihan', [
             'boq' => $boqData
@@ -921,6 +933,7 @@ class PaketController extends Controller
     /**
      * Generate PDF Tagihan untuk paket tertentu
      * Sesuai dengan Activity Diagram dan Sequence Diagram
+     * UPDATED: Menggunakan NilaiKontrak untuk menyimpan data perhitungan
      */
     public function generatePDF($id)
     {
@@ -930,25 +943,33 @@ class PaketController extends Controller
                 ob_end_clean();
             }
 
-            // 1. Ambil data paket dari database
-            $boqData = $this->calculateBOQ($id);
+            // 1. Calculate dan simpan ke nilai_kontrak
+            $calculatorService = app(\App\Services\ContractCalculatorService::class);
+            $periode = \Carbon\Carbon::now()->format('Y-m');
+            $nilaiKontrak = $calculatorService->calculateForPaket($id, $periode);
 
-            // 2. Generate unique token
+            // 2. Ambil data paket dari database (untuk compatibility)
+            $boqData = $this->calculateBOQ($id);
+            
+            // Tambahkan data nilai_kontrak ke boqData
+            $boqData['nilai_kontrak'] = $nilaiKontrak;
+
+            // 3. Generate unique token
             $token = TagihanCetak::generateToken();
 
-            // 3. Generate QR Code URL
+            // 4. Generate QR Code URL
             $verifyUrl = url('/verify-tagihan/' . $token);
 
-            // 4. Generate QR Code as SVG for PDF (SVG doesn't require imagick extension)
+            // 5. Generate QR Code as SVG for PDF (SVG doesn't require imagick extension)
             $qrCode = QrCode::format('svg')->size(100)->generate($verifyUrl);
 
-            // 5. Simpan ke tagihan_cetak
+            // 6. Simpan ke tagihan_cetak dengan reference ke nilai_kontrak
             $tagihan = TagihanCetak::create([
                 'paket_id' => $id,
                 'token' => $token,
-                'total_boq' => $boqData['total_boq'],
-                'jumlah_pengawas' => $boqData['pengawas']['count'],
-                'jumlah_pelaksana' => $boqData['pelaksana']['count'],
+                'total_boq' => $nilaiKontrak->total_nilai_kontrak, // Gunakan dari nilai_kontrak
+                'jumlah_pengawas' => $nilaiKontrak->jumlah_pengawas,
+                'jumlah_pelaksana' => $nilaiKontrak->jumlah_pelaksana,
                 'vendor' => $boqData['vendor'],
                 'tanggal_cetak' => now()
             ]);

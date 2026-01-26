@@ -34,10 +34,6 @@
                             data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                             <i class="fas fa-trash"></i>
                         </a>
-                        <a href="{{ route('paket.tagihan', $item->paket_id) }}" class="btn btn-sm btn-info"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Tagihan">
-                            <i class="fas fa-eye"></i>
-                        </a>
                     </td>
                 </tr>
             @endforeach
