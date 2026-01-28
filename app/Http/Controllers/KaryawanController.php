@@ -24,7 +24,7 @@ class KaryawanController extends Controller
         $data = Karyawan::with([
             'perusahaan',
             'pakaianTerakhir',
-        ])->get();
+        ])->where('is_deleted', 0)->get();
 
         $paketList = DB::table('paket')->get();
 
@@ -53,7 +53,7 @@ class KaryawanController extends Controller
         //     ->get();
 
         $harianShift = DB::table('riwayat_shift as rs1')
-            ->join('harianshift', 'rs1.kode_harianshift', '=', 'harianshift.kode_harianshift')
+            ->join('md_harianshift', 'rs1.kode_harianshift', '=', 'md_harianshift.kode_harianshift')
             ->join(DB::raw('(
                 SELECT karyawan_id, MAX(beg_date) as max_date
                 FROM riwayat_shift
@@ -62,12 +62,12 @@ class KaryawanController extends Controller
                 $join->on('rs1.karyawan_id', '=', 'latest.karyawan_id')
                     ->on('rs1.beg_date', '=', 'latest.max_date');
             })
-            ->select('rs1.karyawan_id', 'harianshift.harianshift as harianshift')
+            ->select('rs1.karyawan_id', 'md_harianshift.harianshift as harianshift')
             ->get()
             ->keyBy('karyawan_id');
 
         $jabatan = DB::table('riwayat_jabatan as rj1')
-            ->join('jabatan', 'rj1.kode_jabatan', '=', 'jabatan.kode_jabatan')
+            ->join('md_jabatan', 'rj1.kode_jabatan', '=', 'md_jabatan.kode_jabatan')
             ->join(DB::raw('(
                 SELECT karyawan_id, MAX(beg_date) as max_date
                 FROM riwayat_jabatan
@@ -76,15 +76,16 @@ class KaryawanController extends Controller
                 $join->on('rj1.karyawan_id', '=', 'latest.karyawan_id')
                     ->on('rj1.beg_date', '=', 'latest.max_date');
             })
-            ->select('rj1.karyawan_id', 'jabatan.jabatan as jabatan')
+            ->select('rj1.karyawan_id', 'md_jabatan.jabatan as jabatan')
             ->get()
             ->keyBy('karyawan_id');
 
-        $jabatanList = DB::table('jabatan')->get();
+        $jabatanList = DB::table('md_jabatan')->get();
 
-        $area = DB::table('karyawan')
-            ->leftJoin('area', 'karyawan.area_id', '=', 'area.area_id')
-            ->select('karyawan.karyawan_id', 'area.area')
+        $area = DB::table('md_karyawan')
+            ->where('md_karyawan.is_deleted', 0)
+            ->leftJoin('md_area', 'md_karyawan.area_id', '=', 'md_area.area_id')
+            ->select('md_karyawan.karyawan_id', 'md_area.area')
             ->get()
             ->keyBy('karyawan_id');
 
@@ -93,6 +94,7 @@ class KaryawanController extends Controller
         // $pakaian = Karyawan::with('pakaianTerakhir')->get();
         //  dd($pakaian[0]->pakaianTerakhir->nilai_jatah);
 
+        $hasDeleted = Karyawan::where('is_deleted', 1)->exists();
 
         return view('karyawan', [
             'data' => $data,
@@ -104,19 +106,26 @@ class KaryawanController extends Controller
             'jabatanList' => $jabatanList,
             'area' => $area,
             'masterUkuran' => $masterUkuran,
+            'hasDeleted' => $hasDeleted
             // 'pakaian'      => $pakaian
         ]);
     }
 
 
+    public function trash()
+    {
+        $data = Karyawan::with(['perusahaan'])->where('is_deleted', 1)->get();
+        return view('karyawan-sampah', ['data' => $data]);
+    }
+
     public function detail($id)
     {
-        $dataM = DB::table('karyawan')
+        $dataM = DB::table('md_karyawan')
             ->where('karyawan_id', '=', $id)
             ->first();
-        $dataP = DB::table('perusahaan')
+        $dataP = DB::table('md_perusahaan')
             ->get();
-        $dataU = Db::table('unit_kerja')
+        $dataU = Db::table('md_unit_kerja')
             ->get();
 
         return view('detail-karyawan', ['dataM' => $dataM, 'dataP' => $dataP, 'dataU' => $dataU]);
@@ -124,9 +133,9 @@ class KaryawanController extends Controller
 
     public function getTambah()
     {
-        $dataP = DB::table('perusahaan')
+        $dataP = DB::table('md_perusahaan')
             ->get();
-        $dataU = Db::table('unit_kerja')
+        $dataU = Db::table('md_unit_kerja')
             ->get();
 
         return view('tambah-karyawan', ['dataP' => $dataP, 'dataU' => $dataU]);
@@ -171,12 +180,12 @@ class KaryawanController extends Controller
 
     public function getUpdate($id)
     {
-        $dataM = DB::table('karyawan')
+        $dataM = DB::table('md_karyawan')
             ->where('karyawan_id', '=', $id)
             ->first();
-        $dataP = DB::table('perusahaan')
+        $dataP = DB::table('md_perusahaan')
             ->get();
-        $dataU = Db::table('unit_kerja')
+        $dataU = Db::table('md_unit_kerja')
             ->get();
 
         return view('update-karyawan', ['dataM' => $dataM, 'dataP' => $dataP, 'dataU' => $dataU]);
@@ -216,9 +225,22 @@ class KaryawanController extends Controller
 
     public function destroy($id)
     {
-        $hapus = Karyawan::findorfail($id);
-        $hapus->delete();
+        Karyawan::where('karyawan_id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Karyawan::where('karyawan_id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 
     public function simpanMutasi(Request $request)
@@ -265,7 +287,7 @@ class KaryawanController extends Controller
         // Validasi input
         $request->validate([
             'karyawan_id' => 'required|exists:karyawan,karyawan_id',
-            'kode_jabatan' => 'required|exists:jabatan,kode_jabatan',
+            'kode_jabatan' => 'required|exists:md_jabatan,kode_jabatan',
             'beg_date' => 'required',
         ]);
 
@@ -307,7 +329,7 @@ class KaryawanController extends Controller
         ]);
 
 
-        DB::table('pakaian')->insert([
+        DB::table('md_pakaian')->insert([
             'karyawan_id' => $request->karyawan_id,
             'nilai_jatah' => 600000,
             'ukuran_baju' => $request->ukuran_baju,

@@ -2,7 +2,12 @@
 @section('title', 'Tunjangan Risiko')
 @section('content')
     <h3 class="mt-4">Tunjangan Risiko</h3>
-    <a href="/gettambah-resiko" class="btn btn-primary mb-3">Tambah Data</a>
+    <div class="d-flex align-items-center mb-3 text-center gap-2">
+    <a href="/gettambah-resiko" class="btn btn-primary">Tambah Data</a>
+    @if($hasDeleted)
+      <a href="/resiko/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
+    @endif
+  </div>
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}

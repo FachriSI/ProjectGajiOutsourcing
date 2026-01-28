@@ -123,7 +123,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
-                text: "{{ session('success') }}",
+                html: "{!! session('success') !!}",
                 showConfirmButton: false,
                 timer: 2000
             });
@@ -135,7 +135,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Oops!',
-                text: "{{ session('error') }}",
+                html: "{!! session('error') !!}",
                 showConfirmButton: true
             });
         </script>
@@ -149,7 +149,7 @@
                 var deleteUrl = $(this).attr('href');
                 Swal.fire({
                     title: 'Apakah Anda Yakin?',
-                    text: "Data yang dihapus tidak dapat dikembalikan!",
+                    text: "Data akan dipindahkan ke sampah dan dapat dipulihkan!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',

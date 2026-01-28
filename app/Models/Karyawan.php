@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Karyawan extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "karyawan"; //cek
+    public $timestamps = true;
+    protected $table = "md_karyawan"; //cek
     protected $primaryKey = "karyawan_id"; //cek
     public $incrementing = true;
     protected $keyType = 'int';
@@ -33,8 +33,10 @@ class Karyawan extends Model
         'catatan_pengganti',
         'catatan_berhenti',
         'tanggal_berhenti',
-        'tunjangan_penyesuaian'
-
+        'tunjangan_penyesuaian',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at'
     ];
 
     public function perusahaan()

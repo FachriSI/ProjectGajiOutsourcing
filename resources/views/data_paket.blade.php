@@ -4,8 +4,11 @@
 
 @section('content')
     <h3 class="mt-4">Paket</h3>
-    <div class="mb-3">
+    <div class="d-flex align-items-center mb-3 text-center gap-2">
         <a href="/gettambah-paket" class="btn btn-primary">Tambah Paket</a>
+        @if($hasDeleted)
+            <a href="/paket/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
+        @endif
     </div>
     <table class="table datatable">
         <thead>

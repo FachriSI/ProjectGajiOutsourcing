@@ -4,11 +4,12 @@
 
 @section('content')
     <h3 class="mt-4">UMP</h3>
-    <div class="mb-3">
-        <a href="/gettambah-ump-tahunan" class="btn btn-primary">Tambah UMP tahunan</a>
-        <a href="/gettambah-ump" class="btn btn-primary">Tambah UMP </a>
-
-    </div>
+  <div class="d-flex align-items-center mb-3 text-center gap-2">
+    <a href="/gettambah-ump" class="btn btn-primary">Tambah Data</a>
+    @if($hasDeleted)
+      <a href="/ump/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
+    @endif
+  </div>
     <table class="table datatable">
         <thead>
             <tr>

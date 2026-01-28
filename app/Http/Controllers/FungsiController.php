@@ -11,7 +11,7 @@ class FungsiController extends Controller
 {
     public function index()
     {
-        $data = DB::table('fungsi')->get();
+        $data = DB::table('md_fungsi')->where('is_deleted', 0)->get();
         return view('fungsi', ['data' => $data]);
     }
 
@@ -40,7 +40,7 @@ class FungsiController extends Controller
 
     public function getUpdate($id)
     {
-        $dataF = DB::table('fungsi')
+        $dataF = DB::table('md_fungsi')
             ->where('kode_fungsi', '=', $id)
             ->first();
 
@@ -64,7 +64,21 @@ class FungsiController extends Controller
 
     public function destroy($id)
     {
-        Fungsi::where('kode_fungsi', $id)->delete();
+        Fungsi::where('kode_fungsi', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Fungsi::where('kode_fungsi', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

@@ -8,14 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Lokasi extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "lokasi"; //cek
+    protected $table = 'md_lokasi';
+    public $timestamps = true;
+
     protected $primaryKey = "kode_lokasi"; //cek
 
     protected $fillable = [
         'kode_lokasi',
         'lokasi',
-        'jenis'
+        'jenis',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at'
     ];
     
     public function ump()

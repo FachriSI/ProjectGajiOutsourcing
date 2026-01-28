@@ -10,18 +10,28 @@ class UmpController extends Controller
 {
     public function index()
     {
-        $data = DB::table('ump')
-            ->join('lokasi','lokasi.kode_lokasi','=','ump.kode_lokasi')
-            ->select('ump.*', 'lokasi.*')
+        $data = DB::table('md_ump')
+            ->where('md_ump.is_deleted', 0)
+            ->join('md_lokasi','md_lokasi.kode_lokasi','=','md_ump.kode_lokasi')
+            ->select('md_ump.*', 'md_lokasi.*')
              ->get();
-            //  dd($data);
-        return view('ump', ['data' => $data]);
 
+        $hasDeleted = Ump::where('is_deleted', 1)->exists();
+        return view('ump', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Ump::where('md_ump.is_deleted', 1)
+            ->join('md_lokasi','md_lokasi.kode_lokasi','=','md_ump.kode_lokasi')
+            ->select('md_ump.*', 'md_lokasi.*')
+            ->get();
+        return view('ump-sampah', ['data' => $data]);
     }
 
     public function getTambah()
     {  
-        $data = DB::table('lokasi')
+        $data = DB::table('md_lokasi')
             ->get();      
         return view('tambah-ump-tahunan', compact('data'));
     }
@@ -46,7 +56,7 @@ class UmpController extends Controller
 
     public function getTambah2()
     {  
-        $data = DB::table('lokasi')
+        $data = DB::table('md_lokasi')
             ->get();      
         return view('tambah-ump', compact('data'));
     }
@@ -72,8 +82,8 @@ class UmpController extends Controller
 
     public function getUpdate($id)
     {
-        $data = DB::table('ump')
-            ->join('lokasi', 'lokasi.kode_lokasi','=','ump.kode_lokasi')
+        $data = DB::table('md_ump')
+            ->join('md_lokasi', 'md_lokasi.kode_lokasi','=','md_ump.kode_lokasi')
             ->where('id','=', $id)
             ->first();
 
@@ -98,9 +108,22 @@ class UmpController extends Controller
 
     public function destroy($id)
     {
-        $hapus = Ump::findorfail($id);
-        $hapus->delete();
+        Ump::where('id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Ump::where('id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 
 }

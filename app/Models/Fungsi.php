@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Fungsi extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "fungsi"; //cek
+    protected $table = 'md_fungsi';
+    public $timestamps = true;
+
     protected $primaryKey = "kode_fungsi"; //cek
 
     protected $fillable = [
         'kode_fungsi',
         'fungsi',
-        'keterangan'
+        'keterangan',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at'
     ];
 }

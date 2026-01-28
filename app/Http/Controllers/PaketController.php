@@ -636,20 +636,23 @@ class PaketController extends Controller
 
     public function indexpaket()
     {
-        $data = DB::table('paket')
-            ->join('unit_kerja', 'unit_kerja.unit_id', '=', 'paket.unit_id')
-            ->select('paket.*', 'unit_kerja.*')
+        $data = DB::table('md_paket')
+            ->join('md_unit_kerja', 'md_unit_kerja.unit_id', '=', 'md_paket.unit_id')
+            ->select('md_paket.*', 'md_unit_kerja.*')
+            ->where('md_paket.is_deleted', 0)
             ->orderBy('paket_id', 'asc')
             ->get();
         //  dd($data);
-        return view('data_paket', ['data' => $data]);
+
+        $hasDeleted = Paket::where('is_deleted', 1)->exists();
+        return view('data_paket', ['data' => $data, 'hasDeleted' => $hasDeleted]);
 
     }
 
     public function getTambah()
     {
-        $unit = DB::table('unit_kerja')
-            ->select('unit_kerja.*')
+        $unit = DB::table('md_unit_kerja')
+            ->select('md_unit_kerja.*')
             ->get();
         return view('tambah-paket', ['unit' => $unit]);
     }
@@ -673,11 +676,11 @@ class PaketController extends Controller
 
     public function getUpdate($id)
     {
-        $dataP = DB::table('paket')
+        $dataP = DB::table('md_paket')
             ->where('paket_id', '=', $id)
             ->first();
-        $unit = DB::table('unit_kerja')
-            ->select('unit_kerja.*')
+        $unit = DB::table('md_unit_kerja')
+            ->select('md_unit_kerja.*')
             ->get();
 
         return view('update-paket', ['dataP' => $dataP, 'unit' => $unit]);
@@ -703,8 +706,32 @@ class PaketController extends Controller
     public function destroy($id)
     {
         $hapus = Paket::findorfail($id);
-        $hapus->delete();
+        $hapus->is_deleted = 1;
+        $hapus->deleted_by = session('user_name');
+        $hapus->deleted_at = now();
+        $hapus->save();
+
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function trash()
+    {
+        $data = Paket::where('md_paket.is_deleted', 1)
+            ->join('md_unit_kerja', 'md_unit_kerja.unit_id', '=', 'md_paket.unit_id')
+            ->select('md_paket.*', 'md_unit_kerja.*')
+            ->get();
+        return view('paket-sampah', ['data' => $data]);
+    }
+
+    public function restore($id)
+    {
+        $data = Paket::findorfail($id);
+        $data->is_deleted = 0;
+        $data->deleted_by = null;
+        $data->deleted_at = null;
+        $data->save();
+
+        return redirect('/datapaket')->with('success', 'Data berhasil dipulihkan!');
     }
 
     /**

@@ -5,8 +5,12 @@
 @section('content')
 
     <h3 class="mt-4">Fungsi</h3>
-    <a href="/gettambah-fungsi" class="btn btn-primary mb-3">Tambah Data</a>
-
+    <div class="d-flex align-items-center mb-3 text-center gap-2">
+    <a href="/gettambah-fungsi" class="btn btn-primary">Tambah Data</a>
+    @if($hasDeleted)
+      <a href="/fungsi/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
+    @endif
+  </div>
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}

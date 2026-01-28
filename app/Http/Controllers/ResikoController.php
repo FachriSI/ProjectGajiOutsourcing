@@ -10,8 +10,18 @@ class ResikoController extends Controller
 {
     public function index()
     {
-        $data = DB::table('resiko')->get();
-        return view('resiko', ['data' => $data]);
+        $data = DB::table('md_resiko')
+            ->where('is_deleted', 0)
+             ->get();
+
+        $hasDeleted = Resiko::where('is_deleted', 1)->exists();
+        return view('resiko', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Resiko::where('is_deleted', 1)->get();
+        return view('resiko-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -37,7 +47,7 @@ class ResikoController extends Controller
 
     public function getUpdate($id)
     {
-        $dataR = DB::table('resiko')->where('kode_resiko', '=', $id)->first();
+        $dataR = DB::table('md_resiko')->where('kode_resiko', '=', $id)->first();
         return view('update-resiko', ['dataR' => $dataR]);
     }
 
@@ -55,7 +65,21 @@ class ResikoController extends Controller
 
     public function destroy($id)
     {
-        Resiko::where('kode_resiko', $id)->delete();
+        Resiko::where('kode_resiko', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Resiko::where('kode_resiko', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

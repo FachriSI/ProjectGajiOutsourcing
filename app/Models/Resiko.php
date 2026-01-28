@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Resiko extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "resiko"; //cek
+    protected $table = 'md_resiko';
+    public $timestamps = true;
+
     protected $primaryKey = "kode_resiko"; //cek
 
     protected $fillable = [
         'kode_resiko',
         'resiko',
-        'tunjangan_resiko'
+        'tunjangan_resiko',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at'
     ];
 }

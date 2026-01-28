@@ -11,15 +11,24 @@ class MasakerjaController extends Controller
     public function index()
     {
         $data = DB::table('masa_kerja')
-            ->join('karyawan', 'masa_kerja.karyawan_id', '=', 'karyawan.karyawan_id')
-            ->select('masa_kerja.*', 'karyawan.nama_tk as nama')
-            ->get();
-        return view('masakerja', ['data' => $data]);
+            ->join('md_karyawan', 'masa_kerja.karyawan_id', '=', 'md_karyawan.karyawan_id')
+        $data = DB::table('md_masakerja')
+            ->where('is_deleted', 0)
+             ->get();
+
+        $hasDeleted = Masakerja::where('is_deleted', 1)->exists();
+        return view('masakerja', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Masakerja::where('is_deleted', 1)->get();
+        return view('masakerja-sampah', ['data' => $data]);
     }
 
     public function getTambah()
     {
-        $karyawan = DB::table('karyawan')->get();
+        $karyawan = DB::table('md_karyawan')->where('is_deleted', 0)->get();
         return view('tambah-masakerja', ['karyawan' => $karyawan]);
     }
 
@@ -43,7 +52,7 @@ class MasakerjaController extends Controller
     public function getUpdate($id)
     {
         $dataM = DB::table('masa_kerja')->where('id', '=', $id)->first();
-        $karyawan = DB::table('karyawan')->get();
+        $karyawan = DB::table('md_karyawan')->get();
         return view('update-masakerja', ['dataM' => $dataM, 'karyawan' => $karyawan]);
     }
 

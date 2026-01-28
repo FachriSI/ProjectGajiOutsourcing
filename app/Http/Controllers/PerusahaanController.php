@@ -11,11 +11,19 @@ class PerusahaanController extends Controller
 {
     public function index()
     {
-        $data = DB::table('perusahaan')
+        $data = DB::table('md_perusahaan')
+            ->where('is_deleted', 0)
             ->get();
         // dd($data);
-        return view('perusahaan', ['data' => $data]);
+        $hasDeleted = Perusahaan::where('is_deleted', 1)->exists();
+        return view('perusahaan', ['data' => $data, 'hasDeleted' => $hasDeleted]);
 
+    }
+
+    public function trash()
+    {
+        $data = Perusahaan::where('is_deleted', 1)->get();
+        return view('perusahaan-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -52,7 +60,7 @@ class PerusahaanController extends Controller
 
     public function getUpdate($id)
     {
-        $dataP = DB::table('perusahaan')
+        $dataP = DB::table('md_perusahaan')
             ->where('perusahaan_id', '=', $id)
             ->first();
 
@@ -85,8 +93,21 @@ class PerusahaanController extends Controller
 
     public function destroy($id)
     {
-        $hapus = Perusahaan::findorfail($id);
-        $hapus->delete();
+        Perusahaan::where('perusahaan_id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Perusahaan::where('perusahaan_id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

@@ -11,9 +11,19 @@ class DepartemenController extends Controller
 {
     public function index()
     {
-        $data = DB::table('departemen')
+        $data = DB::table('md_departemen')
+            ->where('is_deleted', 0)
             ->get();
-        return view('departemen', ['data' => $data]);
+
+        $hasDeleted = Departemen::where('is_deleted', 1)->exists();
+
+        return view('departemen', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Departemen::where('is_deleted', 1)->get();
+        return view('departemen-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -41,7 +51,7 @@ class DepartemenController extends Controller
 
     public function getUpdate($id)
     {
-        $dataD = DB::table('departemen')
+        $dataD = DB::table('md_departemen')
             ->where('departemen_id', '=', $id)
             ->first();
 
@@ -65,7 +75,22 @@ class DepartemenController extends Controller
 
     public function destroy($id)
     {
-        Departemen::where('departemen_id', $id)->delete();
+        // Soft Delete
+        Departemen::where('departemen_id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Departemen::where('departemen_id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

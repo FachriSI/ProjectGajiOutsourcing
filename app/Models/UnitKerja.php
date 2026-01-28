@@ -8,14 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class UnitKerja extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "unit_kerja"; //cek
+    protected $table = 'md_unit_kerja';
+    public $timestamps = true;
+
     protected $primaryKey = "unit_id"; //cek
 
     protected $fillable = [
         'unit_id',
         'unit_kerja',
-        'fungsi'
+        'fungsi',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at'
     ];
 
     public function paketUnit()

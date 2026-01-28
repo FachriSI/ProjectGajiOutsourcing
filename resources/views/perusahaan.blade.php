@@ -5,8 +5,11 @@
 @section('content')
 
     <h3 class="mt-4">Vendor/Perusahaan</h3>
-    <div class="d-flex align-items-center mb-3 gap-2">
+    <div class="d-flex align-items-center mb-3 text-center gap-2">
         <a href="/gettambah-perusahaan " class="btn btn-primary">Tambah Data</a>
+        @if($hasDeleted)
+            <a href="/perusahaan/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
+        @endif
 
         <!-- Button Template & Import -->
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importTemplateBaruModal" title="Template & Import Data">

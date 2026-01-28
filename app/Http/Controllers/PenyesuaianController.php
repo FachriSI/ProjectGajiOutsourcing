@@ -10,8 +10,18 @@ class PenyesuaianController extends Controller
 {
     public function index()
     {
-        $data = DB::table('penyesuaian')->get();
-        return view('penyesuaian', ['data' => $data]);
+        $data = DB::table('md_penyesuaian')
+            ->where('is_deleted', 0)
+             ->get();
+
+        $hasDeleted = Penyesuaian::where('is_deleted', 1)->exists();
+        return view('penyesuaian', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Penyesuaian::where('is_deleted', 1)->get();
+        return view('penyesuaian-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -37,7 +47,7 @@ class PenyesuaianController extends Controller
 
     public function getUpdate($id)
     {
-        $dataP = DB::table('penyesuaian')->where('kode_suai', '=', $id)->first();
+        $dataP = DB::table('md_penyesuaian')->where('kode_suai', '=', $id)->first();
         return view('update-penyesuaian', ['dataP' => $dataP]);
     }
 
@@ -55,7 +65,21 @@ class PenyesuaianController extends Controller
 
     public function destroy($id)
     {
-        Penyesuaian::where('kode_suai', $id)->delete();
+        Penyesuaian::where('kode_suai', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Penyesuaian::where('kode_suai', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

@@ -10,16 +10,23 @@ class PakaianController extends Controller
 {
     public function index()
     {
-        $data = DB::table('pakaian')
-            ->join('karyawan', 'pakaian.karyawan_id', '=', 'karyawan.karyawan_id')
-            ->select('pakaian.*', 'karyawan.nama_tk as nama')
-            ->get();
-        return view('pakaian', ['data' => $data]);
+        $data = DB::table('md_pakaian')
+            ->where('is_deleted', 0)
+             ->get();
+
+        $hasDeleted = Pakaian::where('is_deleted', 1)->exists();
+        return view('pakaian', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Pakaian::where('is_deleted', 1)->get();
+        return view('pakaian-sampah', ['data' => $data]);
     }
 
     public function getTambah()
     {
-        $karyawan = DB::table('karyawan')->get();
+        $karyawan = DB::table('md_karyawan')->get();
         return view('tambah-pakaian', ['karyawan' => $karyawan]);
     }
 
@@ -40,8 +47,8 @@ class PakaianController extends Controller
 
     public function getUpdate($id)
     {
-        $dataP = DB::table('pakaian')->where('pakaian_id', '=', $id)->first();
-        $karyawan = DB::table('karyawan')->get();
+        $dataP = DB::table('md_pakaian')->where('pakaian_id', '=', $id)->first();
+        $karyawan = DB::table('md_karyawan')->get();
         return view('update-pakaian', ['dataP' => $dataP, 'karyawan' => $karyawan]);
     }
 
@@ -60,7 +67,21 @@ class PakaianController extends Controller
 
     public function destroy($id)
     {
-        Pakaian::where('pakaian_id', $id)->delete();
+        Pakaian::where('pakaian_id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Pakaian::where('pakaian_id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

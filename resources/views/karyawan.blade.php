@@ -7,6 +7,9 @@
   <h3 class="mt-4">Karyawan</h3>
   <div class="d-flex align-items-center mb-3 gap-2">
     <a href="/gettambah-karyawan" class="btn btn-primary">Tambah Data</a>
+    @if($hasDeleted)
+      <a href="/karyawan/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
+    @endif
 
     <!-- Button Template & Import -->
     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#templateModal" title="Template & Import Data">

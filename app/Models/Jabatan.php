@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Jabatan extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "jabatan"; //cek
+    protected $table = 'md_jabatan';
+    public $timestamps = true;
+
     protected $primaryKey = "kode_jabatan"; //cek
 
     protected $fillable = [
         'kode_jabatan',
         'jabatan',
-        'tunjangan_jabatan'
+        'tunjangan_jabatan',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at'
     ];
 }

@@ -10,8 +10,18 @@ class LokasiController extends Controller
 {
     public function index()
     {
-        $data = DB::table('lokasi')->get();
-        return view('lokasi', ['data' => $data]);
+        $data = DB::table('md_lokasi')
+            ->where('is_deleted', 0)
+             ->get();
+
+        $hasDeleted = Lokasi::where('is_deleted', 1)->exists();
+        return view('lokasi', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Lokasi::where('is_deleted', 1)->get();
+        return view('lokasi-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -37,7 +47,7 @@ class LokasiController extends Controller
 
     public function getUpdate($id)
     {
-        $dataL = DB::table('lokasi')->where('kode_lokasi', '=', $id)->first();
+        $dataL = DB::table('md_lokasi')->where('kode_lokasi', '=', $id)->first();
         return view('update-lokasi', ['dataL' => $dataL]);
     }
 
@@ -55,7 +65,21 @@ class LokasiController extends Controller
 
     public function destroy($id)
     {
-        Lokasi::where('kode_lokasi', $id)->delete();
+        Lokasi::where('kode_lokasi', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Lokasi::where('kode_lokasi', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

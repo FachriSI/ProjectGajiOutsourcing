@@ -318,9 +318,9 @@ class PenempatanController extends Controller
         $dataM = DB::table('penempatan')
             ->where('id','=', $id)
             ->first();
-        $dataP = DB::table('perusahaan')
+        $dataP = DB::table('md_perusahaan')
             ->get();
-        $dataU = Db::table('unit_kerja')
+        $dataU = Db::table('md_unit_kerja')
             ->get();
 
         return view('detail-penempatan', ['dataM'=>$dataM, 'dataP' =>$dataP, 'dataU' => $dataU]);
@@ -340,19 +340,19 @@ class PenempatanController extends Controller
 
     public function getTambah()
     {
-        $dataK = DB::table('karyawan')
+        $dataK = DB::table('md_karyawan')->where('is_deleted', 0)
             ->get();
-        $dataU = Db::table('unit_kerja')
+        $dataU = Db::table('md_unit_kerja')
             ->get();
-        $dataP = Db::table('perusahaan')
+        $dataP = Db::table('md_perusahaan')
             ->get();
-        $dataS = Db::table('suai')
+        $dataS = Db::table('md_penyesuaian')
             ->get();
-        $dataL = Db::table('lokasi')
+        $dataL = Db::table('md_lokasi')
             ->get();
         $dataPk = Db::table('paket')
             ->get();
-        $dataJ = Db::table('jabatan')
+        $dataJ = Db::table('md_jabatan')
             ->get();
         return view('tambah-penempatan2', ['dataK'=>$dataK, 'dataU'=>$dataU, 'dataP'=>$dataP, 'dataJ'=>$dataJ,'dataS'=>$dataS,'dataL'=>$dataL, 'dataPk'=>$dataPk]);
     }
@@ -442,9 +442,9 @@ class PenempatanController extends Controller
         $dataM = DB::table('master_data')
             ->where('id','=', $id)
             ->first();
-        $dataP = DB::table('perusahaan')
+        $dataP = DB::table('md_perusahaan')
             ->get();
-        $dataU = Db::table('unit_kerja')
+        $dataU = Db::table('md_unit_kerja')
             ->get();
 
         return view('update-master', ['dataM'=>$dataM, 'dataP' =>$dataP, 'dataU' => $dataU]);
@@ -519,13 +519,13 @@ class PenempatanController extends Controller
     public function formPengganti($id)
     {
         // Ambil data utama karyawan
-        $dataM = DB::table('karyawan')
+        $dataM = DB::table('md_karyawan')
             ->where('karyawan_id', '=', $id)
             ->first();
 
         // Ambil semua data perusahaan & jabatan 
-        $dataP = DB::table('perusahaan')->get();
-        $dataJ = DB::table('jabatan')->get();
+        $dataP = DB::table('md_perusahaan')->get();
+        $dataJ = DB::table('md_jabatan')->get();
 
         // Ambil quota jam real terakhir
         $quotaJam = DB::table('kuota_jam')
@@ -537,8 +537,8 @@ class PenempatanController extends Controller
         $lokasiTerakhir = DB::table('riwayat_lokasi')
             ->where('karyawan_id', $id)
             ->orderByDesc('beg_date')
-            ->join('lokasi', 'riwayat_lokasi.kode_lokasi', '=', 'lokasi.kode_lokasi')
-            ->select('lokasi.*')
+            ->join('md_lokasi', 'riwayat_lokasi.kode_lokasi', '=', 'md_lokasi.kode_lokasi')
+            ->select('md_lokasi.*')
             ->first();
 
         // Ambil paket terakhir
@@ -573,7 +573,7 @@ class PenempatanController extends Controller
                 ->startOfMonth(); 
 
             // Ambil data karyawan lama
-            $karyawanLama = DB::table('karyawan')->where('karyawan_id', $id)->first();
+            $karyawanLama = DB::table('md_karyawan')->where('karyawan_id', $id)->first();
 
             // Buat catatan pengganti
             $catatanPengganti = "Pengganti ID $id,";
@@ -587,7 +587,7 @@ class PenempatanController extends Controller
             }
 
             // Simpan karyawan baru
-            $newId = DB::table('karyawan')->insertGetId([
+            $newId = DB::table('md_karyawan')->insertGetId([
                 'osis_id'                => $request->osis_id,
                 'ktp'                    => $request->ktp,
                 'nama_tk'                => $request->nama,
@@ -660,7 +660,7 @@ class PenempatanController extends Controller
             
 
             // Update status karyawan lama
-            DB::table('karyawan')
+            DB::table('md_karyawan')
             ->where('karyawan_id', $id)
             ->update([
                 'status_aktif' => 'Sudah Diganti',

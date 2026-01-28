@@ -9,7 +9,7 @@ class Area extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    protected $table = "area"; //cek
+    protected $table = "md_area"; //cek
     protected $primaryKey = "area_id"; //cek
 
     protected $fillable = [

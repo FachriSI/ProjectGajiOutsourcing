@@ -12,12 +12,19 @@ class UnitKerjaController extends Controller
 {
     public function index()
     {
-        $data = DB::table('unit_kerja')
+        $data = DB::table('md_unit_kerja')
+            ->where('is_deleted', 0)
             ->select('unit_kerja.unit_id', 'unit_kerja.unit_kerja')
              ->get();
-            //  dd($data);
-        return view('unit-kerja', ['data' => $data]);
 
+        $hasDeleted = UnitKerja::where('is_deleted', 1)->exists();
+        return view('unit-kerja', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = UnitKerja::where('is_deleted', 1)->get();
+        return view('unit-kerja-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -47,7 +54,7 @@ class UnitKerjaController extends Controller
 
     public function getTambahBidang()
     {        
-        $dataU = DB::table('unit_kerja')
+        $dataU = DB::table('md_unit_kerja')
         ->get();
         return view('tambah-bidang',['dataU'=>$dataU ]);
     }
@@ -69,14 +76,14 @@ class UnitKerjaController extends Controller
 
     public function getTambahArea()
     {        
-        $dataU = DB::table('unit_kerja')
+        $dataU = DB::table('md_unit_kerja')
         ->get();
         return view('tambah-area',['dataU'=>$dataU ]);
     }
 
     public function getBidang($unit_id)
     {
-        $bidang = DB::table('bidang')->where('unit_id', $unit_id)->get();
+        $bidang = DB::table('md_bidang')->where('unit_id', $unit_id)->get();
         return response()->json($bidang);
     }
 
@@ -98,7 +105,7 @@ class UnitKerjaController extends Controller
 
     public function getUpdate($id)
     {
-        $dataP = DB::table('unit_kerja')
+        $dataP = DB::table('md_unit_kerja')
             ->where('unit_id','=', $id)
             ->first();
 
@@ -122,8 +129,21 @@ class UnitKerjaController extends Controller
 
     public function destroy($id)
     {
-        $hapus = UnitKerja::findorfail($id);
-        $hapus->delete();
+        UnitKerja::where('unit_id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        UnitKerja::where('unit_id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

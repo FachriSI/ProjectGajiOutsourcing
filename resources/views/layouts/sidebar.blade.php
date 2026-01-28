@@ -34,7 +34,7 @@
                     <i class="fas fa-box"></i> Paket & Penempatan
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('paket') || request()->is('penempatan*') || request()->is('datapaket*') ? 'show' : '' }}"
+                <div class="collapse {{ request()->is('paket') || request()->is('penempatan*') || request()->is('datapaket*') || request()->is('lokasi*') ? 'show' : '' }}"
                     id="collapsePaket" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ request()->is('paket') ? 'active' : '' }}" href="{{ url('/paket') }}">
@@ -48,6 +48,9 @@
                             href="{{ url('/datapaket') }}">
                             <i class="fas fa-boxes"></i> Paket
                         </a>
+                        <a class="nav-link {{ request()->is('lokasi*') ? 'active' : '' }}" href="{{ url('/lokasi') }}">
+                            <i class="fas fa-map-pin"></i> Lokasi
+                        </a>
                     </nav>
                 </div>
 
@@ -57,7 +60,7 @@
                     <i class="fas fa-sitemap"></i> Organisasi
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('departemen*') || request()->is('fungsi*') || request()->is('jabatan*') || request()->is('unit-kerja*') ? 'show' : '' }}"
+                <div class="collapse {{ request()->is('departemen*') || request()->is('fungsi*') || request()->is('unit-kerja*') ? 'show' : '' }}"
                     id="collapseOrganisasi" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ request()->is('departemen*') ? 'active' : '' }}"
@@ -67,10 +70,7 @@
                         <a class="nav-link {{ request()->is('fungsi*') ? 'active' : '' }}" href="{{ url('/fungsi') }}">
                             <i class="fas fa-cogs"></i> Fungsi
                         </a>
-                        <a class="nav-link {{ request()->is('jabatan*') ? 'active' : '' }}"
-                            href="{{ url('/jabatan') }}">
-                            <i class="fas fa-id-badge"></i> Tunjangan Jabatan
-                        </a>
+
                         <a class="nav-link {{ request()->is('unit-kerja*') ? 'active' : '' }}"
                             href="{{ url('/unit-kerja') }}">
                             <i class="fas fa-briefcase"></i> Unit Kerja
@@ -78,23 +78,7 @@
                     </nav>
                 </div>
 
-                <!-- Lokasi & Resiko (Dropdown) -->
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLokasi"
-                    aria-expanded="false" aria-controls="collapseLokasi">
-                    <i class="fas fa-map-marker-alt"></i> Lokasi & Resiko
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse {{ request()->is('lokasi*') || request()->is('resiko*') ? 'show' : '' }}"
-                    id="collapseLokasi" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link {{ request()->is('lokasi*') ? 'active' : '' }}" href="{{ url('/lokasi') }}">
-                            <i class="fas fa-map-pin"></i> Lokasi
-                        </a>
-                        <a class="nav-link {{ request()->is('resiko*') ? 'active' : '' }}" href="{{ url('/resiko') }}">
-                            <i class="fas fa-exclamation-triangle"></i> Tunjangan Risiko
-                        </a>
-                    </nav>
-                </div>
+
 
                 <!-- Tunjangan (Dropdown) -->
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTunjangan"
@@ -102,9 +86,16 @@
                     <i class="fas fa-hand-holding-usd"></i> Tunjangan
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('harianshift*') || request()->is('kuotajam*') || request()->is('masakerja*') || request()->is('pakaian*') || request()->is('penyesuaian*') ? 'show' : '' }}"
+                <div class="collapse {{ request()->is('jabatan*') || request()->is('resiko*') || request()->is('harianshift*') || request()->is('kuotajam*') || request()->is('masakerja*') || request()->is('pakaian*') || request()->is('penyesuaian*') ? 'show' : '' }}"
                     id="collapseTunjangan" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ request()->is('jabatan*') ? 'active' : '' }}"
+                            href="{{ url('/jabatan') }}">
+                            <i class="fas fa-id-badge"></i> Tunjangan Jabatan
+                        </a>
+                        <a class="nav-link {{ request()->is('resiko*') ? 'active' : '' }}" href="{{ url('/resiko') }}">
+                            <i class="fas fa-exclamation-triangle"></i> Tunjangan Risiko
+                        </a>
                         <a class="nav-link {{ request()->is('harianshift*') ? 'active' : '' }}"
                             href="{{ url('/harianshift') }}">
                             <i class="fas fa-clock"></i> Harian/Shift

@@ -10,8 +10,18 @@ class HarianshiftController extends Controller
 {
     public function index()
     {
-        $data = DB::table('harianshift')->get();
-        return view('harianshift', ['data' => $data]);
+        $data = DB::table('md_harianshift')
+            ->where('is_deleted', 0)
+             ->get();
+
+        $hasDeleted = Harianshift::where('is_deleted', 1)->exists();
+        return view('harianshift', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Harianshift::where('is_deleted', 1)->get();
+        return view('harianshift-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -37,7 +47,7 @@ class HarianshiftController extends Controller
 
     public function getUpdate($id)
     {
-        $dataH = DB::table('harianshift')->where('kode_harianshift', '=', $id)->first();
+        $dataH = DB::table('md_harianshift')->where('kode_harianshift', '=', $id)->first();
         return view('update-harianshift', ['dataH' => $dataH]);
     }
 
@@ -55,7 +65,21 @@ class HarianshiftController extends Controller
 
     public function destroy($id)
     {
-        Harianshift::where('kode_harianshift', $id)->delete();
+        Harianshift::where('kode_harianshift', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Harianshift::where('kode_harianshift', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

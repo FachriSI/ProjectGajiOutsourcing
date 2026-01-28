@@ -1,8 +1,12 @@
 @extends('layouts.main')
 @section('title', 'Masa Kerja')
 @section('content')
-    <h3 class="mt-4">Masa Kerja</h3>
-    <a href="/gettambah-masakerja" class="btn btn-primary mb-3">Tambah Data</a>
+    <div class="d-flex align-items-center mb-3 text-center gap-2">
+        <a href="/gettambah-masakerja" class="btn btn-primary">Tambah Data</a>
+        @if($hasDeleted)
+            <a href="/masakerja/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
+        @endif
+    </div>
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}<button type="button"
                 class="btn-close" data-bs-dismiss="alert"></button></div>

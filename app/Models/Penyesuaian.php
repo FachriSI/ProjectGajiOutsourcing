@@ -8,13 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Penyesuaian extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "penyesuaian"; //cek
+    public $timestamps = true;
+    protected $table = "md_penyesuaian"; //cek
     protected $primaryKey = "kode_suai"; //cek
 
     protected $fillable = [
         'kode_suai',
         'keterangan',
-        'tunjangan_penyesuaian'
+        'tunjangan_penyesuaian',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at'
     ];
 }

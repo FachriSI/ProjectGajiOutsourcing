@@ -10,8 +10,18 @@ class JabatanController extends Controller
 {
     public function index()
     {
-        $data = DB::table('jabatan')->get();
-        return view('jabatan', ['data' => $data]);
+        $data = DB::table('md_jabatan')
+            ->where('is_deleted', 0)
+             ->get();
+
+        $hasDeleted = Jabatan::where('is_deleted', 1)->exists();
+        return view('jabatan', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+    }
+
+    public function trash()
+    {
+        $data = Jabatan::where('is_deleted', 1)->get();
+        return view('jabatan-sampah', ['data' => $data]);
     }
 
     public function getTambah()
@@ -39,7 +49,7 @@ class JabatanController extends Controller
 
     public function getUpdate($id)
     {
-        $dataJ = DB::table('jabatan')->where('kode_jabatan', '=', $id)->first();
+        $dataJ = DB::table('md_jabatan')->where('kode_jabatan', '=', $id)->first();
         return view('update-jabatan', ['dataJ' => $dataJ]);
     }
 
@@ -57,7 +67,21 @@ class JabatanController extends Controller
 
     public function destroy($id)
     {
-        Jabatan::where('kode_jabatan', $id)->delete();
+        Jabatan::where('kode_jabatan', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Jabatan::where('kode_jabatan', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return back()->with('success', 'Data berhasil dipulihkan!');
     }
 }

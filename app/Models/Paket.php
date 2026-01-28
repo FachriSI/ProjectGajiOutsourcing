@@ -8,15 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Paket extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "paket"; //cek
+    public $timestamps = true;
+    protected $table = "md_paket"; //cek
     protected $primaryKey = "paket_id"; //cek
 
     protected $fillable = [
         'paket_id',
         'paket',
         'kuota_paket',
-        'unit_id'
+        'unit_id',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'deleted_by',
+        'is_deleted'
     ];
 
     public function paketKaryawan()

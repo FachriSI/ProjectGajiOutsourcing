@@ -9,7 +9,7 @@ class Bidang extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    protected $table = "bidang"; //cek
+    protected $table = "md_bidang"; //cek
     protected $primaryKey = "bidang_id"; //cek
 
     protected $fillable = [
