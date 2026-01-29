@@ -33,6 +33,7 @@ class Karyawan extends Model
         'catatan_pengganti',
         'catatan_berhenti',
         'tanggal_berhenti',
+        'diberhentikan_oleh',
         'tunjangan_penyesuaian',
         'is_deleted',
         'deleted_by',

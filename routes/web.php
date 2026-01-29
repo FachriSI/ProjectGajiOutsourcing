@@ -203,6 +203,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/import-template-baru', [ImportController::class, 'importTemplateBaru']);
 
     Route::get('/paket', [PaketController::class, 'index']);
+    Route::get('/paket/{id}', [PaketController::class, 'show']);
     Route::get('/datapaket', [PaketController::class, 'indexpaket']);
     Route::get('/gettambah-paket', [PaketController::class, 'getTambah']);
     Route::post('/tambah-paket', [PaketController::class, 'setTambah']);

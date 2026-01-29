@@ -164,25 +164,33 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: 'Masukkan Catatan Berhenti',
-                        input: 'textarea',
-                        inputPlaceholder: 'Contoh: Mengundurkan diri, Habis Kontrak...',
-                        inputAttributes: {
-                            'aria-label': 'Catatan Berhenti'
-                        },
+                        title: 'Konfirmasi Berhenti',
+                        html:
+                            '<input type="date" id="swal-input-date" class="swal2-input" placeholder="Tanggal Berhenti">' +
+                            '<textarea id="swal-input-catatan" class="swal2-textarea" placeholder="Contoh: Mengundurkan diri, Habis Kontrak..."></textarea>',
+                        focusConfirm: false,
                         showCancelButton: true,
                         confirmButtonText: 'Kirim',
                         cancelButtonText: 'Batal',
+                        preConfirm: () => {
+                            const date = document.getElementById('swal-input-date').value;
+                            const note = document.getElementById('swal-input-catatan').value;
+                            if (!date || !note) {
+                                Swal.showValidationMessage('Tanggal dan Catatan harus diisi');
+                            }
+                            return { date: date, note: note }
+                        }
                     }).then((inputResult) => {
-                        if (inputResult.isConfirmed && inputResult.value) {
-                            const catatan = inputResult.value;
+                        if (inputResult.isConfirmed) {
+                            const { date, note } = inputResult.value;
 
                             $.ajax({
                                 url: "/set-berhenti",
                                 type: "POST",
                                 data: {
                                     id: id,
-                                    catatan: catatan,
+                                    catatan: note,
+                                    tanggal_berhenti: date,
                                     _token: $('meta[name="csrf-token"]').attr('content')
                                 },
                                 success: function (response) {

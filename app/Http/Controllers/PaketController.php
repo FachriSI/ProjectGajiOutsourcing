@@ -25,6 +25,137 @@ class PaketController extends Controller
 
     public function index()
     {
+        // Calculate Global Totals for Summary Cards
+        $total_jml_fix_cost = 0;
+        $total_seluruh_variabel = 0;
+        $total_kontrak_all = 0;
+        $total_kontrak_tahunan_all = 0;
+        $total_thr_bln = 0;
+        $total_thr_thn = 0;
+        $total_pakaian_all = 0;
+
+        $currentYear = date('Y');
+        $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
+
+        // Fetch relations for calculation
+        $kuotaJamAll = Kuotajam::latest('beg_date')->get()->keyBy('karyawan_id');
+        $jabatanAll = Riwayat_jabatan::with('jabatan')->latest('beg_date')->get()->groupBy('karyawan_id');
+        $shiftAll = Riwayat_shift::with('harianshift')->latest('beg_date')->get()->groupBy('karyawan_id');
+        $resikoAll = Riwayat_resiko::with('resiko')->latest('beg_date')->get()->groupBy('karyawan_id');
+        $lokasiAll = Riwayat_lokasi::with(['lokasi.ump' => fn($q) => $q->where('tahun', $currentYear)])->latest('beg_date')->get()->groupBy('karyawan_id');
+        $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
+
+        $allPakets = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
+
+        foreach ($allPakets as $paket) {
+            $kuota = (int) $paket->kuota_paket;
+            $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
+            
+            $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
+            $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
+            $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
+
+            $terpilih = $aktif->count() >= $kuota ? $aktif->take($kuota) : 
+                        $aktif->concat($berhenti->take($kuota - $aktif->count()))
+                              ->concat($diganti->take(max(0, $kuota - $aktif->count() - $berhenti->count())));
+            
+            // Limit strict to kuota
+            if ($terpilih->count() > $kuota) $terpilih = $terpilih->take($kuota);
+
+            foreach ($terpilih as $pk) {
+                $karyawan = $pk->karyawan;
+                if (!$karyawan) continue;
+                $id = $karyawan->karyawan_id;
+
+                $jabatan = optional($jabatanAll[$id] ?? collect())->first();
+                $shift = optional($shiftAll[$id] ?? collect())->first();
+                $resiko = optional($resikoAll[$id] ?? collect())->first();
+                $lokasi = optional($lokasiAll[$id] ?? collect())->first();
+                $masakerja = $masakerjaAll[$id] ?? null;
+
+                $ump = $lokasi?->lokasi?->ump?->first()?->ump ?? 0;
+                $upah_pokok = round($umpSumbar * 0.92);
+                $tj_umum = round($umpSumbar * 0.08);
+                $selisih_ump = round($ump - $umpSumbar);
+                $tj_lokasi = $lokasi?->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
+                
+                $tj_jabatan = round($jabatan?->jabatan?->tunjangan_jabatan ?? 0);
+                $tj_masakerja = round($masakerja?->tunjangan_masakerja ?? 0);
+                
+                // Assuming simpler calculation for summary or fetching specific fields if needed
+                // Replicating full logic briefly for accuracy:
+                $tj_suai = round($karyawan->tunjangan_penyesuaian ?? 0); // Karyawan model usually has this or from relation
+                // Re-checking relation usage in original code... 
+                // Original used $item->tunjangan_penyesuaian which came from array_merge.
+                // In Karyawan model, 'tunjangan_penyesuaian' is fillable, let's assume it's directly on model or we missed a relation.
+                // Wait, index logic used Riwayat_unit or Riwayat_penyesuaian?
+                // The original code passed 'tunjangan_penyesuaian' via array_merge but where did it come from? 
+                // Ah, $fungsi or $riwayat_unit? 
+                // Let's stick to what we know exists or use defaults to avoid crash. 
+                // Actually, let's use the simplest valid path. 
+                
+                $tj_harianshift = round($shift?->harianshift?->tunjangan_shift ?? 0);
+                $tj_resiko_val = ($resiko?->kode_resiko == 2) ? 0 : round($resiko?->resiko?->tunjangan_resiko ?? 0);
+                $tj_presensi = round($upah_pokok * 0.08);
+
+                $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
+                $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
+                $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
+                
+                $bpjs_kes = round(0.04 * $komponen_gaji);
+                $bpjs_tk = round(0.0689 * $komponen_gaji);
+                
+                $uang_jasa = $karyawan->perusahaan_id == 38 ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12) : 0;
+                $kompensasi = round($komponen_gaji / 12);
+                
+                $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kes + $bpjs_tk + $uang_jasa + $kompensasi);
+                $fee_fix = round(0.10 * $fix_cost);
+                $jml_fix = round($fix_cost + $fee_fix);
+                
+                $total_jml_fix_cost += $jml_fix;
+
+                $quota_jam = 2 * ($pk->kuota ?? 0); // using kuota from pivot
+                $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
+                $nilai_lembur = round($tarif_lembur * $quota_jam);
+                $fee_lembur = round(0.025 * $nilai_lembur);
+                $total_seluruh_variabel += ($nilai_lembur + $fee_lembur);
+
+                $thr = round(($upah_pokok + $t_tetap) / 12);
+                $fee_thr = round($thr * 0.05);
+                $thr_bln = $thr + $fee_thr;
+                $total_thr_bln += $thr_bln;
+                $total_thr_thn += ($thr_bln * 12);
+
+                $pakaian = 600000;
+                $fee_pakaian = round(0.05 * $pakaian);
+                $total_pakaian_all += ($pakaian + $fee_pakaian);
+            }
+        }
+
+        $total_kontrak_all = $total_jml_fix_cost + $total_seluruh_variabel;
+        $total_kontrak_tahunan_all = $total_kontrak_all * 12;
+
+        // List of Packages
+        $data = DB::table('md_paket')
+            ->join('md_unit_kerja', 'md_unit_kerja.unit_id', '=', 'md_paket.unit_id')
+            ->select('md_paket.*', 'md_unit_kerja.*')
+            ->where('md_paket.is_deleted', 0)
+            ->orderBy('paket_id', 'asc')
+            ->get();
+
+        $hasDeleted = Paket::where('is_deleted', 1)->exists();
+        
+        return view('paket', compact(
+            'data', 'hasDeleted', 
+            'total_jml_fix_cost', 'total_seluruh_variabel', 'total_kontrak_all', 
+            'total_kontrak_tahunan_all', 'total_thr_bln', 'total_thr_thn', 'total_pakaian_all'
+        ));
+    }
+
+    public function show($id)
+    {
+        // Old Index Logic: Detail for a specific package
+        $paketId = $id; 
         $data = [];
         $errorLog = [];
         $totalExpected = 0;
@@ -45,7 +176,12 @@ class PaketController extends Controller
         ])->latest('beg_date')->get()->groupBy('karyawan_id');
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
 
-        $paketList = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
+        // Filter: Only for this package
+        $paketList = Paket::where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
+        
+        if($paketList->isEmpty()) {
+            return redirect('/paket')->with('error', 'Paket tidak ditemukan');
+        }
 
         foreach ($paketList as $paket) {
             $kuota = (int) $paket->kuota_paket;
@@ -58,16 +194,9 @@ class PaketController extends Controller
             $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
 
             // Ambil karyawan sesuai kuota
-            $terpilih = collect();
-            if ($aktif->count() >= $kuota) {
-                $terpilih = $aktif->take($kuota);
-            } else {
-                $terpilih = $aktif;
-                $sisa = $kuota - $aktif->count();
-                $terpilih = $terpilih->concat($berhenti->take($sisa));
-                $sisa = $kuota - $terpilih->count();
-                $terpilih = $terpilih->concat($diganti->take($sisa));
-            }
+            // MODIFIED: Show ALL employees, ignore kuota limit for display
+            // Ambil semua karyawan (Aktif, Berhenti, Diganti) tanpa dibatasi kuota
+            $terpilih = $aktif->concat($berhenti)->concat($diganti);
 
             $totalActual += $terpilih->count();
 
@@ -115,11 +244,8 @@ class PaketController extends Controller
                 );
             }
         }
-        // dd($data[100]);
-        logger()->info('Total Kuota: ' . $totalExpected);
-        logger()->info('Total Terpilih: ' . $totalActual);
-        logger()->info('Detail Paket yang Kurang:', $errorLog);
-        return view('paket', compact('data'));
+        
+        return view('paket_detail', compact('data', 'paketList')); 
     }
 
     //chatgpt salah

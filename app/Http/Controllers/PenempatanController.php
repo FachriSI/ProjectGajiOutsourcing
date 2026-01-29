@@ -500,20 +500,22 @@ class PenempatanController extends Controller
     // }
 
     public function setBerhenti(Request $request)
-    {
-        $request->validate([
-            'id' => 'required',
-            'catatan' => 'required|string|max:1000'
-        ]);
+{
+    $request->validate([
+        'id' => 'required',
+        'catatan' => 'required|string|max:1000',
+        'tanggal_berhenti' => 'required|date',
+    ]);
 
-        Karyawan::where('karyawan_id', $request->id)->update([
-            'status_aktif' => 'Berhenti', // jika ada kolom status
-            'catatan_berhenti' => $request->catatan,
-            'tanggal_berhenti' => now(), // opsional
-        ]);
+    Karyawan::where('karyawan_id', $request->id)->update([
+        'status_aktif' => 'Berhenti',
+        'catatan_berhenti' => $request->catatan,
+        'tanggal_berhenti' => $request->tanggal_berhenti,
+        'diberhentikan_oleh' => auth()->id(),
+    ]);
 
-        return response()->json(['message' => 'Karyawan berhasil diberhentikan']);
-    }
+    return response()->json(['message' => 'Karyawan berhasil diberhentikan']);
+}
 
 
     public function formPengganti($id)
