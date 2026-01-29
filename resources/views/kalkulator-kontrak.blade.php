@@ -240,13 +240,18 @@
                                                 <span class="text-muted">-</span>
                                             @endif
                                         </td>
+                                        @php
+                                            // Use actual contract periode if available, otherwise use current periode
+                                            $routePeriode = $nilaiKontrak ? \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y-m') : $currentPeriode;
+                                        @endphp
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="{{ route('kalkulator.show', ['paket_id' => $item->paket_id, 'periode' => $currentPeriode]) }}"
+                                                <a href="{{ route('kalkulator.show', ['paket_id' => $item->paket_id, 'periode' => $routePeriode]) }}"
                                                     class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
                                                     title="Hitung & Lihat Detail">
                                                     <i class="fas fa-calculator"></i>
                                                 </a>
+                                                @if($nilaiKontrak)
                                                 <a href="{{ route('paket.tagihan', $item->paket_id) }}"
                                                     class="btn btn-sm btn-info" data-bs-toggle="tooltip"
                                                     title="Lihat Tagihan BOQ">
@@ -262,6 +267,20 @@
                                                     title="Lihat Riwayat">
                                                     <i class="fas fa-history"></i>
                                                 </a>
+                                                @else
+                                                <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
+                                                    title="Hitung kontrak terlebih dahulu">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
+                                                    title="Hitung kontrak terlebih dahulu">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
+                                                    title="Hitung kontrak terlebih dahulu">
+                                                    <i class="fas fa-history"></i>
+                                                </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

@@ -941,7 +941,12 @@ class PaketController extends Controller
     {
         // Calculate BOQ dan simpan ke nilai_kontrak
         $calculatorService = app(\App\Services\ContractCalculatorService::class);
-        $periode = \Carbon\Carbon::now()->format('Y-m');
+        
+        // Get latest periode dari nilai_kontrak yang sudah ada, atau current jika belum ada
+        $latestNilai = \App\Models\NilaiKontrak::where('paket_id', $id)
+            ->orderBy('periode', 'desc')
+            ->first();
+        $periode = $latestNilai ? \Carbon\Carbon::parse($latestNilai->periode)->format('Y-m') : \Carbon\Carbon::now()->format('Y-m');
         
         // Calculate dan simpan
         $nilaiKontrak = $calculatorService->calculateForPaket($id, $periode);
@@ -970,9 +975,17 @@ class PaketController extends Controller
                 ob_end_clean();
             }
 
-            // 1. Calculate dan simpan ke nilai_kontrak
+            // 1. Get latest periode dari nilai_kontrak yang sudah ada
+            $latestNilai = \App\Models\NilaiKontrak::where('paket_id', $id)
+                ->orderBy('periode', 'desc')
+                ->first();
+            
+            if (!$latestNilai) {
+                throw new \Exception('Data kontrak belum tersedia. Silakan hitung kontrak terlebih dahulu.');
+            }
+            
             $calculatorService = app(\App\Services\ContractCalculatorService::class);
-            $periode = \Carbon\Carbon::now()->format('Y-m');
+            $periode = \Carbon\Carbon::parse($latestNilai->periode)->format('Y-m');
             $nilaiKontrak = $calculatorService->calculateForPaket($id, $periode);
 
             // 2. Ambil data paket dari database (untuk compatibility)
@@ -987,8 +1000,62 @@ class PaketController extends Controller
             // 4. Generate QR Code URL
             $verifyUrl = url('/verify-tagihan/' . $token);
 
-            // 5. Generate QR Code as SVG for PDF (SVG doesn't require imagick extension)
-            $qrCode = QrCode::format('svg')->size(100)->generate($verifyUrl);
+            // 5. Generate QR Code using QRServer.com API (more reliable than Google Charts)
+            // QRServer.com is actively maintained and handles long URLs better
+            $qrSize = 120;
+            
+            // Use QRServer.com API instead of Google Charts (deprecated)
+            $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?' . http_build_query([
+                'size' => $qrSize . 'x' . $qrSize,
+                'data' => $verifyUrl,
+                'format' => 'png'
+            ]);
+            
+            // Download QR image from Google API
+            try {
+                // Log attempt
+                \Log::info('Attempting to download QR code from: ' . $qrApiUrl);
+                
+                // Use context to set proper headers
+                $context = stream_context_create([
+                    'http' => [
+                        'method' => 'GET',
+                        'header' => 'User-Agent: Mozilla/5.0',
+                        'timeout' => 10
+                    ]
+                ]);
+                
+                $qrImageData = @file_get_contents($qrApiUrl, false, $context);
+                
+                if ($qrImageData !== false && strlen($qrImageData) > 0) {
+                    // Convert to base64 for PDF embedding
+                    $qrCodeBase64 = base64_encode($qrImageData);
+                    $qrCodeImg = '<img src="data:image/png;base64,' . $qrCodeBase64 . '" alt="QR Code" style="width:120px;height:120px;display:block;margin:0 auto;" />';
+                    \Log::info('QR code downloaded successfully, size: ' . strlen($qrImageData) . ' bytes');
+                } else {
+                    // Fallback if download fails
+                    \Log::warning('QR code download returned empty or false');
+                    $qrCodeImg = '<div style="border:2px solid #000;padding:10px;width:120px;height:120px;text-align:center;font-size:7px;line-height:1.3;">
+                        <strong>Verifikasi Online</strong><br/><br/>
+                        Kunjungi:<br/>
+                        <span style="font-size:6px;word-break:break-all;">' . $verifyUrl . '</span>
+                    </div>';
+                }
+            } catch (\Exception $e) {
+                // Fallback on error with detailed logging
+                \Log::error('QR code generation failed: ' . $e->getMessage());
+                \Log::error('Error details: ' . print_r([
+                    'allow_url_fopen' => ini_get('allow_url_fopen'),
+                    'openssl_loaded' => extension_loaded('openssl'),
+                    'url' => $qrApiUrl
+                ], true));
+                
+                $qrCodeImg = '<div style="border:2px solid #000;padding:10px;width:120px;height:120px;text-align:center;font-size:7px;line-height:1.3;">
+                    <strong>Verifikasi Online</strong><br/><br/>
+                    Kunjungi:<br/>
+                    <span style="font-size:6px;word-break:break-all;">' . $verifyUrl . '</span>
+                </div>';
+            }
 
             // 6. Simpan ke tagihan_cetak dengan reference ke nilai_kontrak
             $tagihan = TagihanCetak::create([
@@ -1001,13 +1068,18 @@ class PaketController extends Controller
                 'tanggal_cetak' => now()
             ]);
 
+
             // 6. Generate PDF dengan DomPDF
+            // Extract year from contract period for signature
+            $contractYear = \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y');
+            
             $pdf = Pdf::loadView('tagihan-pdf', [
                 'boq' => $boqData,
-                'qrCode' => $qrCode,
+                'qrCode' => $qrCodeImg,
                 'token' => $token,
                 'tanggal_cetak' => now()->format('d F Y'),
-                'cetak_id' => $tagihan->cetak_id
+                'cetak_id' => $tagihan->cetak_id,
+                'contract_year' => $contractYear  // Year from contract period for signature
             ]);
 
             $pdf->setPaper('A4', 'portrait');
@@ -1028,22 +1100,105 @@ class PaketController extends Controller
     /**
      * Verifikasi keaslian tagihan melalui QR Code
      */
+    /**
+     * Verify tagihan from QR code scan
+     * Public access - no auth required
+     * Directly shows PDF in browser (can be printed)
+     */
     public function verifyTagihan($token)
     {
-        $tagihan = TagihanCetak::where('token', $token)->with('paket')->first();
+        // Find tagihan with related data
+        $tagihan = TagihanCetak::where('token', $token)
+            ->with(['paket.unitKerja'])
+            ->first();
 
         if (!$tagihan) {
-            return view('verify-tagihan', [
-                'valid' => false,
+            // Show error page if invalid token
+            return view('verify-tagihan-error', [
                 'message' => 'Token tagihan tidak ditemukan atau tidak valid.'
             ]);
         }
 
-        return view('verify-tagihan', [
-            'valid' => true,
-            'tagihan' => $tagihan,
-            'message' => 'Tagihan terverifikasi dan valid.'
+        // Regenerate PDF to show in browser
+        // Get nilai kontrak untuk regenerate
+        $nilaiKontrak = \App\Models\NilaiKontrak::where('paket_id', $tagihan->paket_id)
+            ->orderBy('periode', 'desc')
+            ->first();
+
+        if (!$nilaiKontrak) {
+            return view('verify-tagihan-error', [
+                'message' => 'Data kontrak tidak ditemukan.'
+            ]);
+        }
+
+        // Calculate BOQ data
+        $boqData = $this->calculateBOQ($tagihan->paket_id);
+        
+        // Generate QR Code
+        $verifyUrl = url('/verify-tagihan/' . $token);
+        $qrSize = 120;
+        $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?' . http_build_query([
+            'size' => $qrSize . 'x' . $qrSize,
+            'data' => $verifyUrl,
+            'format' => 'png'
         ]);
+        
+        // Download and encode QR
+        try {
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'GET',
+                    'header' => 'User-Agent: Mozilla/5.0',
+                    'timeout' => 10
+                ]
+            ]);
+            
+            $qrImageData = @file_get_contents($qrApiUrl, false, $context);
+            
+            if ($qrImageData !== false && strlen($qrImageData) > 0) {
+                $qrCodeBase64 = base64_encode($qrImageData);
+                $qrCodeImg = '<img src="data:image/png;base64,' . $qrCodeBase64 . '" alt="QR Code" style="width:120px;height:120px;display:block;margin:0 auto;" />';
+            } else {
+                $qrCodeImg = '<div style="border:2px solid #000;padding:10px;width:120px;height:120px;text-align:center;font-size:7px;">QR Code</div>';
+            }
+        } catch (\Exception $e) {
+            $qrCodeImg = '<div style="border:2px solid #000;padding:10px;width:120px;height:120px;text-align:center;font-size:7px;">QR Code</div>';
+        }
+
+        // Extract year from contract period
+        $contractYear = \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y');
+        
+        // Generate PDF and stream to browser (not download)
+        $pdf = Pdf::loadView('tagihan-pdf', [
+            'boq' => $boqData,
+            'qrCode' => $qrCodeImg,
+            'token' => $token,
+            'tanggal_cetak' => now()->format('d F Y'),
+            'cetak_id' => $tagihan->cetak_id,
+            'contract_year' => $contractYear
+        ]);
+
+        $pdf->setPaper('A4', 'portrait');
+        
+        // Stream PDF to browser (can view and print)
+        return $pdf->stream('Tagihan_' . $tagihan->cetak_id . '.pdf');
+    }
+
+    /**
+     * Download PDF from verification page
+     * Public access - requires valid token
+     */
+    public function downloadVerifiedPDF($token)
+    {
+        $tagihan = TagihanCetak::where('token', $token)->first();
+
+        if (!$tagihan) {
+            abort(404, 'Tagihan tidak ditemukan');
+        }
+
+        // Regenerate PDF sama seperti generatePDF method
+        // Atau redirect ke route generatePDF jika lebih prefer
+        return redirect()->route('paket.pdf.download', $tagihan->paket_id);
     }
 
 }

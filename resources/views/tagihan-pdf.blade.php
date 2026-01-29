@@ -450,14 +450,14 @@
             <div class="signature-left">
                 <div class="qr-section">
                     {!! $qrCode !!}
-                    <p style="font-size: 7px; margin-top: 3px;">Scan untuk verifikasi</p>
-                    <p style="font-size: 6px; word-break: break-all; max-width: 200px;">Token:
+                    <p style="font-size: 7px; margin-top: 3px; text-align: center;">Scan untuk verifikasi</p>
+                    <p style="font-size: 6px; word-break: break-all; max-width: 200px; text-align: center;">Token:
                         {{ substr($token, 0, 20) }}...
                     </p>
                 </div>
             </div>
             <div class="signature-right">
-                <p>Padang, ........................................ 202</p>
+                <p>Padang, ........................................ {{ $contract_year }}</p>
                 <br>
                 <p>PT ........................................................</p>
                 <div class="signature-line"></div>

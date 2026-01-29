@@ -3,168 +3,231 @@
 @section('title', 'Detail Kontrak')
 
 @section('content')
-    <div class="container-fluid py-3">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">
-                <i class="fas fa-file-contract me-2"></i>
-                Detail Kontrak: {{ $nilaiKontrak->paket->paket }}
-            </h4>
-            <div>
-                <a href="{{ route('kalkulator.index') }}" class="btn btn-secondary me-2">
-                    <i class="fas fa-arrow-left me-1"></i> Kembali
-                </a>
-                <a href="{{ route('paket.pdf.download', $nilaiKontrak->paket_id) }}" class="btn btn-success" target="_blank">
-                    <i class="fas fa-download me-1"></i> Unduh PDF
-                </a>
-            </div>
-        </div>
+    <h3 class="mt-4">Detail Nilai Kontrak</h3>
+    <p class="text-muted">Rincian lengkap perhitungan nilai kontrak untuk paket {{ $nilaiKontrak->paket->paket }}</p>
 
-        <!-- Summary Card -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Ringkasan</h5>
+    <div class="container-fluid px-0">
+        <!-- Header Actions -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-contract me-2"></i>
+                    {{ $nilaiKontrak->paket->paket }}
+                </h5>
+                <div>
+                    <a href="{{ route('kalkulator.index') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-arrow-left me-1"></i> Kembali
+                    </a>
+                    <a href="{{ route('paket.pdf.download', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-success" target="_blank">
+                        <i class="fas fa-file-pdf me-1"></i> Unduh PDF dengan QR Code
+                    </a>
+                    <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-info" target="_blank">
+                        <i class="fas fa-eye me-1"></i> Preview Tagihan
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="mb-2"><strong>Unit Kerja:</strong></p>
+                        <p class="text-muted">{{ $nilaiKontrak->paket->unitKerja->unit_kerja ?? '-' }}</p>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <p class="mb-2"><strong>Paket:</strong> {{ $nilaiKontrak->paket->paket }}</p>
-                                <p class="mb-2"><strong>Unit Kerja:</strong> {{ $nilaiKontrak->paket->unitKerja->unit_kerja ?? '-' }}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p class="mb-2"><strong>Periode:</strong> {{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('F Y') }}</p>
-                                <p class="mb-2"><strong>Dihitung:</strong> {{ $nilaiKontrak->calculated_at->format('d M Y H:i') }}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p class="mb-2"><strong>UMP Sumbar:</strong> Rp {{ number_format($nilaiKontrak->ump_sumbar, 0, ',', '.') }}</p>
-                                <p class="mb-2"><strong>Kuota Paket:</strong> {{ $nilaiKontrak->kuota_paket }} orang</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p class="mb-2"><strong>Karyawan Aktif:</strong> {{ $nilaiKontrak->jumlah_karyawan_aktif }} orang</p>
-                                <p class="mb-2"><strong>Total Karyawan:</strong> {{ $nilaiKontrak->jumlah_karyawan_total }} orang</p>
-                            </div>
-                        </div>
+                    <div class="col-md-3">
+                        <p class="mb-2"><strong>Periode:</strong></p>
+                        <p class="text-muted">{{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('F Y') }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-2"><strong>Tanggal Perhitungan:</strong></p>
+                        <p class="text-muted">{{ $nilaiKontrak->calculated_at->format('d M Y, H:i') }} WIB</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-2"><strong>UMP Sumbar {{ $nilaiKontrak->tahun }}:</strong></p>
+                        <p class="text-primary fw-bold">Rp {{ number_format($nilaiKontrak->ump_sumbar, 0, ',', '.') }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Total Nilai Kontrak -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="alert alert-success text-center">
-                    <h1 class="display-4 mb-0">
-                        <i class="fas fa-money-bill-wave"></i> 
-                        Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}
-                    </h1>
-                    <p class="mb-0 mt-2">Total Nilai Kontrak per Bulan</p>
+        <div class="card shadow mb-4">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">
+                <h6 class="text-white mb-2 text-uppercase" style="letter-spacing: 1px;">
+                    <i class="fas fa-money-bill-wave me-2"></i>Total Nilai Kontrak per Bulan
+                </h6>
+                <h1 class="display-3 text-white fw-bold mb-0">
+                    Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}
+                </h1>
+                <div class="mt-3">
+                    <span class="badge bg-light text-success px-3 py-2">
+                        <i class="fas fa-calendar-check me-1"></i> 
+                        Periode: {{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('F Y') }}
+                    </span>
                 </div>
             </div>
         </div>
 
         <!-- Breakdown Pengawas vs Pelaksana -->
         <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card border-primary shadow">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-user-tie"></i> Pengawas</h5>
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-tie me-2"></i>Pengawas
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <table class="table table-sm">
-                            <tr>
-                                <td><strong>Jumlah</strong></td>
-                                <td class="text-end">{{ $nilaiKontrak->jumlah_pengawas }} orang</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Total Nilai</strong></td>
-                                <td class="text-end">Rp {{ number_format($nilaiKontrak->total_pengawas, 0, ',', '.') }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Rata-rata per Orang</strong></td>
-                                <td class="text-end">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="mb-0 text-primary">{{ $nilaiKontrak->jumlah_pengawas }}</h2>
+                            <span class="text-muted">Orang</span>
+                        </div>
+                        <hr>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Total Nilai:</span>
+                                <strong class="text-primary">
+                                    Rp {{ number_format($nilaiKontrak->total_pengawas, 0, ',', '.') }}
+                                </strong>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Rata-rata/Orang:</span>
+                                <strong>
                                     Rp {{ $nilaiKontrak->jumlah_pengawas > 0 ? number_format($nilaiKontrak->total_pengawas / $nilaiKontrak->jumlah_pengawas, 0, ',', '.') : 0 }}
-                                </td>
-                            </tr>
-                        </table>
+                                </strong>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card border-secondary shadow">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0"><i class="fas fa-users"></i> Pelaksana</h5>
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>Pelaksana
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <table class="table table-sm">
-                            <tr>
-                                <td><strong>Jumlah</strong></td>
-                                <td class="text-end">{{ $nilaiKontrak->jumlah_pelaksana }} orang</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Total Nilai</strong></td>
-                                <td class="text-end">Rp {{ number_format($nilaiKontrak->total_pelaksana, 0, ',', '.') }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Rata-rata per Orang</strong></td>
-                                <td class="text-end">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="mb-0 text-success">{{ $nilaiKontrak->jumlah_pelaksana }}</h2>
+                            <span class="text-muted">Orang</span>
+                        </div>
+                        <hr>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Total Nilai:</span>
+                                <strong class="text-success">
+                                    Rp {{ number_format($nilaiKontrak->total_pelaksana, 0, ',', '.') }}
+                                </strong>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Rata-rata/Orang:</span>
+                                <strong>
                                     Rp {{ $nilaiKontrak->jumlah_pelaksana > 0 ? number_format($nilaiKontrak->total_pelaksana / $nilaiKontrak->jumlah_pelaksana, 0, ',', '.') : 0 }}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Comparison with Previous Period -->
-        @if($previousNilai)
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card shadow">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-chart-line"></i> Perbandingan dengan Periode Sebelumnya</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <p class="mb-2"><strong>Periode Sebelumnya:</strong> {{ \Carbon\Carbon::parse($previousNilai->periode)->format('F Y') }}</p>
-                                <p class="mb-2"><strong>Nilai Sebelumnya:</strong> Rp {{ number_format($previousNilai->total_nilai_kontrak, 0, ',', '.') }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <p class="mb-2"><strong>Periode Sekarang:</strong> {{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('F Y') }}</p>
-                                <p class="mb-2"><strong>Nilai Sekarang:</strong> Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                @php
-                                    $delta = $nilaiKontrak->total_nilai_kontrak - $previousNilai->total_nilai_kontrak;
-                                    $percentage = $previousNilai->total_nilai_kontrak > 0 ? ($delta / $previousNilai->total_nilai_kontrak) * 100 : 0;
-                                @endphp
-                                <p class="mb-2"><strong>Selisih:</strong> 
-                                    <span class="{{ $delta >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ $delta >= 0 ? '+' : '' }}Rp {{ number_format($delta, 0, ',', '.') }}
-                                    </span>
-                                </p>
-                                <p class="mb-2"><strong>Persentase:</strong> 
-                                    <span class="{{ $percentage >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ $percentage >= 0 ? '+' : '' }}{{ number_format($percentage, 2) }}%
-                                    </span>
-                                </p>
+                                </strong>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        @endif
+
+        <!-- Kombinasi: Perbandingan + Statistik Karyawan -->
+        <div class="row mb-4">
+            @if($previousNilai)
+            <div class="col-md-12">
+                <div class="card shadow">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>Perbandingan dengan Periode Sebelumnya
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="p-3">
+                                    <small class="text-muted d-block mb-1">Periode Sebelumnya</small>
+                                    <h6 class="mb-2">{{ \Carbon\Carbon::parse($previousNilai->periode)->format('F Y') }}</h6>
+                                    <h5 class="text-secondary">Rp {{ number_format($previousNilai->total_nilai_kontrak, 0, ',', '.') }}</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                @php
+                                    $delta = $nilaiKontrak->total_nilai_kontrak - $previousNilai->total_nilai_kontrak;
+                                    $percentage = $previousNilai->total_nilai_kontrak > 0 ? ($delta / $previousNilai->total_nilai_kontrak) * 100 : 0;
+                                @endphp
+                                <div class="p-3 bg-light h-100 d-flex flex-column justify-content-center">
+                                    <i class="fas fa-{{ $delta >= 0 ? 'arrow-up' : 'arrow-down' }} fa-2x mb-2 text-{{ $delta >= 0 ? 'success' : 'danger' }}"></i>
+                                    <h5 class="mb-1 text-{{ $delta >= 0 ? 'success' : 'danger' }}">
+                                        {{ $delta >= 0 ? '+' : '' }}Rp {{ number_format(abs($delta), 0, ',', '.') }}
+                                    </h5>
+                                    <span class="badge bg-{{ $delta >= 0 ? 'success' : 'danger' }}">
+                                        {{ $delta >= 0 ? '+' : '' }}{{ number_format($percentage, 2) }}%
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3">
+                                    <small class="text-muted d-block mb-1">Periode Sekarang</small>
+                                    <h6 class="mb-2">{{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('F Y') }}</h6>
+                                    <h5 class="text-primary">Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @else
+            <div class="col-md-12">
+                <div class="card shadow">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>Statistik Karyawan
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="p-3">
+                                    <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+                                    <h3 class="mb-0 text-success">{{ $nilaiKontrak->jumlah_karyawan_aktif }}</h3>
+                                    <small class="text-muted">Karyawan Aktif</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3">
+                                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                    <h3 class="mb-0 text-primary">{{ $nilaiKontrak->jumlah_karyawan_total }}</h3>
+                                    <small class="text-muted">Total Karyawan</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3">
+                                    <i class="fas fa-clipboard-list fa-2x text-info mb-2"></i>
+                                    <h3 class="mb-0 text-info">{{ $nilaiKontrak->kuota_paket }}</h3>
+                                    <small class="text-muted">Kuota Paket</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+        </div>
 
         <!-- Detail Karyawan -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card shadow">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="mb-0"><i class="fas fa-list"></i> Detail Breakdown per Karyawan</h5>
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users-cog me-2"></i>Detail Breakdown per Karyawan
+                        </h5>
+                        <span class="badge bg-light text-dark">
+                            {{ count($nilaiKontrak->breakdown_json['karyawan'] ?? []) }} Karyawan
+                        </span>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -220,14 +283,28 @@
             </div>
         </div>
 
+
         <!-- Action Buttons -->
-        <div class="mt-4 d-flex gap-2">
-            <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-info">
-                <i class="fas fa-history"></i> Lihat Riwayat Perubahan
-            </a>
-            <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-primary">
-                <i class="fas fa-file-invoice"></i> Lihat Tagihan Lengkap
-            </a>
+        <div class="card shadow mt-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-info w-100">
+                            <i class="fas fa-history me-2"></i>Lihat Riwayat Perubahan
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-primary w-100">
+                            <i class="fas fa-file-invoice me-2"></i>Lihat Tagihan Lengkap
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-warning w-100">
+                            <i class="fas fa-history me-2"></i>Lihat Riwayat Kontrak
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

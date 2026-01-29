@@ -65,6 +65,14 @@ class NilaiKontrak extends Model
     }
 
     /**
+     * Relationship to ContractValidation
+     */
+    public function validations()
+    {
+        return $this->hasMany(ContractValidation::class, 'nilai_kontrak_id', 'id');
+    }
+
+    /**
      * Scope untuk filter by periode
      */
     public function scopePeriode($query, $periode)

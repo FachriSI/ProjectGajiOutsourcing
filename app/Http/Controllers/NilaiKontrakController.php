@@ -43,7 +43,7 @@ class NilaiKontrakController extends Controller
     public function calculate(Request $request)
     {
         $request->validate([
-            'paket_id' => 'required|exists:paket,paket_id',
+            'paket_id' => 'required|exists:md_paket,paket_id',
             'periode' => 'required|date_format:Y-m'
         ]);
 

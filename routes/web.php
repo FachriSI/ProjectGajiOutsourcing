@@ -45,6 +45,11 @@ Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])
 
 // Public Routes (No Auth Required)
 Route::get('/verify-tagihan/{token}', [PaketController::class, 'verifyTagihan'])->name('tagihan.verify');
+Route::get('/verify-tagihan/{token}/download', [PaketController::class, 'downloadVerifiedPDF'])->name('tagihan.verify.download');
+
+// Public route for QR code validation
+Route::get('/validate/{token}', [App\Http\Controllers\ContractValidationController::class, 'validate'])->name('contract.validate');
+Route::get('/api/validate/{token}', [App\Http\Controllers\ContractValidationController::class, 'validateApi'])->name('contract.validate.api');
 
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
@@ -233,4 +238,5 @@ Route::middleware(['auth'])->group(function () {
 
     // API untuk AJAX
     Route::get('/api/nilai-kontrak/calculate/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'apiCalculate'])->name('api.kalkulator.calculate');
+
 });

@@ -26,7 +26,7 @@ class KaryawanController extends Controller
             'pakaianTerakhir',
         ])->where('is_deleted', 0)->get();
 
-        $paketList = DB::table('paket')->get();
+        $paketList = DB::table('md_paket')->get();
 
         // Ambil paket aktif saat ini untuk tiap karyawan
         $paketKaryawan = DB::table('paket_karyawan as pk1')
@@ -247,8 +247,8 @@ class KaryawanController extends Controller
     {
         // Validasi input
         $request->validate([
-            'karyawan_id' => 'required|exists:karyawan,karyawan_id',
-            'paket_id' => 'required|exists:paket,paket_id',
+            'karyawan_id' => 'required|exists:md_karyawan,karyawan_id',
+            'paket_id' => 'required|exists:md_paket,paket_id',
             'beg_date' => 'required',
         ]);
 
@@ -286,7 +286,7 @@ class KaryawanController extends Controller
     {
         // Validasi input
         $request->validate([
-            'karyawan_id' => 'required|exists:karyawan,karyawan_id',
+            'karyawan_id' => 'required|exists:md_karyawan,karyawan_id',
             'kode_jabatan' => 'required|exists:md_jabatan,kode_jabatan',
             'beg_date' => 'required',
         ]);

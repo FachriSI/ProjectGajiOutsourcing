@@ -159,6 +159,18 @@ class ContractCalculatorService
             $kompensasi = round($komponen_gaji / 12);
 
             $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
+            $fee_fix_cost = round(0.10 * $fix_cost);
+            $jumlah_fix_cost = round($fix_cost + $fee_fix_cost);
+
+            // Lembur calculation
+            $quota_jam = $kuota_jam->kuota ?? 0;
+            $quota_jam_perkalian = 2 * $quota_jam;
+            $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
+            $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
+            $fee_lembur = round(0.025 * $nilai_lembur);
+            $total_variabel = $nilai_lembur + $fee_lembur;
+
+            $total_kontrak = $jumlah_fix_cost + $total_variabel;
 
             // Tentukan kategori (Pengawas atau Pelaksana)
             $jabatan_nama = optional($jabatan?->jabatan)->jabatan ?? '';
@@ -175,7 +187,9 @@ class ContractCalculatorService
                 $pengawas['bpjs_kesehatan'] += $bpjs_kesehatan;
                 $pengawas['bpjs_ketenagakerjaan'] += $bpjs_ketenagakerjaan;
                 $pengawas['kompensasi'] += $kompensasi;
-                $pengawas['total'] += $fix_cost;
+                $pengawas['nilai_kontrak'] += $jumlah_fix_cost;
+                $pengawas['lembur'] += $total_variabel;
+                $pengawas['total'] += $total_kontrak;
             } else {
                 $pelaksana['count']++;
                 $pelaksana['upah_pokok'] += $upah_pokok;
@@ -185,7 +199,9 @@ class ContractCalculatorService
                 $pelaksana['bpjs_kesehatan'] += $bpjs_kesehatan;
                 $pelaksana['bpjs_ketenagakerjaan'] += $bpjs_ketenagakerjaan;
                 $pelaksana['kompensasi'] += $kompensasi;
-                $pelaksana['total'] += $fix_cost;
+                $pelaksana['nilai_kontrak'] += $jumlah_fix_cost;
+                $pelaksana['lembur'] += $total_variabel;
+                $pelaksana['total'] += $total_kontrak;
             }
 
             // Simpan detail karyawan untuk breakdown
@@ -202,7 +218,9 @@ class ContractCalculatorService
                 'bpjs_kesehatan' => $bpjs_kesehatan,
                 'bpjs_ketenagakerjaan' => $bpjs_ketenagakerjaan,
                 'kompensasi' => $kompensasi,
-                'total' => $fix_cost
+                'fix_cost' => $jumlah_fix_cost,
+                'lembur' => $total_variabel,
+                'total' => $total_kontrak
             ];
         }
 
