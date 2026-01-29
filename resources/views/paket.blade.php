@@ -70,55 +70,6 @@
         </div>
     </div>
 
-<style>
-    /* Custom Table Styling - Matched with Detail Page */
-    #datatablesSimple {
-        width: 100% !important;
-        border-collapse: collapse !important;
-    }
-
-    /* Line at the very top, above the headers */
-    #datatablesSimple thead tr:first-child th {
-        border-top: 3px solid #343a40 !important;
-    }
-
-    #datatablesSimple thead th {
-        background-color: #343a40;
-        color: #ffffff;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        vertical-align: middle;
-        white-space: nowrap;
-        border-bottom: 2px solid #dee2e6; /* Standard separation */
-        border-right: 1px solid #4b545c; /* Vertical separators in header */
-    }
-
-    #datatablesSimple tbody td {
-        vertical-align: middle;
-        font-size: 0.9rem;
-        border-right: 1px solid #dee2e6; /* Vertical separators in body */
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    /* Row hover effect */
-    #datatablesSimple tbody tr:hover {
-        background-color: #f1f3f5;
-    }
-
-    /* Compact pagination */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.2rem 0.5rem;
-    }
-
-    /* Add spacing between controls (Search/Entries) and Table */
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_length {
-        margin-bottom: 20px !important;
-        padding-bottom: 10px !important; 
-    }
-</style>
 
     <div class="card mb-4 border-0 shadow">
         <div class="card-body">
@@ -141,13 +92,14 @@
                             <td>{{ $item->kuota_paket }}</td>
                             <td>{{ $item->unit_kerja }}</td>
                             <td>
-                                <a href="{{ url('/paket/' . $item->paket_id) }}" class="btn btn-sm btn-info text-white" title="Lihat Detail">
+                                <a href="{{ url('/paket/' . $item->paket_id) }}" class="btn btn-sm btn-info text-white"
+                                    title="Lihat Detail">
                                     <i class="fas fa-eye"></i> Detail
                                 </a>
                             </td>
                             <td>
-                                <a href="/getupdate-paket/{{ $item->paket_id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
-                                    data-bs-placement="top" title="Edit">
+                                <a href="/getupdate-paket/{{ $item->paket_id }}" class="btn btn-sm btn-warning"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a href="{{ url('delete-paket', $item->paket_id) }}" class="btn btn-sm btn-danger btn-delete"
@@ -162,13 +114,13 @@
         </div>
     </div>
 
-    
+
     <!-- Add jQuery DataTables Script to ensure controls appear and match Detail page styling -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#datatablesSimple').DataTable({
                 "language": {
                     "search": "Cari:",

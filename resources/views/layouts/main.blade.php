@@ -27,6 +27,9 @@
     <!-- Custom Styles -->
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
 
+    <!-- Global Table Styles -->
+    <link href="{{ asset('css/custom-tables.css') }}" rel="stylesheet">
+
 
     <!-- jQuery (harus paling atas sebelum plugin lain) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -84,30 +87,30 @@
                 width: '100%'
             });
 
-            $('.datatable').each(function() {
+            $('.datatable').each(function () {
                 if (!$.fn.DataTable.isDataTable(this)) {
                     $(this).DataTable({
                         language: {
-                            "decimal":        "",
-                            "emptyTable":     "Tidak ada data yang tersedia pada tabel ini",
-                            "info":           "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-                            "infoEmpty":      "Menampilkan 0 sampai 0 dari 0 entri",
-                            "infoFiltered":   "(disaring dari _MAX_ entri keseluruhan)",
-                            "infoPostFix":    "",
-                            "thousands":      ",",
-                            "lengthMenu":     "Tampilkan _MENU_ entri",
+                            "decimal": "",
+                            "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
+                            "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                            "infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+                            "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Tampilkan _MENU_ entri",
                             "loadingRecords": "Sedang memuat...",
-                            "processing":     "Sedang memproses...",
-                            "search":         "Cari:",
-                            "zeroRecords":    "Tidak ditemukan data yang sesuai",
+                            "processing": "Sedang memproses...",
+                            "search": "Cari:",
+                            "zeroRecords": "Tidak ditemukan data yang sesuai",
                             "paginate": {
-                                "first":      "Pertama",
-                                "last":       "Terakhir",
-                                "next":       "Selanjutnya",
-                                "previous":   "Sebelumnya"
+                                "first": "Pertama",
+                                "last": "Terakhir",
+                                "next": "Selanjutnya",
+                                "previous": "Sebelumnya"
                             },
                             "aria": {
-                                "sortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                                "sortAscending": ": aktifkan untuk mengurutkan kolom ke atas",
                                 "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
                             }
                         }

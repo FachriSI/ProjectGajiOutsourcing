@@ -3,93 +3,93 @@
 @section('title', 'Detail Paket')
 
 @section('content')
-@php
-    $total_kontrak_all = 0;
-    $total_kontrak_tahunan_all = 0;
-    $total_thr_bln = 0;
-    $total_thr_thn = 0;
-    $total_pakaian_all = 0;
-    $total_jml_fix_cost = 0;
-    $total_fix_cost = 0;
-    $total_seluruh_variabel = 0;
+    @php
+        $total_kontrak_all = 0;
+        $total_kontrak_tahunan_all = 0;
+        $total_thr_bln = 0;
+        $total_thr_thn = 0;
+        $total_pakaian_all = 0;
+        $total_jml_fix_cost = 0;
+        $total_fix_cost = 0;
+        $total_seluruh_variabel = 0;
 
-    foreach ($data as $item) {
-        $ump = $item->lokasi['ump']['ump'] ?? 0;
-        $ump_sumbar = $item->ump_sumbar ?? 0;
+        foreach ($data as $item) {
+            $ump = $item->lokasi['ump']['ump'] ?? 0;
+            $ump_sumbar = $item->ump_sumbar ?? 0;
 
-        $upah_pokok = round($ump_sumbar * 0.92);
-        $tj_umum = round($ump_sumbar * 0.08);
+            $upah_pokok = round($ump_sumbar * 0.92);
+            $tj_umum = round($ump_sumbar * 0.08);
 
-        $selisih_ump = round($ump - $ump_sumbar);
-        $tj_lokasi = $item->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
+            $selisih_ump = round($ump - $ump_sumbar);
+            $tj_lokasi = $item->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
 
-        $tj_jabatan = round($item->tunjangan_jabatan ?? 0);
-        $tj_masakerja = round($item->tunjangan_masakerja ?? 0);
-        $tj_suai = round($item->tunjangan_penyesuaian ?? 0);
-        $tj_harianshift = round($item->harianshift['tunjangan_shift'] ?? 0);
-        $tj_resiko = ($item->kode_resiko == 2) ? 0 : round($item->resiko['tunjangan_resiko'] ?? 0);
-        $tj_presensi = round($upah_pokok * 0.08);
+            $tj_jabatan = round($item->tunjangan_jabatan ?? 0);
+            $tj_masakerja = round($item->tunjangan_masakerja ?? 0);
+            $tj_suai = round($item->tunjangan_penyesuaian ?? 0);
+            $tj_harianshift = round($item->harianshift['tunjangan_shift'] ?? 0);
+            $tj_resiko = ($item->kode_resiko == 2) ? 0 : round($item->resiko['tunjangan_resiko'] ?? 0);
+            $tj_presensi = round($upah_pokok * 0.08);
 
-        $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
-        $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
+            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
+            $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
 
-        $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
-        $bpjs_kesehatan = round(0.04 * $komponen_gaji);
-        $bpjs_ketenagakerjaan = round(0.0689 * $komponen_gaji);
+            $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
+            $bpjs_kesehatan = round(0.04 * $komponen_gaji);
+            $bpjs_ketenagakerjaan = round(0.0689 * $komponen_gaji);
 
-        $uang_jasa = $item->perusahaan_id == 38
-            ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12)
-            : 0;
+            $uang_jasa = $item->perusahaan_id == 38
+                ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12)
+                : 0;
 
-        $kompensasi = round($komponen_gaji / 12);
+            $kompensasi = round($komponen_gaji / 12);
 
-        $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
-        $fee_fix_cost = round(0.10 * $fix_cost);
-        $jumlah_fix_cost = round($fix_cost + $fee_fix_cost);
+            $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
+            $fee_fix_cost = round(0.10 * $fix_cost);
+            $jumlah_fix_cost = round($fix_cost + $fee_fix_cost);
 
-        $total_fix_cost += $fix_cost;
-        $total_jml_fix_cost += $jumlah_fix_cost;
+            $total_fix_cost += $fix_cost;
+            $total_jml_fix_cost += $jumlah_fix_cost;
 
-        // Lembur
-        $quota_jam_perkalian = 2 * ($item->kuota ?? 0);
-        $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
-        $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
-        $fee_lembur = round(0.025 * $nilai_lembur);
-        $total_variabel = $nilai_lembur + $fee_lembur;
-        $total_seluruh_variabel += $total_variabel;
+            // Lembur
+            $quota_jam_perkalian = 2 * ($item->kuota ?? 0);
+            $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
+            $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
+            $fee_lembur = round(0.025 * $nilai_lembur);
+            $total_variabel = $nilai_lembur + $fee_lembur;
+            $total_seluruh_variabel += $total_variabel;
 
-        $total_kontrak = $jumlah_fix_cost + $total_variabel;
-        $total_kontrak_tahunan = $total_kontrak * 12;
+            $total_kontrak = $jumlah_fix_cost + $total_variabel;
+            $total_kontrak_tahunan = $total_kontrak * 12;
 
-        $total_kontrak_all += $total_kontrak;
-        $total_kontrak_tahunan_all += $total_kontrak_tahunan;
+            $total_kontrak_all += $total_kontrak;
+            $total_kontrak_tahunan_all += $total_kontrak_tahunan;
 
-        // THR
-        $thr = round(($upah_pokok + $t_tetap) / 12);
-        $fee_thr = round($thr * 0.05);
-        $thr_bln = $thr + $fee_thr;
-        $thr_thn = $thr_bln * 12;
+            // THR
+            $thr = round(($upah_pokok + $t_tetap) / 12);
+            $fee_thr = round($thr * 0.05);
+            $thr_bln = $thr + $fee_thr;
+            $thr_thn = $thr_bln * 12;
 
-        $total_thr_bln += $thr_bln;
-        $total_thr_thn += $thr_thn;
+            $total_thr_bln += $thr_bln;
+            $total_thr_thn += $thr_thn;
 
-        // Pakaian
-        $pakaian = 600000;
-        $fee_pakaian = round(0.05 * $pakaian);
-        $total_pakaian = $pakaian + $fee_pakaian;
-        $total_pakaian_all += $total_pakaian;
-    }
-@endphp
+            // Pakaian
+            $pakaian = 600000;
+            $fee_pakaian = round(0.05 * $pakaian);
+            $total_pakaian = $pakaian + $fee_pakaian;
+            $total_pakaian_all += $total_pakaian;
+        }
+    @endphp
 
-<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-    <h3>Detail Paket: {{ $paketList->first()->paket ?? 'Nama Paket' }}</h3>
-    <div>
-         <button class="btn btn-primary" onclick="window.print()">
-            <i class="fas fa-print"></i> Print
-        </button>
-        <a href="/paket" class="btn btn-secondary">Kembali</a>
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <h3>Detail Paket: {{ $paketList->first()->paket ?? 'Nama Paket' }}</h3>
+        <div>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <a href="/paket" class="btn btn-secondary">Kembali</a>
+        </div>
     </div>
-</div>
 
     <div class="row mb-4">
         <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
@@ -150,226 +150,230 @@
         </div>
     </div>
 
-<div class="row mb-3">
-    <div class="col-md-4">
-        <label for="filterAktifMulai">Filter Aktif Mulai</label>
-        <select id="filterAktifMulai" class="form-control">
-        <option value="">Semua</option>
-        @php
-            $tanggal = collect($data)->pluck('aktif_mulai')->unique()->toArray();
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="filterAktifMulai">Filter Aktif Mulai</label>
+            <select id="filterAktifMulai" class="form-control">
+                <option value="">Semua</option>
+                @php
+                    $tanggal = collect($data)->pluck('aktif_mulai')->unique()->toArray();
 
-            // Mengonversi tanggal ke objek DateTime dan mengurutkannya
-            usort($tanggal, function($a, $b) {
-                $dateA = DateTime::createFromFormat('F Y', $a);
-                $dateB = DateTime::createFromFormat('F Y', $b);
-                return $dateA <=> $dateB; // Mengurutkan berdasarkan objek DateTime
-            });
-        @endphp
-        @foreach ($tanggal as $tgl)
-            <option value="{{ $tgl }}">{{ $tgl }}</option>
-        @endforeach
-    </select>
+                    // Mengonversi tanggal ke objek DateTime dan mengurutkannya
+                    usort($tanggal, function ($a, $b) {
+                        $dateA = DateTime::createFromFormat('F Y', $a);
+                        $dateB = DateTime::createFromFormat('F Y', $b);
+                        return $dateA <=> $dateB; // Mengurutkan berdasarkan objek DateTime
+                    });
+                @endphp
+                @foreach ($tanggal as $tgl)
+                    <option value="{{ $tgl }}">{{ $tgl }}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
-</div>
 
-<style>
-    /* Custom Table Styling */
-    #datatablesSimple {
-        width: 100% !important;
-        border-collapse: collapse !important;
-    }
 
-    /* Request 1: Line at the very top, above the headers */
-    #datatablesSimple thead tr:first-child th {
-        border-top: 3px solid #343a40 !important;
-    }
+    <!-- Outer container matches index page style (Shadow & Card) -->
+    <div class="card mb-4 border-0 shadow">
+        <div class="card-body">
+            <table id="datatablesSimple" class="table table-bordered table-hover display nowrap" style="width:100%">
+                <thead class="thead-dark">
+                    <tr>
+                        <th style="width: 30px;"></th> <!-- Expand icon -->
+                        <th>No.</th>
+                        <th>OSIS ID</th>
+                        <th>Nama</th>
+                        <th>Jabatan</th>
+                        <th>Vendor/Perusahaan</th>
+                        <th>Aktif Mulai</th>
+                        <th>Upah Pokok</th>
+                        <th>Tj. Tetap</th>
+                        <th>Tj. Tidak Tetap</th>
+                        <th>Tj. Lokasi</th>
+                        <th>BPJS Kesehatan</th>
+                        <th>BPJS Ketenagakerjaan</th>
+                        <th>Kompensasi</th>
+                        <th>Nilai Kontrak/Orang/Bln</th>
+                        <th>Tarif Lembur/Jam</th>
+                        <th>Nilai Lembur/Orang/Bln</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($data as $item)
+                            @php 
+                                            $upah_pokok = $item->ump_sumbar * 0.92;
+                                    $tj_umum = $item->ump_sumbar * 0.08;
+                                    $selisih_ump = round(($item->lokasi['ump']['ump'] ?? 0) - ($item->ump_sumbar ?? 0));
+                                    $tj_lokasi = $item->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
+                                    $tj_jabatan = $item->tunjangan_jabatan;
+                                    $tj_suai = $item->tunjangan_penyesuaian;
+                                    $tj_resiko = $item->kode_resiko == 2 ? 0 : $item->resiko['tunjangan_resiko'];
+                                    $tj_presensi = $upah_pokok * 0.08;
+                                    $tj_harianshift = $item->tunjangan_shift ?? 0;
+                                    $tj_masakerja = $item->tunjangan_masakerja ?? 0;
 
-    #datatablesSimple thead th {
-        background-color: #343a40;
-        color: #ffffff;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        vertical-align: middle;
-        white-space: nowrap;
-        border-bottom: 2px solid #dee2e6; /* Standard separation */
-        border-right: 1px solid #4b545c; /* Vertical separators in header */
-    }
+                                    $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
+                                    $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
 
-    #datatablesSimple tbody td {
-        vertical-align: middle;
-        font-size: 0.9rem;
-        border-right: 1px solid #dee2e6; /* Vertical separators in body */
-        border-bottom: 1px solid #dee2e6;
-    }
+                                    $bpjs_kesehatan = 0.04 * ($upah_pokok + $t_tetap + $tj_lokasi);
+                                    $bpjs_ketenagakerjaan = 0.0689 * ($upah_pokok + $t_tetap + $tj_lokasi);
 
-    /* Row hover effect */
-    #datatablesSimple tbody tr:hover {
-        background-color: #f1f3f5;
-    }
+                                    $uang_jasa = ($item->perusahaan_id == 38 ? ($upah_pokok + $t_tetap + $t_tdk_tetap) / 12 : 0);
+                                    $kompensasi = ($upah_pokok + $t_tetap + $tj_lokasi) / 12;
 
-    /* Compact pagination */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.2rem 0.5rem;
-    }
+                                    $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
+                                    $fee_fix_cost = round(0.10 * $fix_cost);
+                                    $jumlah_fix_cost = round($fix_cost + $fee_fix_cost);
 
-    /* Add spacing between controls (Search/Entries) and Table */
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_length {
-        margin-bottom: 20px !important;
-        padding-bottom: 10px !important; 
-    }
-</style>
+                                    $quota_jam_perkalian = 2 * $item->kuota;
+                                    $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
+                                    $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
+                                    $fee_lembur = 0.025 * $nilai_lembur;
+                                    $total_variabel = $nilai_lembur + $fee_lembur;
 
-<!-- Outer container matches index page style (Shadow & Card) -->
-<div class="card mb-4 border-0 shadow">
-    <div class="card-body">
-        <table id="datatablesSimple" class="table table-bordered table-hover display nowrap" style="width:100%">
-        <thead class="thead-dark">
-        <tr>
-            <th>No.</th>
-            <!-- Rest of headers remain same -->
-            <th>OSIS ID</th>
-            <th>Nama</th>
-            <th>Vendor/Perusahaan</th>
-            <th>Aktif Mulai</th>
-            <th>Upah Pokok</th>
-            <th>Tj. Umum</th>
-            <th>Tj. Lokasi</th>
-            <th>Tj. Jabatan</th>
-            <th>Tj. Masa Kerja</th>
-            <th>Tj. Suai</th>
-            <th>Tj. Resiko</th>
-            <th>Tj. Shift</th>
-            <th>Tj. Presensi</th>
-            <th>T.Tetap</th>
-            <th>T.Tidak Tetap</th>
-            <th>BPJS Kesehatan</th>
-            <th>BPJS Ketenagakerjaan</th>
-            <th>Uang Jasa</th>
-            <th>Kompensasi</th>
-            <th>Fix Cost</th>
-            <th>Fee Fix Cost</th>
-            <th>Jumlah Fix Cost</th>
-            <th>Quota Jam Perkalian</th>
-            <th>Tarif Lembur</th>
-            <th>Nilai Lembur</th>
-            <th>Fee Lembur</th>
-            <th>Total Variabel</th>
-            <th>Total Kontrak/Bln</th>
-            <th>Total Kontrak/Thn</th>
-            <th>THR</th>
-            <th>Fee THR</th>
-            <th>THR/Bln</th>
-            <th>THR/Thn</th>
-            <th>Total Pakaian</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach ($data as $item)
-        <tr>
-            @php 
-            $upah_pokok = $item->ump_sumbar * 0.92;
-            $tj_umum = $item->ump_sumbar * 0.08;
-            $selisih_ump = round(($item->lokasi['ump']['ump'] ?? 0) - ($item->ump_sumbar ?? 0));
-            $tj_lokasi = $item->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
-            $tj_jabatan = $item->tunjangan_jabatan;
-            $tj_suai = $item->tunjangan_penyesuaian;
-            $tj_resiko = $item->kode_resiko == 2 ? 0 : $item->resiko['tunjangan_resiko'];
-            $tj_presensi = $upah_pokok * 0.08;
-            $tj_harianshift = $item->tunjangan_shift ?? 0;
-            $tj_masakerja = $item->tunjangan_masakerja ?? 0;
+                                    $total_kontrak = $jumlah_fix_cost + $total_variabel;
+                                    $total_kontrak_tahunan = $total_kontrak * 12;
 
-            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
-            $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
+                                    $thr = round(($upah_pokok + $t_tetap) / 12);
+                                    $fee_thr = round($thr * 0.05);
+                                    $thr_bln = $thr + $fee_thr;
+                                    $thr_thn = $thr_bln * 12;
 
-            $bpjs_kesehatan = 0.04 * ($upah_pokok + $t_tetap + $tj_lokasi);
-            $bpjs_ketenagakerjaan = 0.0689 * ($upah_pokok + $t_tetap + $tj_lokasi);
+                                    $pakaian = 600000;
+                                    $fee_pakaian = round(0.05 * $pakaian);
+                                    $total_pakaian = $pakaian + $fee_pakaian;
 
-            $uang_jasa = ($item->perusahaan_id == 38 ? ($upah_pokok + $t_tetap + $t_tdk_tetap) / 12 : 0);
-            $kompensasi = ($upah_pokok + $t_tetap + $tj_lokasi) / 12;
-
-            $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
-            $fee_fix_cost = round(0.10 * $fix_cost);
-            $jumlah_fix_cost = round($fix_cost + $fee_fix_cost);
-
-            $quota_jam_perkalian = 2 * $item->kuota;
-            $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
-            $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
-            $fee_lembur = 0.025 * $nilai_lembur;
-            $total_variabel = $nilai_lembur + $fee_lembur;
-
-            $total_kontrak = $jumlah_fix_cost + $total_variabel;
-            $total_kontrak_tahunan = $total_kontrak*12;
-
-            $thr = round(($upah_pokok+$t_tetap)/12);
-            $fee_thr = round($thr*0.05);
-            $thr_bln = $thr+$fee_thr;
-            $thr_thn = $thr_bln*12;
-
-            $pakaian = 600000;
-            $fee_pakaian = round(0.05*$pakaian);
-            $total_pakaian = $pakaian+$fee_pakaian;
-
-            @endphp
+                                @endphp
+           <tr class="parent-row" 
+            data-tj-umum="{{ number_format($tj_umum, 0, ',', '.') }}"
+            data-tj-jabatan="{{ number_format($tj_jabatan, 0, ',', '.') }}"
+            data-tj-masakerja="{{ number_format($tj_masakerja, 0, ',', '.') }}"
+            data-tj-suai="{{ number_format($tj_suai, 0, ',', '.') }}"
+            data-tj-resiko="{{ number_format($tj_resiko, 0, ',', '.') }}"
+            data-tj-shift="{{ number_format($tj_harianshift, 0, ',', '.') }}"
+            data-tj-presensi="{{ number_format($tj_presensi, 0, ',', '.') }}"
+            data-uang-jasa="{{ number_format($uang_jasa, 0, ',', '.') }}"
+            data-fix-cost="{{ number_format($fix_cost, 0, ',', '.') }}"
+            data-fee-fix-cost="{{ number_format($fee_fix_cost, 0, ',', '.') }}"
+            data-jumlah-fix-cost="{{ number_format($jumlah_fix_cost, 0, ',', '.') }}"
+            data-quota-jam="{{ number_format($quota_jam_perkalian, 0, ',', '.') }}"
+            data-nilai-lembur="{{ number_format($nilai_lembur, 0, ',', '.') }}"
+            data-fee-lembur="{{ number_format($fee_lembur, 0, ',', '.') }}"
+            data-total-variabel="{{ number_format($total_variabel, 0, ',', '.') }}"
+            data-total-kontrak-bln="{{ number_format($total_kontrak, 0, ',', '.') }}"
+            data-total-kontrak-thn="{{ number_format($total_kontrak_tahunan, 0, ',', '.') }}"
+            data-thr="{{ number_format($thr, 0, ',', '.') }}"
+            data-fee-thr="{{ number_format($fee_thr, 0, ',', '.') }}"
+            data-thr-bln="{{ number_format($thr_bln, 0, ',', '.') }}"
+            data-thr-thn="{{ number_format($thr_thn, 0, ',', '.') }}"
+            data-total-pakaian="{{ number_format($total_pakaian, 0, ',', '.') }}">
+            
+            <td class="details-control" style="cursor: pointer; text-align: center;">
+                <button class="btn btn-sm btn-outline-primary toggle-details" style="font-size: 11px; padding: 2px 8px;">
+                    <i class="fas fa-plus-circle"></i> Detail
+                </button>
+            </td>
             <td>{{ $loop->iteration }}</td>
             <td>{{$item->osis_id}}</td>
             <td>{{$item->nama_tk}}</td>
+            <td>{{$item->jabatan->nama_jabatan ?? '-'}}</td>
             <td>{{$item->perusahaan}}</td>
             <td>{{$item->aktif_mulai}}</td>
             <td>{{ number_format($upah_pokok, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_umum, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_lokasi, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_jabatan, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_masakerja, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_suai, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_resiko, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_harianshift, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_presensi, 0, ',', '.') }}</td>
             <td>{{ number_format($t_tetap, 0, ',', '.') }}</td>
             <td>{{ number_format($t_tdk_tetap, 0, ',', '.') }}</td>
+            <td>{{ number_format($tj_lokasi, 0, ',', '.') }}</td>
             <td>{{ number_format($bpjs_kesehatan, 0, ',', '.') }}</td>
             <td>{{ number_format($bpjs_ketenagakerjaan, 0, ',', '.') }}</td>
-            <td>{{ number_format($uang_jasa, 0, ',', '.') }}</td>
             <td>{{ number_format($kompensasi, 0, ',', '.') }}</td>
-            <td>{{ number_format($fix_cost, 0, ',', '.') }}</td>
-            <td>{{ number_format($fee_fix_cost, 0, ',', '.') }}</td>
             <td>{{ number_format($jumlah_fix_cost, 0, ',', '.') }}</td>
-            <td>{{ number_format($quota_jam_perkalian, 0, ',', '.') }}</td>
             <td>{{ number_format($tarif_lembur, 0, ',', '.') }}</td>
             <td>{{ number_format($nilai_lembur, 0, ',', '.') }}</td>
-            <td>{{ number_format($fee_lembur, 0, ',', '.') }}</td>
-            <td>{{ number_format($total_variabel, 0, ',', '.') }}</td>
-            <td>{{ number_format($total_kontrak, 0, ',', '.') }}</td>
-            <td>{{ number_format($total_kontrak_tahunan, 0, ',', '.') }}</td>
-            <td>{{ number_format($thr, 0, ',', '.') }}</td>
-            <td>{{ number_format($fee_thr, 0, ',', '.') }}</td>
-            <td>{{ number_format($thr_bln, 0, ',', '.') }}</td>
-            <td>{{ number_format($thr_thn, 0, ',', '.') }}</td>
-            <td>{{ number_format($total_pakaian, 0, ',', '.') }}</td>
         </tr>
-        
-    @endforeach 
-    </tbody>
-</table>
+
+                    @endforeach 
+            </tbody>
+        </table>
+        </div>
     </div>
-</div>
 
-<script>
-$(document).on('click', '.btn-berhenti', function(e) {
-    e.preventDefault();
-    const id = $(this).data('id');
-    // ... stopped logic if needed here ...
-});
+    <script>
+    $(document).on('click', '.btn-berhenti', function(e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        // ... stopped logic if needed here ...
+    });
 
-$(document).ready(function () {
+    $(document).ready(function () {
+    // Function to format child row content
+    function formatChildRow(data) {
+        return `
+            <div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #007bff;">
+                <h5 class="mb-3"><i class="fas fa-info-circle"></i> Detail Breakdown Komponen</h5>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary"><i class="fas fa-money-bill-wave"></i> Breakdown Tunjangan Tetap & Tidak Tetap</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr><td><strong>Tj. Umum</strong></td><td class="text-right">Rp${data.tjUmum}</td></tr>
+                            <tr><td><strong>Tj. Jabatan</strong></td><td class="text-right">Rp${data.tjJabatan}</td></tr>
+                            <tr><td><strong>Tj. Masa Kerja</strong></td><td class="text-right">Rp${data.tjMasakerja}</td></tr>
+                            <tr><td><strong>Tj. Penyesuaian</strong></td><td class="text-right">Rp${data.tjSuai}</td></tr>
+                            <tr><td><strong>Tj. Resiko</strong></td><td class="text-right">Rp${data.tjResiko}</td></tr>
+                            <tr><td><strong>Tj. Shift</strong></td><td class="text-right">Rp${data.tjShift}</td></tr>
+                            <tr><td><strong>Tj. Presensi</strong></td><td class="text-right">Rp${data.tjPresensi}</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6 class="text-primary"><i class="fas fa-calculator"></i> Breakdown Cost & Fee</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr><td><strong>Uang Jasa</strong></td><td class="text-right">Rp${data.uangJasa}</td></tr>
+                            <tr><td><strong>Fix Cost (sebelum fee)</strong></td><td class="text-right">Rp${data.fixCost}</td></tr>
+                            <tr><td><strong>Fee Fix Cost (10%)</strong></td><td class="text-right">Rp${data.feeFixCost}</td></tr>
+                            <tr><td><strong>Jumlah Fix Cost</strong></td><td class="text-right">Rp${data.jumlahFixCost}</td></tr>
+                        </table>
+                        
+                        <h6 class="text-primary mt-3"><i class="fas fa-clock"></i> Detail Lembur</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr><td><strong>Quota Jam Perkalian</strong></td><td class="text-right">${data.quotaJam} jam</td></tr>
+                            <tr><td><strong>Nilai Lembur</strong></td><td class="text-right">Rp${data.nilaiLembur}</td></tr>
+                            <tr><td><strong>Fee Lembur (2.5%)</strong></td><td class="text-right">Rp${data.feeLembur}</td></tr>
+                            <tr><td><strong>Total Variabel</strong></td><td class="text-right">Rp${data.totalVariabel}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <h6 class="text-success"><i class="fas fa-file-invoice-dollar"></i> Total Kontrak & Benefit</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr class="table-info">
+                                <td><strong>Total Kontrak/Bulan</strong></td>
+                                <td class="text-right"><strong>Rp${data.totalKontrakBln}</strong></td>
+                            </tr>
+                            <tr class="table-info">
+                                <td><strong>Total Kontrak/Tahun</strong></td>
+                                <td class="text-right"><strong>Rp${data.totalKontrakThn}</strong></td>
+                            </tr>
+                            <tr><td><strong>THR (Base)</strong></td><td class="text-right">Rp${data.thr}</td></tr>
+                            <tr><td><strong>Fee THR (5%)</strong></td><td class="text-right">Rp${data.feeThr}</td></tr>
+                            <tr><td><strong>THR/Bulan</strong></td><td class="text-right">Rp${data.thrBln}</td></tr>
+                            <tr><td><strong>THR/Tahun</strong></td><td class="text-right">Rp${data.thrThn}</td></tr>
+                            <tr><td><strong>Total Pakaian/Tahun</strong></td><td class="text-right">Rp${data.totalPakaian}</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     if (!$.fn.DataTable.isDataTable('#datatablesSimple')) {
         var table = $('#datatablesSimple').DataTable({
             autoWidth: false, 
-            order: [], 
+            order: [[1, 'asc']], // Order by No column
             columnDefs: [
-                { orderable: false, targets: 0 } 
+                { orderable: false, targets: [0, 1] } // Disable sorting for expand icon and No columns
             ],
             language: {
                 "search": "Cari:",
@@ -386,10 +390,59 @@ $(document).ready(function () {
 
         // Fix Numbering (1, 2, 3...) regardless of sort/search
         table.on('order.dt search.dt', function () {
-            table.column(0, {search:'applied', order:'applied'}).nodes().each(function (cell, i) {
+            table.column(1, {search:'applied', order:'applied'}).nodes().each(function (cell, i) {
                 cell.innerHTML = i + 1;
             });
         }).draw();
+
+        // Expand/Collapse row functionality
+        $('#datatablesSimple tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            var button = $(this).find('button.toggle-details');
+            var icon = button.find('i');
+
+            if (row.child.isShown()) {
+                // Close this row
+                row.child.hide();
+                tr.removeClass('shown');
+                icon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
+                button.removeClass('btn-outline-danger').addClass('btn-outline-primary');
+                button.html('<i class="fas fa-plus-circle"></i> Detail');
+            } else {
+                // Open this row
+                var data = {
+                    tjUmum: tr.attr('data-tj-umum'),
+                    tjJabatan: tr.attr('data-tj-jabatan'),
+                    tjMasakerja: tr.attr('data-tj-masakerja'),
+                    tjSuai: tr.attr('data-tj-suai'),
+                    tjResiko: tr.attr('data-tj-resiko'),
+                    tjShift: tr.attr('data-tj-shift'),
+                    tjPresensi: tr.attr('data-tj-presensi'),
+                    uangJasa: tr.attr('data-uang-jasa'),
+                    fixCost: tr.attr('data-fix-cost'),
+                    feeFixCost: tr.attr('data-fee-fix-cost'),
+                    jumlahFixCost: tr.attr('data-jumlah-fix-cost'),
+                    quotaJam: tr.attr('data-quota-jam'),
+                    nilaiLembur: tr.attr('data-nilai-lembur'),
+                    feeLembur: tr.attr('data-fee-lembur'),
+                    totalVariabel: tr.attr('data-total-variabel'),
+                    totalKontrakBln: tr.attr('data-total-kontrak-bln'),
+                    totalKontrakThn: tr.attr('data-total-kontrak-thn'),
+                    thr: tr.attr('data-thr'),
+                    feeThr: tr.attr('data-fee-thr'),
+                    thrBln: tr.attr('data-thr-bln'),
+                    thrThn: tr.attr('data-thr-thn'),
+                    totalPakaian: tr.attr('data-total-pakaian')
+                };
+                
+                row.child(formatChildRow(data)).show();
+                tr.addClass('shown');
+                icon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+                button.removeClass('btn-outline-primary').addClass('btn-outline-danger');
+                button.html('<i class="fas fa-minus-circle"></i> Tutup');
+            }
+        });
 
         // Wrap ONLY the table with 'table-responsive' so controls stay outside but inside card body
         // Margin-top is adjusted to 10px since card-body already has padding
