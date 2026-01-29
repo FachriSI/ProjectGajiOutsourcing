@@ -19,20 +19,18 @@
 
     <h3 class="mt-4">Penempatan</h3>
     <!-- Tombol Ikon Excel -->
+    <!-- Tombol Ikon Excel -->
     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal"
-        title="Upload Kolektif Data">
+        title="Template & Import Data">
         <i class="fas fa-file-excel fa-lg"></i>
     </button>
-    <!-- Di samping tombol Upload Excel -->
-    <a href="{{ asset('templates/template_import.xlsx') }}" class="btn btn-outline-success" download>
-        <i class="fas fa-download"></i> Template
-    </a>
+    
     <!-- Modal Import Excel -->
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Import Data Karyawan
+                    <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import Data
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
@@ -40,8 +38,15 @@
                 <form action="{{ url('/import-karyawan') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span>1. Download Template:</span>
+                            <a href="{{ asset('templates/template_import.xlsx') }}" class="btn btn-outline-success btn-sm" download>
+                                <i class="fas fa-download"></i> Download Template
+                            </a>
+                        </div>
+                        <hr>
                         <div class="mb-3">
-                            <label for="file" class="form-label">Pilih File Excel</label>
+                            <label for="file" class="form-label">2. Upload File Excel:</label>
                             <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv"
                                 required>
                             <div class="form-text">Format yang didukung: .xlsx, .xls, .csv</div>
