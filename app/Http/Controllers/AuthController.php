@@ -14,20 +14,38 @@ class AuthController extends Controller
 
     public function authenticate(Request $request)
     {
+        // Validasi input dengan pesan error Indonesia
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Email dan password harus diisi',
+            'email.email' => 'Format email tidak valid',
+            'password.required' => 'Email dan password harus diisi',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        try {
+            // Coba autentikasi
+            if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
 
-            return redirect()->intended('dashboard');
+                return redirect()->intended('dashboard');
+            }
+
+            // Jika kredensial salah (email tidak terdaftar ATAU password salah)
+            // Gunakan pesan yang sama untuk keduanya demi keamanan
+            return back()->withErrors([
+                'login' => 'Email atau password yang Anda masukkan salah. Silakan periksa kembali.',
+            ])->onlyInput('email');
+
+        } catch (\Exception $e) {
+            // Tangani server error
+            \Log::error('Login error: ' . $e->getMessage());
+
+            return back()->withErrors([
+                'login' => 'Maaf, sistem sedang mengalami gangguan. Silakan coba beberapa saat lagi.',
+            ])->onlyInput('email');
         }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
     }
 
     public function logout(Request $request)

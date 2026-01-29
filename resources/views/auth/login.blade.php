@@ -102,12 +102,14 @@
         <p class="login-subtitle">Silakan login untuk masuk ke sistem</p>
 
         @if ($errors->any())
-            <div class="alert alert-danger" style="font-size: 13px; padding: 10px;">
-                <ul class="mb-0" style="padding-left: 20px;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div class="alert alert-danger"
+                style="font-size: 14px; padding: 12px 15px; border-radius: 8px; border-left: 4px solid #dc3545; margin-bottom: 20px;">
+                @foreach ($errors->all() as $error)
+                    <div style="display: flex; align-items: flex-start;">
+                        <span style="margin-right: 8px;">⚠️</span>
+                        <span>{{ $error }}</span>
+                    </div>
+                @endforeach
             </div>
         @endif
 
