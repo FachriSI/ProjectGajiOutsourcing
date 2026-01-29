@@ -350,7 +350,7 @@ class PenempatanController extends Controller
             ->get();
         $dataL = Db::table('md_lokasi')
             ->get();
-        $dataPk = Db::table('paket')
+        $dataPk = Db::table('md_paket')
             ->get();
         $dataJ = Db::table('md_jabatan')
             ->get();
@@ -545,8 +545,8 @@ class PenempatanController extends Controller
         $paketTerakhir = DB::table('paket_karyawan')
             ->where('karyawan_id', $id)
             ->orderByDesc('beg_date')
-            ->join('paket', 'paket_karyawan.paket_id', '=', 'paket.paket_id')
-            ->select('paket.*')
+            ->join('md_paket', 'paket_karyawan.paket_id', '=', 'md_paket.paket_id')
+            ->select('md_paket.*')
             ->first();
 
         return view('form-pengganti', [
