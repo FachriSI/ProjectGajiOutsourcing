@@ -5,7 +5,7 @@
 
                 <!-- Dashboard (Standalone) -->
                 <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
-                    <i class="fas fa-tachometer-alt"></i> Beranda
+                    <i class="fas fa-tachometer-alt"></i> Report
                 </a>
 
                 <!-- SDM & Vendor (Dropdown) -->
@@ -86,7 +86,7 @@
                     <i class="fas fa-hand-holding-usd"></i> Tunjangan
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('jabatan*') || request()->is('resiko*') || request()->is('harianshift*') || request()->is('kuotajam*') || request()->is('masakerja*') || request()->is('pakaian*') || request()->is('penyesuaian*') ? 'show' : '' }}"
+                <div class="collapse {{ request()->is('jabatan*') || request()->is('resiko*') || request()->is('harianshift*') || request()->is('kuotajam*') || request()->is('masakerja*') || request()->is('pakaian*') || request()->is('penyesuaian*') || request()->is('medical-checkup*') ? 'show' : '' }}"
                     id="collapseTunjangan" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ request()->is('jabatan*') ? 'active' : '' }}"
@@ -115,6 +115,10 @@
                         <a class="nav-link {{ request()->is('penyesuaian*') ? 'active' : '' }}"
                             href="{{ url('/penyesuaian') }}">
                             <i class="fas fa-sliders-h"></i> Penyesuaian
+                        </a>
+                        <a class="nav-link {{ request()->is('medical-checkup*') ? 'active' : '' }}"
+                            href="{{ url('/medical-checkup') }}">
+                            <i class="fas fa-notes-medical"></i> Medical Checkup
                         </a>
                     </nav>
                 </div>

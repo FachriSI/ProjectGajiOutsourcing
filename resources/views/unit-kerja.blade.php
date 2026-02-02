@@ -16,7 +16,7 @@
                 <th>No.</th>
                 <th>ID Unit</th>
                 <th>Unit Kerja</th>
-                <th>Aksi</th>
+                <th class="text-center">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -26,15 +26,17 @@
                     <td>{{ $item->unit_id }}</td>
                     <td>{{ $item->unit_kerja }}</td>
 
-                    <td>
-                        <a href="/getupdate-unit/{{ $item->unit_id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{{ url('delete-unit', $item->unit_id) }}" class="btn btn-sm btn-danger btn-delete"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </a>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <a href="/getupdate-unit/{{ $item->unit_id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
+                                data-bs-placement="top" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url('delete-unit', $item->unit_id) }}" class="btn btn-sm btn-danger btn-delete"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             @endforeach

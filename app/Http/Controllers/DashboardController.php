@@ -36,6 +36,13 @@ class DashboardController extends Controller
     }])->latest('beg_date')->get()->groupBy('karyawan_id');
     $masakerjaAll = Masakerja::latest('beg_date')->get()->groupBy('karyawan_id')->map(fn($item) => $item->first());
 
+    // Data Tren Tahunan
+    $trendData = \App\Models\Karyawan::selectRaw('YEAR(tanggal_bekerja) as tahun, count(*) as jumlah')
+        ->whereNotNull('tanggal_bekerja')
+        ->groupBy('tahun')
+        ->orderBy('tahun', 'asc')
+        ->get();
+
     $paketList = Paket::with(['paketKaryawan.karyawan.perusahaan', 'paketKaryawan.paket.unitKerja.departemen'])->get();
     $jabatanCount = [];
     $genderCount = ['Laki-laki' => 0, 'Perempuan' => 0];
@@ -216,7 +223,7 @@ class DashboardController extends Controller
     logger()->info('Total Terpilih: ' . $totalActual);
     logger()->info('Detail Paket yang Kurang:', $errorLog);
 
-    return view('dashboard', compact('data', 'jabatanCount', 'genderCount', 'statusAktifCount','departemenCount','perusahaanCount','fungsiCount','asalKecamatanCount'));
+    return view('dashboard', compact('data', 'jabatanCount', 'genderCount', 'statusAktifCount','departemenCount','perusahaanCount','fungsiCount','asalKecamatanCount', 'trendData'));
 }
 
 }

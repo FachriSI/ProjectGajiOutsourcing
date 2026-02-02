@@ -18,7 +18,7 @@
                 <th>No.</th>
                 <th>Jabatan</th>
                 <th>Tunjangan Jabatan</th>
-                <th>Aksi</th>
+                <th class="text-center">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -27,11 +27,13 @@
                     <td>{{ $loop->iteration }}.</td>
                     <td>{{ $item->jabatan }}</td>
                     <td>Rp {{ number_format($item->tunjangan_jabatan, 0, ',', '.') }}</td>
-                    <td>
-                        <a href="/getupdate-jabatan/{{ $item->kode_jabatan }}" class="btn btn-sm btn-warning"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
-                        <a href="{{ url('delete-jabatan', $item->kode_jabatan) }}" class="btn btn-sm btn-danger btn-delete"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i></a>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <a href="/getupdate-jabatan/{{ $item->kode_jabatan }}" class="btn btn-sm btn-warning"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
+                            <a href="{{ url('delete-jabatan', $item->kode_jabatan) }}" class="btn btn-sm btn-danger btn-delete"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i></a>
+                        </div>
                     </td>
                 </tr>
             @endforeach

@@ -20,7 +20,7 @@
                 <th>No.</th>
                 <th>Harian/Shift</th>
                 <th>Tunjangan Shift</th>
-                <th>Aksi</th>
+                <th class="text-center">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -29,12 +29,14 @@
                     <td>{{ $loop->iteration }}.</td>
                     <td>{{ $item->harianshift }}</td>
                     <td>Rp {{ number_format($item->tunjangan_shift, 0, ',', '.') }}</td>
-                    <td>
-                        <a href="/getupdate-harianshift/{{ $item->kode_harianshift }}" class="btn btn-sm btn-warning"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
-                        <a href="{{ url('delete-harianshift', $item->kode_harianshift) }}"
-                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Delete"><i class="fas fa-trash"></i></a>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <a href="/getupdate-harianshift/{{ $item->kode_harianshift }}" class="btn btn-sm btn-warning"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
+                            <a href="{{ url('delete-harianshift', $item->kode_harianshift) }}"
+                                class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Delete"><i class="fas fa-trash"></i></a>
+                        </div>
                     </td>
                 </tr>
             @endforeach

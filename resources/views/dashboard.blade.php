@@ -3,11 +3,25 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <h1 class="mt-4">Beranda</h1>
+    <h1 class="mt-4">Report</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item active">Beranda</li>
+        <li class="breadcrumb-item active">Report</li>
     </ol>
     <div class="row">
+        <div class="row">
+            <!-- Tren Karyawan per Tahun (Posisi Paling Atas) -->
+            <div class="col-lg-12 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-center font-weight-bold mb-4">Tren Karyawan Masuk per Tahun</h6>
+                        <div style="height: 300px;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row ">
             <!-- Kiri: Chart Departemen -->
             <div class="col-lg-12 mb-2">
@@ -243,6 +257,45 @@
                     '#8E24AA', '#26C6DA', '#D4E157'
                 ]
             );
+
+            // === Chart Tren Karyawan per Tahun (Line Chart) ===
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($trendData->pluck('tahun')) !!},
+                    datasets: [{
+                        label: 'Jumlah Karyawan Masuk',
+                        data: {!! json_encode($trendData->pluck('jumlah')) !!},
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        datalabels: {
+                            display: true,
+                            align: 'top',
+                            color: '#000',
+                            font: { weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
         });
     </script>
 

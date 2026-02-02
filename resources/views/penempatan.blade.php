@@ -114,7 +114,7 @@
                 <th>Jabatan</th>
                 <th>Aktif Mulai</th>
                 <th>Status</th>
-                <th>Aksi</th>
+                <th class="text-center">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -129,14 +129,14 @@
                     <td>{{$item->jabatan}}</td>
                     <td>{{$item->aktif_mulai }}</td>
                     <td>{{$item->status_aktif}}</td>
-                    <td>
+                    <td class="text-center">
                         @if($item->status_aktif === 'Aktif')
-                            <div class="d-flex gap-1">
-                                <a href="#" class="btn btn-danger btn-sm btn-berhenti" data-id="{{ $item->karyawan_id }}">
-                                    <i class="fa fa-times-circle"></i> Berhentikan
+                            <div class="d-flex gap-1 justify-content-center">
+                                <a href="#" class="btn btn-danger btn-sm btn-berhenti" data-id="{{ $item->karyawan_id }}" title="Berhentikan">
+                                    <i class="fa fa-times-circle"></i>
                                 </a>
-                                <a href="#" class="btn btn-warning btn-sm btn-ganti" data-id="{{ $item->karyawan_id }}">
-                                    <i class="fas fa-exchange-alt"></i> Ganti
+                                <a href="#" class="btn btn-warning btn-sm btn-ganti" data-id="{{ $item->karyawan_id }}" title="Ganti">
+                                    <i class="fas fa-exchange-alt"></i>
                                 </a>
                             </div>
                         @elseif($item->status_aktif === 'Berhenti')

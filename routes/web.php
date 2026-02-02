@@ -169,6 +169,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/delete-penyesuaian/{id}', [PenyesuaianController::class, 'destroy']);
     Route::get('/restore-penyesuaian/{id}', [PenyesuaianController::class, 'restore']);
 
+    Route::get('/medical-checkup', function () {
+        return view('medical-checkup');
+    })->name('medical-checkup');
+
     Route::get('/unit-kerja', [UnitKerjaController::class, 'index']);
     Route::get('/gettambah-unit', [UnitKerjaController::class, 'getTambah']);
     Route::post('/tambah-unit', [UnitKerjaController::class, 'setTambah']);

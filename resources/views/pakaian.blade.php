@@ -20,7 +20,7 @@
                 <th>Nilai Jatah</th>
                 <th>Ukuran Baju</th>
                 <th>Ukuran Celana</th>
-                <th>Aksi</th>
+                <th class="text-center">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -31,11 +31,13 @@
                     <td>Rp {{ number_format($item->nilai_jatah, 0, ',', '.') }}</td>
                     <td>{{ $item->ukuran_baju }}</td>
                     <td>{{ $item->ukuran_celana }}</td>
-                    <td>
-                        <a href="/getupdate-pakaian/{{ $item->pakaian_id }}" class="btn btn-sm btn-warning"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
-                        <a href="{{ url('delete-pakaian', $item->pakaian_id) }}" class="btn btn-sm btn-danger btn-delete"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i></a>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <a href="/getupdate-pakaian/{{ $item->pakaian_id }}" class="btn btn-sm btn-warning"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i></a>
+                            <a href="{{ url('delete-pakaian', $item->pakaian_id) }}" class="btn btn-sm btn-danger btn-delete"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i></a>
+                        </div>
                     </td>
                 </tr>
             @endforeach
