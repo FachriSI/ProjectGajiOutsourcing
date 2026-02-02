@@ -16,7 +16,7 @@ class KuotajamController extends Controller
             ->select('kuota_jam.*', 'md_karyawan.nama_tk as nama')
             ->get();
 
-        $hasDeleted = Kuotajam::where('is_deleted', 1)->exists();
+        $hasDeleted = false; // Table does not support soft deletes
         return view('kuotajam', ['data' => $data, 'hasDeleted' => $hasDeleted]);
     }
 

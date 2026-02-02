@@ -36,7 +36,7 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span>1. Download Template Perusahaan:</span>
-                            <a href="{{ asset('templates/templatePerusahaan_import.xlsx') }}" class="btn btn-outline-success btn-sm" download>
+                            <a href="{{ route('template.perusahaan') }}" class="btn btn-outline-success btn-sm">
                                 <i class="fas fa-download"></i> Download Template
                             </a>
                         </div>

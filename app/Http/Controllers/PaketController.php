@@ -17,7 +17,7 @@ use App\Models\Kuotajam;
 use App\Models\Masakerja;
 use App\Models\TagihanCetak;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
+use PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PaketController extends Controller
@@ -867,179 +867,40 @@ class PaketController extends Controller
     public function calculateBOQ($paketId)
     {
         $currentYear = date('Y');
-        $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
-
-        // Ambil data untuk efisiensi
-        $kuotaJamAll = Kuotajam::latest('beg_date')->get()->keyBy('karyawan_id');
-        $jabatanAll = Riwayat_jabatan::with('jabatan')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $shiftAll = Riwayat_shift::with('harianshift')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $resikoAll = Riwayat_resiko::with('resiko')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $lokasiAll = Riwayat_lokasi::with([
-            'lokasi.ump' => function ($query) use ($currentYear) {
-                $query->where('tahun', $currentYear);
-            }
-        ])->latest('beg_date')->get()->groupBy('karyawan_id');
-        $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
-
+        
+        // Use logic from ContractCalculatorService to ensure consistency
+        $calculatorService = app(\App\Services\ContractCalculatorService::class);
+        $periode = now()->format('Y-m');
+        
+        // Calculate (will use updated logic from Service)
+        $nilaiKontrak = $calculatorService->calculateForPaket($paketId, $periode);
+        
+        // Extract breakdown data
+        $breakdown = $nilaiKontrak->breakdown_json;
+        $pengawas = $breakdown['pengawas'];
+        $pelaksana = $breakdown['pelaksana'];
+        $karyawanData = $breakdown['karyawan'];
+        
         $paket = Paket::with(['paketKaryawan.karyawan.perusahaan', 'unitKerja'])->findOrFail($paketId);
-
-        $kuota = (int) $paket->kuota_paket;
-        $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
-
-        // Filter berdasarkan status
-        $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
-        $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
-        $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
-
-        // Ambil karyawan sesuai kuota
-        $terpilih = collect();
-        if ($aktif->count() >= $kuota) {
-            $terpilih = $aktif->take($kuota);
-        } else {
-            $terpilih = $aktif;
-            $sisa = $kuota - $aktif->count();
-            $terpilih = $terpilih->concat($berhenti->take($sisa));
-            $sisa = $kuota - $terpilih->count();
-            $terpilih = $terpilih->concat($diganti->take($sisa));
-        }
-
-        // Initialize totals untuk Pengawas dan Pelaksana
-        $pengawas = [
-            'count' => 0,
-            'upah_pokok' => 0,
-            'tj_tetap' => 0,
-            'tj_tidak_tetap' => 0,
-            'tj_lokasi' => 0,
-            'bpjs_kesehatan' => 0,
-            'bpjs_ketenagakerjaan' => 0,
-            'kompensasi' => 0,
-            'nilai_kontrak' => 0,
-            'lembur' => 0,
-            'total' => 0
-        ];
-        $pelaksana = [
-            'count' => 0,
-            'upah_pokok' => 0,
-            'tj_tetap' => 0,
-            'tj_tidak_tetap' => 0,
-            'tj_lokasi' => 0,
-            'bpjs_kesehatan' => 0,
-            'bpjs_ketenagakerjaan' => 0,
-            'kompensasi' => 0,
-            'nilai_kontrak' => 0,
-            'lembur' => 0,
-            'total' => 0
-        ];
-
-        $karyawanData = [];
+        
+        // Find vendor (first found among employees)
         $vendor = null;
-
-        foreach ($terpilih as $pk) {
-            $karyawan = $pk->karyawan;
-            if (!$karyawan)
-                continue;
-            $id = $karyawan->karyawan_id;
-
-            if (!$vendor && $karyawan->perusahaan) {
-                $vendor = $karyawan->perusahaan->perusahaan;
-            }
-
-            $jabatan = optional($jabatanAll[$id] ?? collect())->first();
-            $shift = optional($shiftAll[$id] ?? collect())->first();
-            $resiko = optional($resikoAll[$id] ?? collect())->first();
-            $lokasi = optional($lokasiAll[$id] ?? collect())->first();
-            $kuota_jam = $kuotaJamAll[$id] ?? null;
-            $masakerja = $masakerjaAll[$id] ?? null;
-
-            // Kalkulasi komponen gaji
-            $upah_pokok = round($umpSumbar * 0.92);
-            $tj_umum = round($umpSumbar * 0.08);
-            $ump_lokasi = $lokasi->lokasi['ump']['ump'] ?? 0;
-            $kode_lokasi = $lokasi->kode_lokasi ?? 12;
-            $selisih_ump = round($ump_lokasi - $umpSumbar);
-            $tj_lokasi = $kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
-            $tj_jabatan = optional($jabatan?->jabatan)->tunjangan_jabatan ?? 0;
-            $tj_masakerja = $masakerja->tunjangan_masakerja ?? 0;
-            $tj_suai = $karyawan->tunjangan_penyesuaian ?? 0;
-            $tj_harianshift = $shift->harianshift['tunjangan_shift'] ?? 0;
-            $kode_resiko = $resiko->kode_resiko ?? 2;
-            $tj_resiko = ($kode_resiko == 2) ? 0 : ($resiko->resiko['tunjangan_resiko'] ?? 0);
-            $tj_presensi = round($upah_pokok * 0.08);
-
-            $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
-            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
-
-            $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
-            $bpjs_kesehatan = round(0.04 * $komponen_gaji);
-            $bpjs_ketenagakerjaan = round(0.0689 * $komponen_gaji);
-
-            $perusahaan_id = $karyawan->perusahaan_id ?? 0;
-            $uang_jasa = $perusahaan_id == 38 ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12) : 0;
-            $kompensasi = round($komponen_gaji / 12);
-
-            $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
-            $fee_fix_cost = round(0.10 * $fix_cost);
-            $jumlah_fix_cost = round($fix_cost + $fee_fix_cost);
-
-            // Lembur
-            $quota_jam = $kuota_jam->kuota ?? 0;
-            $quota_jam_perkalian = 2 * $quota_jam;
-            $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
-            $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
-            $fee_lembur = round(0.025 * $nilai_lembur);
-            $total_variabel = $nilai_lembur + $fee_lembur;
-
-            $total_kontrak = $jumlah_fix_cost + $total_variabel;
-
-            // Determine if Pengawas or Pelaksana based on jabatan name
-            $namaJabatan = optional($jabatan?->jabatan)->jabatan ?? '';
-            $isPengawas = stripos($namaJabatan, 'Pengawas') !== false;
-
-            $target = $isPengawas ? 'pengawas' : 'pelaksana';
-
-            if ($isPengawas) {
-                $pengawas['count']++;
-                $pengawas['upah_pokok'] += $upah_pokok;
-                $pengawas['tj_tetap'] += $t_tetap;
-                $pengawas['tj_tidak_tetap'] += $t_tdk_tetap;
-                $pengawas['tj_lokasi'] += $tj_lokasi;
-                $pengawas['bpjs_kesehatan'] += $bpjs_kesehatan;
-                $pengawas['bpjs_ketenagakerjaan'] += $bpjs_ketenagakerjaan;
-                $pengawas['kompensasi'] += $kompensasi;
-                $pengawas['nilai_kontrak'] += $jumlah_fix_cost;
-                $pengawas['lembur'] += $total_variabel;
-                $pengawas['total'] += $total_kontrak;
-            } else {
-                $pelaksana['count']++;
-                $pelaksana['upah_pokok'] += $upah_pokok;
-                $pelaksana['tj_tetap'] += $t_tetap;
-                $pelaksana['tj_tidak_tetap'] += $t_tdk_tetap;
-                $pelaksana['tj_lokasi'] += $tj_lokasi;
-                $pelaksana['bpjs_kesehatan'] += $bpjs_kesehatan;
-                $pelaksana['bpjs_ketenagakerjaan'] += $bpjs_ketenagakerjaan;
-                $pelaksana['kompensasi'] += $kompensasi;
-                $pelaksana['nilai_kontrak'] += $jumlah_fix_cost;
-                $pelaksana['lembur'] += $total_variabel;
-                $pelaksana['total'] += $total_kontrak;
-            }
-
-            $karyawanData[] = [
-                'nama' => $karyawan->nama_tk,
-                'jabatan' => $namaJabatan,
-                'tipe' => $isPengawas ? 'Pengawas' : 'Pelaksana',
-                'upah_pokok' => $upah_pokok,
-                'tj_tetap' => $t_tetap,
-                'tj_tidak_tetap' => $t_tdk_tetap,
-                'tj_lokasi' => $tj_lokasi,
-                'bpjs_kesehatan' => $bpjs_kesehatan,
-                'bpjs_ketenagakerjaan' => $bpjs_ketenagakerjaan,
-                'kompensasi' => $kompensasi,
-                'fix_cost' => $jumlah_fix_cost,
-                'lembur' => $total_variabel,
-                'total' => $total_kontrak
-            ];
+        foreach ($karyawanData as $kd) {
+             // Note: karyawanData from service doesn't have perusahaan name directly, 
+             // but we can fetch it or just re-loop from packet if strictly needed.
+             // For safety/speed, let's just grab it from the packet relation we loaded above.
+             // Or better, iterate unique employees from packet to find vendor.
+             // Since service logic for "terpilih" matches fairly well, we can trust the counts.
         }
-
+        
+        // Re-determine vendor from the packet employees for display consistency
+        foreach ($paket->paketKaryawan as $pk) {
+             if ($pk->karyawan && $pk->karyawan->perusahaan) {
+                 $vendor = $pk->karyawan->perusahaan->perusahaan;
+                 break;
+             }
+        }
+        
         $totalBOQ = $pengawas['total'] + $pelaksana['total'];
         $totalBulanan = $totalBOQ;
         $totalTahunan = $totalBOQ * 12;
@@ -1054,7 +915,7 @@ class PaketController extends Controller
             'total_bulanan' => $totalBulanan,
             'total_tahunan' => $totalTahunan,
             'total_boq' => $totalBOQ,
-            'ump_sumbar' => $umpSumbar,
+            'ump_sumbar' => $nilaiKontrak->ump_sumbar,
             'tahun' => $currentYear
         ];
     }

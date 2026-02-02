@@ -10,13 +10,15 @@ class MasakerjaController extends Controller
 {
     public function index()
     {
+        // $data = DB::table('masa_kerja')
+        //     ->join('md_karyawan', 'masa_kerja.karyawan_id', '=', 'md_karyawan.karyawan_id')
         $data = DB::table('masa_kerja')
             ->join('md_karyawan', 'masa_kerja.karyawan_id', '=', 'md_karyawan.karyawan_id')
-        $data = DB::table('md_masakerja')
-            ->where('is_deleted', 0)
+            ->select('masa_kerja.*', 'md_karyawan.nama_tk as nama')
+            // ->where('is_deleted', 0) // Table does not support soft deletes
              ->get();
 
-        $hasDeleted = Masakerja::where('is_deleted', 1)->exists();
+        $hasDeleted = false; // Table does not support soft deletes
         return view('masakerja', ['data' => $data, 'hasDeleted' => $hasDeleted]);
     }
 

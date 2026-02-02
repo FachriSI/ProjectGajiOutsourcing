@@ -48,7 +48,7 @@ Route::get('/verify-tagihan/{token}', [PaketController::class, 'verifyTagihan'])
 Route::get('/verify-tagihan/{token}/download', [PaketController::class, 'downloadVerifiedPDF'])->name('tagihan.verify.download');
 
 // Public route for QR code validation
-Route::get('/validate/{token}', [App\Http\Controllers\ContractValidationController::class, 'validate'])->name('contract.validate');
+Route::get('/validate/{token}', [App\Http\Controllers\ContractValidationController::class, 'showValidation'])->name('contract.validate');
 Route::get('/api/validate/{token}', [App\Http\Controllers\ContractValidationController::class, 'validateApi'])->name('contract.validate.api');
 
 // Protected Routes
@@ -201,6 +201,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/import-mutasi', [ImportController::class, 'importMutasi']);
     Route::post('/import-pakaian', [ImportController::class, 'importPakaian']);
     Route::post('/import-template-baru', [ImportController::class, 'importTemplateBaru']);
+    
+    // Dynamic Template Downloads
+    Route::get('/templates/mutasi-promosi', [App\Http\Controllers\TemplateController::class, 'downloadMutasi'])->name('template.mutasi');
+    Route::get('/templates/pakaian', [App\Http\Controllers\TemplateController::class, 'downloadPakaian'])->name('template.pakaian');
+    Route::get('/templates/perusahaan', [App\Http\Controllers\TemplateController::class, 'downloadPerusahaan'])->name('template.perusahaan');
+    Route::get('/templates/karyawan', [App\Http\Controllers\TemplateController::class, 'downloadKaryawan'])->name('template.karyawan');
 
     Route::get('/paket', [PaketController::class, 'index']);
     Route::get('/paket/{id}', [PaketController::class, 'show']);

@@ -131,8 +131,7 @@
                 <a href="{{ url('/datapaket') }}" class="btn btn-secondary me-2">
                     <i class="fas fa-arrow-left me-1"></i> Kembali
                 </a>
-                <a href="{{ route('paket.pdf.download', $boq['paket']->paket_id) }}" class="btn btn-success"
-                    target="_blank">
+                <a href="{{ route('paket.pdf.download', $boq['paket']->paket_id) }}" class="btn btn-success">
                     <i class="fas fa-download me-1"></i> Download PDF
                 </a>
             </div>

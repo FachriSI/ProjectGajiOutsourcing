@@ -12,7 +12,8 @@ class FungsiController extends Controller
     public function index()
     {
         $data = DB::table('md_fungsi')->where('is_deleted', 0)->get();
-        return view('fungsi', ['data' => $data]);
+        $hasDeleted = Fungsi::where('is_deleted', 1)->exists();
+        return view('fungsi', ['data' => $data, 'hasDeleted' => $hasDeleted]);
     }
 
     public function getTambah()

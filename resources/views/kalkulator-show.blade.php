@@ -18,6 +18,12 @@
                     <a href="{{ route('kalkulator.index') }}" class="btn btn-sm btn-light">
                         <i class="fas fa-arrow-left me-1"></i> Kembali
                     </a>
+                    <a href="{{ route('paket.pdf.download', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-success" target="_blank">
+                        <i class="fas fa-file-pdf me-1"></i> Unduh PDF dengan QR Code
+                    </a>
+                    <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-info" target="_blank">
+                        <i class="fas fa-eye me-1"></i> Preview Tagihan
+                    </a>
                 </div>
             </div>
             <div class="card-body">
@@ -39,6 +45,25 @@
                         <p class="text-primary fw-bold">Rp {{ number_format($nilaiKontrak->ump_sumbar, 0, ',', '.') }}</p>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons (Moved to Top) -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-info w-100 mb-2">
+                    <i class="fas fa-history me-2"></i>Lihat Riwayat Perubahan
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-file-invoice me-2"></i>Lihat Tagihan Lengkap
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-warning w-100 mb-2">
+                    <i class="fas fa-history me-2"></i>Lihat Riwayat Kontrak
+                </a>
             </div>
         </div>
 
@@ -279,10 +304,24 @@
 
         <!-- Action Buttons -->
         <div class="card shadow mt-4">
-            <div class="card-body text-center">
-                <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-primary">
-                    <i class="fas fa-file-invoice me-2"></i>Lihat Tagihan Lengkap
-                </a>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-info w-100">
+                            <i class="fas fa-history me-2"></i>Lihat Riwayat Perubahan
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-primary w-100">
+                            <i class="fas fa-file-invoice me-2"></i>Lihat Tagihan Lengkap
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ route('kalkulator.history', $nilaiKontrak->paket_id) }}" class="btn btn-warning w-100">
+                            <i class="fas fa-history me-2"></i>Lihat Riwayat Kontrak
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

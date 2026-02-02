@@ -40,7 +40,7 @@
                     <div class="modal-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span>1. Download Template:</span>
-                            <a href="{{ asset('templates/template_import.xlsx') }}" class="btn btn-outline-success btn-sm" download>
+                            <a href="{{ route('template.karyawan') }}" class="btn btn-outline-success btn-sm">
                                 <i class="fas fa-download"></i> Download Template
                             </a>
                         </div>
