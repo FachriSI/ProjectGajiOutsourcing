@@ -14,13 +14,13 @@
 
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            font-size: 9px;
-            line-height: 1.3;
+            font-size: 8px;
+            line-height: 1.2;
             color: #333;
         }
 
         .container {
-            padding: 15px 20px;
+            padding: 12px 14px;
         }
 
         /* Header */
@@ -28,21 +28,21 @@
             background-color: #8B0000;
             color: white;
             border: 1px solid #333;
-            padding: 8px;
+            padding: 6px;
             text-align: center;
             font-weight: bold;
-            font-size: 11px;
-            margin-bottom: 10px;
+            font-size: 9px;
+            margin-bottom: 8px;
         }
 
         /* Info Section */
         .info-table {
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 7px;
         }
 
         .info-table td {
-            padding: 2px 5px;
+            padding: 2px 4px;
             vertical-align: top;
         }
 
@@ -56,15 +56,16 @@
         table.boq-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
         }
 
         table.boq-table th,
         table.boq-table td {
             border: 1px solid #333;
-            padding: 3px 5px;
+            padding: 3px;
             text-align: left;
-            font-size: 9px;
+            font-size: 8px;
+            line-height: 1.2;
         }
 
         table.boq-table th {
@@ -79,11 +80,11 @@
         }
 
         table.boq-table .sub-item {
-            padding-left: 15px;
+            padding-left: 12px;
         }
 
         table.boq-table .sub-item-2 {
-            padding-left: 25px;
+            padding-left: 20px;
         }
 
         table.boq-table .total-row {
@@ -106,32 +107,34 @@
 
         /* Notes */
         .notes {
-            font-size: 8px;
-            margin: 8px 0;
+            font-size: 7px;
+            margin: 6px 0;
+            line-height: 1.2;
         }
 
         .notes p {
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         /* Second Table - Pekerjaan Tambah */
         .section-title {
             font-weight: bold;
-            margin: 15px 0 8px 0;
-            font-size: 9px;
+            margin: 7px 0 5px 0;
+            font-size: 8px;
         }
 
         table.tambah-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         table.tambah-table th,
         table.tambah-table td {
             border: 1px solid #333;
-            padding: 3px 5px;
-            font-size: 9px;
+            padding: 3px;
+            font-size: 8px;
+            line-height: 1.2;
         }
 
         table.tambah-table th {
@@ -147,12 +150,12 @@
 
         /* Footer & Signature */
         .footer {
-            margin-top: 30px;
+            margin-top: 14px;
         }
 
         .signature-section {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 14px;
         }
 
         .signature-left {
@@ -167,9 +170,9 @@
         }
 
         .signature-line {
-            margin-top: 50px;
+            margin-top: 28px;
             border-top: 1px solid #333;
-            width: 150px;
+            width: 130px;
             display: inline-block;
         }
 
@@ -180,12 +183,12 @@
         }
 
         .qr-section {
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .qr-section svg {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
         }
     </style>
 </head>
@@ -336,8 +339,8 @@
                 <!-- Summary Section -->
                 <tr class="total-row">
                     <td><strong>Jumlah Pekerja Alih Daya (sesuai Kontrak)</strong></td>
-                    <td class="text-center">{{ $boq['pengawas']['count'] }}</td>
-                    <td class="text-center">{{ $boq['pelaksana']['count'] }}</td>
+                    <td class="text-right">{{ $boq['pengawas']['count'] }}</td>
+                    <td class="text-right">{{ $boq['pelaksana']['count'] }}</td>
                 </tr>
                 <tr>
                     <td class="sub-item"><strong>Nilai Kontrak Pekerja Alih Daya 1 bulan</strong></td>
@@ -450,7 +453,7 @@
             <div class="signature-left">
                 <div class="qr-section">
                     {!! $qrCode !!}
-                    <p style="font-size: 7px; margin-top: 3px; text-align: center;">Scan untuk verifikasi</p>
+                    <p style="font-size: 8px; margin-top: 4px; text-align: center; font-weight: bold;">Scan untuk verifikasi</p>
                     <p style="font-size: 6px; word-break: break-all; max-width: 200px; text-align: center;">Token:
                         {{ substr($token, 0, 20) }}...
                     </p>

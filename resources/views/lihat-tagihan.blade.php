@@ -3,6 +3,123 @@
 @section('title', 'Lihat Tagihan - ' . $boq['paket']->paket)
 
 @section('content')
+    <style>
+        @media print {
+            /* Set page size and margins */
+            @page {
+                size: A4 portrait;
+                margin: 10mm 8mm;
+            }
+
+            /* Hide non-essential elements */
+            .btn, button, .d-flex.justify-content-between,
+            nav, .navbar, .sidebar, footer {
+                display: none !important;
+            }
+
+            /* Remove container padding */
+            .container-fluid {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Compact card styling */
+            .card {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+            }
+
+            .card-header {
+                padding: 4px 8px !important;
+                font-size: 11pt !important;
+                page-break-after: avoid;
+            }
+
+            .card-body {
+                padding: 6px 8px !important;
+            }
+
+            /* Reduce font sizes */
+            h4 { font-size: 11pt !important; margin: 0 0 4px 0 !important; }
+            h5 { font-size: 10pt !important; margin: 0 !important; }
+            h6 { font-size: 9pt !important; margin: 4px 0 2px 0 !important; }
+            body, p, td, th { font-size: 8pt !important; line-height: 1.2 !important; }
+            small, .small { font-size: 7pt !important; }
+            .fst-italic { font-size: 7pt !important; }
+
+            /* Compact table styling */
+            table {
+                font-size: 8pt !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .table-borderless {
+                margin-bottom: 6px !important;
+            }
+
+            .table-borderless td {
+                padding: 1px 4px !important;
+            }
+
+            th, td {
+                padding: 2px 4px !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Reduce spacing between sections */
+            .mb-3, .mb-4 { margin-bottom: 4px !important; }
+            .mt-3, .mt-4 { margin-top: 6px !important; }
+            .py-3 { padding-top: 0 !important; padding-bottom: 0 !important; }
+
+            /* Prevent page breaks inside tables */
+            table, tr, td, th {
+                page-break-inside: avoid;
+            }
+
+            /* Compact info section */
+            .table.table-borderless {
+                width: 100% !important;
+                margin-bottom: 4px !important;
+            }
+
+            /* Reduce table row heights */
+            tbody tr {
+                height: auto !important;
+            }
+
+            /* Make text more compact */
+            .ps-4 { padding-left: 8px !important; }
+            .text-end, .text-center { padding: 2px 4px !important; }
+
+            /* Adjust colored backgrounds for print */
+            tr[style*="background-color"] {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Remove extra spacing from notes */
+            .fst-italic p {
+                margin-bottom: 2px !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Compact second table */
+            .table-responsive {
+                margin-top: 4px !important;
+            }
+
+            /* Ensure content fits on one page */
+            .card-body > * {
+                margin-bottom: 3px !important;
+            }
+
+            /* Optimize strong/bold elements */
+            strong { font-weight: 600; }
+        }
+    </style>
+
     <div class="container-fluid py-3">
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
