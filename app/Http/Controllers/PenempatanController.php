@@ -547,8 +547,8 @@ class PenempatanController extends Controller
         $paketTerakhir = DB::table('paket_karyawan')
             ->where('karyawan_id', $id)
             ->orderByDesc('beg_date')
-            ->join('md_paket', 'paket_karyawan.paket_id', '=', 'md_paket.paket_id')
-            ->select('md_paket.*')
+            ->join('md_paket as paket', 'paket_karyawan.paket_id', '=', 'paket.paket_id')
+            ->select('paket.*')
             ->first();
 
         return view('form-pengganti', [

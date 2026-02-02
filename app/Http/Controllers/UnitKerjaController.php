@@ -12,7 +12,7 @@ class UnitKerjaController extends Controller
 {
     public function index()
     {
-        $data = DB::table('md_unit_kerja')
+        $data = DB::table('md_unit_kerja as unit_kerja')
             ->where('is_deleted', 0)
             ->select('unit_kerja.unit_id', 'unit_kerja.unit_kerja')
              ->get();

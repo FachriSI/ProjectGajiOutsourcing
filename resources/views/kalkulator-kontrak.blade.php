@@ -22,8 +22,8 @@
 
     <div class="row">
         <!-- Form Kalkulator -->
-        <div class="col-md-4">
-            <div class="card">
+        <div class="col-md-5">
+            <div class="card shadow">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="fas fa-file-contract"></i> Form Perhitungan</h5>
                 </div>
@@ -54,9 +54,6 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-calculator"></i> Hitung Nilai Kontrak
                             </button>
-                            <button type="button" class="btn btn-success" id="btnCalculateAjax">
-                                <i class="fas fa-bolt"></i> Hitung (AJAX)
-                            </button>
                         </div>
                     </form>
 
@@ -75,27 +72,12 @@
                 </div>
             </div>
 
-            <!-- Info Card -->
-            <div class="card mt-3">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Informasi</h6>
-                </div>
-                <div class="card-body">
-                    <small>
-                        <ul class="mb-0">
-                            <li>Nilai kontrak dihitung berdasarkan UMP tahun berjalan</li>
-                            <li>Distribusi karyawan sesuai kuota paket</li>
-                            <li>Breakdown: Pengawas dan Pelaksana</li>
-                            <li>Data otomatis tersimpan untuk tracking</li>
-                        </ul>
-                    </small>
-                </div>
-            </div>
+
         </div>
 
         <!-- Result Display (AJAX) -->
-        <div class="col-md-8">
-            <div class="card" id="resultCard" style="display: none;">
+        <div class="col-md-7">
+            <div class="card shadow h-100" id="resultCard" style="display: none;">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-chart-line"></i> Hasil Perhitungan</h5>
                 </div>
@@ -182,14 +164,24 @@
                 </div>
             </div>
 
-            <!-- Placeholder saat belum ada hasil -->
-            <div class="card" id="placeholderCard">
-                <div class="card-body text-center py-5">
-                    <i class="fas fa-calculator fa-5x text-muted mb-3"></i>
-                    <h5 class="text-muted">Pilih paket dan klik "Hitung Nilai Kontrak"</h5>
-                    <p class="text-muted">Hasil perhitungan akan ditampilkan di sini</p>
+            <!-- Info Card (Always Visible) -->
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Informasi</h6>
+                </div>
+                <div class="card-body">
+                    <small>
+                        <ul class="mb-0">
+                            <li>Nilai kontrak dihitung berdasarkan UMP tahun berjalan</li>
+                            <li>Distribusi karyawan sesuai kuota paket</li>
+                            <li>Breakdown: Pengawas dan Pelaksana</li>
+                            <li>Data otomatis tersimpan untuk tracking</li>
+                        </ul>
+                    </small>
                 </div>
             </div>
+
+
         </div>
     </div>
 
@@ -366,7 +358,6 @@
                 }
 
                 // Show loading
-                $('#placeholderCard').hide();
                 $('#resultCard').show();
                 $('#resultContent').hide();
                 $('#loadingSpinner').show();
@@ -398,8 +389,8 @@
                             $('#resultContent').show();
                         } else {
                             alert('Gagal menghitung: ' + response.message);
+                            alert('Gagal menghitung: ' + response.message);
                             $('#resultCard').hide();
-                            $('#placeholderCard').show();
                         }
                     },
                     error: function (xhr) {
@@ -408,8 +399,8 @@
                             errorMsg = xhr.responseJSON.message;
                         }
                         alert(errorMsg);
+                        alert(errorMsg);
                         $('#resultCard').hide();
-                        $('#placeholderCard').show();
                     }
                 });
             });

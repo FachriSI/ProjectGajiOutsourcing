@@ -23,7 +23,7 @@ class ContractValidationController extends Controller
      * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function validate($token, Request $request)
+    public function showValidation($token, Request $request)
     {
         $ipAddress = $request->ip();
         

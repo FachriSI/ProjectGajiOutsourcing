@@ -42,7 +42,7 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span>1. Download Template Mutasi:</span>
-                        <a href="{{ asset('templates/templateMutasiPromosi_import.xlsx') }}" class="btn btn-outline-success btn-sm" download>
+                        <a href="{{ route('template.mutasi') }}" class="btn btn-outline-success btn-sm">
                             <i class="fas fa-download"></i> Download Template
                         </a>
                     </div>

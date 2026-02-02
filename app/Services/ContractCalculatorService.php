@@ -44,7 +44,16 @@ class ContractCalculatorService
             ->value('ump');
 
         if (!$umpSumbar) {
-            throw new \Exception("UMP Sumbar untuk tahun {$currentYear} belum tersedia");
+            // Fallback: Use latest available UMP if current year is missing
+            $latestUmp = Ump::where('kode_lokasi', '12')->orderBy('tahun', 'desc')->first();
+            
+            if ($latestUmp) {
+                $umpSumbar = $latestUmp->ump;
+                // Optional: Log warning or set flag that we are using fallback data
+                Log::warning("UMP Sumbar for {$currentYear} not found. Using fallback from {$latestUmp->tahun}: {$umpSumbar}");
+            } else {
+                throw new \Exception("UMP Sumbar untuk tahun {$currentYear} belum tersedia dan tidak ada data UMP sebelumnya.");
+            }
         }
 
         // Ambil data untuk efisiensi (sama seperti PaketController::calculateBOQ)
@@ -133,22 +142,35 @@ class ContractCalculatorService
             $masakerja = $masakerjaAll[$id] ?? null;
 
             // Kalkulasi komponen gaji (sama seperti calculateBOQ)
-            $upah_pokok = round($umpSumbar * 0.92);
-            $tj_umum = round($umpSumbar * 0.08);
+            // Kalkulasi komponen gaji (REVISED 2026-01-29)
+            // Upah Pokok = UMP (Upah Pekerja 92% + Tunjangan Umum 8% merged into Upah Pokok here for calculation base)
+            $upah_pokok = $umpSumbar; 
+            
+            // $upah_pekerja = round($umpSumbar * 0.92); // Not used in total formula, implicit in UMP
+            // $tj_umum = round($umpSumbar * 0.08);      // Not used in total formula, implicit in UMP
+
             $ump_lokasi = $lokasi->lokasi['ump']['ump'] ?? 0;
             $kode_lokasi = $lokasi->kode_lokasi ?? 12;
             $selisih_ump = round($ump_lokasi - $umpSumbar);
             $tj_lokasi = $kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
+            
             $tj_jabatan = optional($jabatan?->jabatan)->tunjangan_jabatan ?? 0;
             $tj_masakerja = $masakerja->tunjangan_masakerja ?? 0;
+            
             $tj_suai = $karyawan->tunjangan_penyesuaian ?? 0;
             $tj_harianshift = $shift->harianshift['tunjangan_shift'] ?? 0;
             $kode_resiko = $resiko->kode_resiko ?? 2;
             $tj_resiko = ($kode_resiko == 2) ? 0 : ($resiko->resiko['tunjangan_resiko'] ?? 0);
+            
+            // Presensi 8% dari Upah Pokok (UMP)
             $tj_presensi = round($upah_pokok * 0.08);
 
-            $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
-            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
+            // Revisions:
+            // Tunjangan Tetap = Tunjangan Jabatan + Tunjangan Masa Kerja (Tunj. Umum removed/merged into Upah Pokok)
+            $t_tetap = $tj_jabatan + $tj_masakerja;
+
+            // Tunjangan Tidak Tetap = Penyesuaian + Risiko + Shift + Presensi
+            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi + $tj_resiko;
 
             $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
             $bpjs_kesehatan = round(0.04 * $komponen_gaji);

@@ -30,7 +30,7 @@ class KaryawanController extends Controller
 
         // Ambil paket aktif saat ini untuk tiap karyawan
         $paketKaryawan = DB::table('paket_karyawan as pk1')
-            ->join('md_paket', 'pk1.paket_id', '=', 'md_paket.paket_id')
+            ->join('md_paket as paket', 'pk1.paket_id', '=', 'paket.paket_id')
             ->join(DB::raw('(
                 SELECT karyawan_id, MAX(beg_date) as max_date
                 FROM paket_karyawan
@@ -39,7 +39,7 @@ class KaryawanController extends Controller
                 $join->on('pk1.karyawan_id', '=', 'latest.karyawan_id')
                     ->on('pk1.beg_date', '=', 'latest.max_date');
             })
-            ->select('pk1.karyawan_id', 'md_paket.paket as nama_paket')
+            ->select('pk1.karyawan_id', 'paket.paket as nama_paket')
             ->get()
             ->keyBy('karyawan_id');
 

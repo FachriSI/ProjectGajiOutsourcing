@@ -26,7 +26,7 @@ class DashboardController extends Controller
     $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
 
     // Ambil semua data di awal untuk efisiensi
-    $kuotaJamAll = Kuotajam::latest('beg_date')->get()->keyBy('karyawan_id');
+    $kuotaJamAll = Kuotajam::latest('beg_date')->get()->groupBy('karyawan_id')->map(fn($item) => $item->first());
     $jabatanAll = Riwayat_jabatan::with('jabatan')->latest('beg_date')->get()->groupBy('karyawan_id');
     $shiftAll = Riwayat_shift::with('harianshift')->latest('beg_date')->get()->groupBy('karyawan_id');
     $resikoAll = Riwayat_resiko::with('resiko')->latest('beg_date')->get()->groupBy('karyawan_id');
@@ -34,7 +34,7 @@ class DashboardController extends Controller
     $lokasiAll = Riwayat_lokasi::with(['lokasi.ump' => function ($query) use ($currentYear) {
         $query->where('tahun', $currentYear);
     }])->latest('beg_date')->get()->groupBy('karyawan_id');
-    $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
+    $masakerjaAll = Masakerja::latest('beg_date')->get()->groupBy('karyawan_id')->map(fn($item) => $item->first());
 
     $paketList = Paket::with(['paketKaryawan.karyawan.perusahaan', 'paketKaryawan.paket.unitKerja.departemen'])->get();
     $jabatanCount = [];
