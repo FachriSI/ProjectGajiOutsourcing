@@ -98,7 +98,7 @@
 <body>
 
     <div class="login-card">
-        <h1 class="login-title">Outsourching PT Semen Padang</h1>
+        <h1 class="login-title">Outsourcing PT Semen Padang</h1>
         <p class="login-subtitle">Silakan login untuk masuk ke sistem</p>
 
         @if ($errors->any())

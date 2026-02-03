@@ -200,12 +200,24 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/set-berhenti', [PenempatanController::class, 'setBerhenti']);
     Route::get('/tambah-pengganti/{id}', [PenempatanController::class, 'formPengganti']);
     Route::post('/simpan-pengganti/{id}', [PenempatanController::class, 'simpanPengganti']);
+    Route::post('/ganti-karyawan/{id}', [PenempatanController::class, 'gantiKaryawan']);
+
+    // API Routes untuk dropdown data
+    Route::get('/api/jabatan', function () {
+        return DB::table('md_jabatan')->select('kode_jabatan', 'jabatan')->get();
+    });
+    Route::get('/api/lokasi', function () {
+        return DB::table('md_lokasi')->select('kode_lokasi', 'lokasi')->get();
+    });
+    Route::get('/api/paket', function () {
+        return DB::table('md_paket')->select('paket_id', 'paket')->get();
+    });
 
     Route::post('/import-karyawan', [ImportController::class, 'import']);
     Route::post('/import-mutasi', [ImportController::class, 'importMutasi']);
     Route::post('/import-pakaian', [ImportController::class, 'importPakaian']);
     Route::post('/import-template-baru', [ImportController::class, 'importTemplateBaru']);
-    
+
     // Dynamic Template Downloads
     Route::get('/templates/mutasi-promosi', [App\Http\Controllers\TemplateController::class, 'downloadMutasi'])->name('template.mutasi');
     Route::get('/templates/pakaian', [App\Http\Controllers\TemplateController::class, 'downloadPakaian'])->name('template.pakaian');
