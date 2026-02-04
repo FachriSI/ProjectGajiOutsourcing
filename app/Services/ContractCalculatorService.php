@@ -187,7 +187,7 @@ class ContractCalculatorService
             // Lembur calculation
             $quota_jam = $kuota_jam->kuota ?? 0;
             $quota_jam_perkalian = 2 * $quota_jam;
-            $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
+            $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap + $tj_lokasi) * 0.75) / 173);
             $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
             $fee_lembur = round(0.025 * $nilai_lembur);
             $total_variabel = $nilai_lembur + $fee_lembur;

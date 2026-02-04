@@ -203,6 +203,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tambah-pengganti/{id}', [PenempatanController::class, 'formPengganti']);
     Route::post('/simpan-pengganti/{id}', [PenempatanController::class, 'simpanPengganti']);
     Route::post('/ganti-karyawan/{id}', [PenempatanController::class, 'gantiKaryawan']);
+    Route::get('/get-mpp-history/{id}', [PenempatanController::class, 'getHistory']);
 
     // API Routes untuk dropdown data
     Route::get('/api/jabatan', function () {
@@ -260,6 +261,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/kalkulator-kontrak/show', [App\Http\Controllers\NilaiKontrakController::class, 'show'])->name('kalkulator.show');
     Route::post('/kalkulator-kontrak/recalculate-all', [App\Http\Controllers\NilaiKontrakController::class, 'recalculateAll'])->name('kalkulator.recalculate');
     Route::get('/kalkulator-kontrak/history/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'history'])->name('kalkulator.history');
+    Route::get('/kalkulator-kontrak/cetak-thr/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'cetakThr'])->name('kalkulator.cetak-thr');
 
     // API untuk AJAX
     Route::get('/api/nilai-kontrak/calculate/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'apiCalculate'])->name('api.kalkulator.calculate');

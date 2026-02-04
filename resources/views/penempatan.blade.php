@@ -141,6 +141,10 @@
                                     title="Ganti">
                                     <i class="fas fa-exchange-alt"></i>
                                 </a>
+                                <a href="#" class="btn btn-info btn-sm btn-history" data-id="{{ $item->karyawan_id }}"
+                                    title="History">
+                                    <i class="fas fa-history"></i>
+                                </a>
                             </div>
                         @elseif($item->status_aktif === 'Berhenti')
                             <a href="/tambah-pengganti/{{ $item->karyawan_id }}" class="btn btn-success btn-sm">
@@ -275,6 +279,79 @@
                     table.column(7).search(val ? '^' + val + '$' : '', true, false).draw();
                 });
             }
+        });
+    </script>
+
+    <!-- Modal History -->
+    <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="historyModalLabel"><i class="fas fa-history me-2"></i> Riwayat Karyawan Sebelumnya</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="tableHistory">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Karyawan</th>
+                                    <th>OSIS ID</th>
+                                    <th>Tanggal Diberhentikan</th>
+                                    <th>Diberhentikan Oleh</th>
+                                    <th>Catatan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data akan dimuat disini via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).on('click', '.btn-history', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+            const tbody = $('#tableHistory tbody');
+            
+            tbody.html('<tr><td colspan="6" class="text-center">Memuat data...</td></tr>');
+            modal.show();
+
+            $.ajax({
+                url: '/get-mpp-history/' + id,
+                type: 'GET',
+                success: function(response) {
+                    tbody.empty();
+                    if (response.length === 0) {
+                        tbody.html('<tr><td colspan="6" class="text-center">Tidak ada riwayat.</td></tr>');
+                    } else {
+                        response.forEach((item, index) => {
+                            tbody.append(`
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.nama}</td>
+                                    <td>${item.osis_id || '-'}</td>
+                                    <td>${item.tanggal_berhenti || '-'}</td>
+                                    <td>${item.diberhentikan_oleh || '-'}</td>
+                                    <td>${item.catatan || '-'}</td>
+                                </tr>
+                            `);
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    tbody.html('<tr><td colspan="6" class="text-center text-danger">Gagal memuat data.</td></tr>');
+                }
+            });
         });
     </script>
 @endsection

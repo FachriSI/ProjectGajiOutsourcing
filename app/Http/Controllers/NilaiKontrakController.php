@@ -193,4 +193,42 @@ class NilaiKontrakController extends Controller
 
         return $nilaiKontrak;
     }
+
+    public function cetakThr($paket_id)
+    {
+        $nilaiKontrak = NilaiKontrak::with(['paket.unitKerja'])
+            ->where('paket_id', $paket_id)
+            ->orderBy('periode', 'desc')
+            ->firstOrFail();
+
+        $breakdown = $nilaiKontrak->breakdown_json ?? [];
+        
+        $totalBasicThr = 0;
+        foreach (($breakdown['karyawan'] ?? []) as $karyawan) {
+            $upah = $karyawan['upah_pokok'] ?? 0;
+            $tjTetap = $karyawan['tj_tetap'] ?? 0;
+            $tjLokasi = $karyawan['tj_lokasi'] ?? 0;
+            // THR = 1 month salary (Upah + Tj Tetap + Tj Lokasi)
+            $totalBasicThr += ($upah + $tjTetap + $tjLokasi);
+        }
+
+        // Fee THR 5%
+        $feeThr = $totalBasicThr * 0.05;
+        $totalNilaiThr = $totalBasicThr + $feeThr;
+
+        $data = [
+            'nama_perusahaan' => 'PT Semen Padang', 
+            'paket' => $nilaiKontrak->paket->paket,
+            'periode_tagihan' => 'THR Tahun ' . $nilaiKontrak->tahun,
+            'jumlah_pekerja' => $nilaiKontrak->jumlah_karyawan_total,
+            'unit_kerja' => $nilaiKontrak->paket->unitKerja->unit_kerja ?? '-',
+            'pekerjaan_pos' => '-', 
+            'nilai_thr' => $totalBasicThr,
+            'fee_thr' => $feeThr,
+            'total' => $totalNilaiThr
+        ];
+
+        $pdf = \PDF::loadView('pdf.thr', compact('data', 'nilaiKontrak'));
+        return $pdf->stream('THR_' . $nilaiKontrak->paket->paket . '_' . $nilaiKontrak->tahun . '.pdf');
+    }
 }

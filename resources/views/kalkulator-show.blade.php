@@ -18,6 +18,9 @@
                     <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-light me-2">
                         <i class="fas fa-file-invoice me-2"></i>Lihat Tagihan Lengkap
                     </a>
+                    <a href="{{ route('kalkulator.cetak-thr', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-light me-2" target="_blank">
+                        <i class="fas fa-print me-2"></i>Cetak THR
+                    </a>
                     <a href="{{ route('kalkulator.index') }}" class="btn btn-sm btn-light">
                         <i class="fas fa-arrow-left me-1"></i> Kembali
                     </a>
@@ -82,9 +85,9 @@
             $totalKontrakThn = $totalKontrakBln * 12;
             
             // 5. THR / Bln
-            // THR = (Upah Pokok + Tj. Tetap) / 12 * 1.05
-            $thrPengawas = (($breakdown['pengawas']['upah_pokok'] ?? 0) + ($breakdown['pengawas']['tj_tetap'] ?? 0)) / 12 * 1.05;
-            $thrPelaksana = (($breakdown['pelaksana']['upah_pokok'] ?? 0) + ($breakdown['pelaksana']['tj_tetap'] ?? 0)) / 12 * 1.05;
+            // THR = (Upah Pokok + Tj. Tetap + Tj. Lokasi) / 12 * 1.05
+            $thrPengawas = (($breakdown['pengawas']['upah_pokok'] ?? 0) + ($breakdown['pengawas']['tj_tetap'] ?? 0) + ($breakdown['pengawas']['tj_lokasi'] ?? 0)) / 12 * 1.05;
+            $thrPelaksana = (($breakdown['pelaksana']['upah_pokok'] ?? 0) + ($breakdown['pelaksana']['tj_tetap'] ?? 0) + ($breakdown['pelaksana']['tj_lokasi'] ?? 0)) / 12 * 1.05;
             $totalThrBln = $thrPengawas + $thrPelaksana;
             
             // 6. THR / Thn
@@ -97,59 +100,123 @@
         @endphp
 
         <div class="row mb-4">
-            <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white h-100 shadow-sm">
-                    <div class="card-body py-2 fw-bold">Total Jml Fix Cost/Bln</div>
-                    <div class="card-footer py-2 fw-bold">
-                        Rp {{ number_format($fixCost, 0, ',', '.') }}
+            <!-- Row 1: Monthly Stats -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #3DD9E2 0%, #17a2b8 100%);">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total Jml Fix Cost/Bln</div>
+                                <div class="h4 mb-0 fw-bold text-white">Rp {{ number_format($fixCost, 0, ',', '.') }}</div>
+                            </div>
+                            <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                <i class="fas fa-tags fa-lg text-white"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white h-100 shadow-sm">
-                    <div class="card-body py-2 fw-bold">Total Variabel Cost/Bln</div>
-                    <div class="card-footer py-2 fw-bold">
-                        Rp {{ number_format($variabelCost, 0, ',', '.') }}
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #868e96 0%, #6c757d 100%);">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total Variabel Cost/Bln</div>
+                                <div class="h4 mb-0 fw-bold text-white">Rp {{ number_format($variabelCost, 0, ',', '.') }}</div>
+                            </div>
+                            <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                <i class="fas fa-chart-area fa-lg text-white"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white h-100 shadow-sm">
-                    <div class="card-body py-2 fw-bold">Total Kontrak/Bln</div>
-                    <div class="card-footer py-2 fw-bold">
-                        Rp {{ number_format($totalKontrakBln, 0, ',', '.') }}
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #38D39F 0%, #28a745 100%);">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total Kontrak/Bln</div>
+                                <div class="h4 mb-0 fw-bold text-white">Rp {{ number_format($totalKontrakBln, 0, ',', '.') }}</div>
+                            </div>
+                            <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                <i class="fas fa-file-contract fa-lg text-white"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white h-100 shadow-sm">
-                    <div class="card-body py-2 fw-bold">Total Kontrak/Thn</div>
-                    <div class="card-footer py-2 fw-bold">
-                        Rp {{ number_format($totalKontrakThn, 0, ',', '.') }}
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #F5A623 0%, #F2994A 100%);">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total THR/Bln</div>
+                                <div class="h4 mb-0 fw-bold text-white">Rp {{ number_format($totalThrBln, 0, ',', '.') }}</div>
+                            </div>
+                            <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                <i class="fas fa-hand-holding-usd fa-lg text-white"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white h-100 shadow-sm">
-                    <div class="card-body py-2 fw-bold">Total THR/Bln</div>
-                    <div class="card-footer py-2 fw-bold">
-                        Rp {{ number_format($totalThrBln, 0, ',', '.') }}
+        </div>
+
+        <div class="row mb-4">
+            <!-- Row 2: Annual Stats -->
+            <div class="col-xl-4 col-md-6 mb-3">
+                <div class="card border-0 shadow-lg h-100 card-hover" style="border-radius: 20px; transition: all 0.3s ease;">
+                    <div class="card-body p-4 position-relative d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                         <div class="row flex-fill align-items-center">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+                                        <i class="fas fa-star fa-2x text-warning"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-bold" style="font-size: 1rem;">TOTAL KONTRAK / TAHUN</div>
+                                        <div class="h3 fw-bold text-white mb-0 mt-1">Rp {{ number_format($totalKontrakThn, 0, ',', '.') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white h-100 shadow-sm">
-                    <div class="card-body py-2 fw-bold">Total THR/Thn</div>
-                    <div class="card-footer py-2 fw-bold">
-                        Rp {{ number_format($totalThrThn, 0, ',', '.') }}
+
+            <div class="col-xl-4 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);">
+                        <div class="d-flex justify-content-between align-items-start h-100 flex-column">
+                            <div class="w-100 d-flex justify-content-between mb-2">
+                                <div class="text-white fw-bold" style="font-size: 0.95rem;">Total THR/Tahun</div>
+                                <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                    <i class="fas fa-gift fa-lg text-white"></i>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="h3 mb-0 fw-bold text-white">Rp {{ number_format($totalThrThn, 0, ',', '.') }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white h-100 shadow-sm">
-                    <div class="card-body py-2 fw-bold">Total Pakaian/Thn</div>
-                    <div class="card-footer py-2 fw-bold">
-                        Rp {{ number_format($totalPakaianThn, 0, ',', '.') }}
+
+            <div class="col-xl-4 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #4A5568 0%, #2D3748 100%);">
+                        <div class="d-flex justify-content-between align-items-start h-100 flex-column">
+                            <div class="w-100 d-flex justify-content-between mb-2">
+                                <div class="text-white fw-bold" style="font-size: 0.95rem;">Total Pakaian/Tahun</div>
+                                <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                    <i class="fas fa-tshirt fa-lg text-white"></i>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="h3 mb-0 fw-bold text-white">Rp {{ number_format($totalPakaianThn, 0, ',', '.') }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

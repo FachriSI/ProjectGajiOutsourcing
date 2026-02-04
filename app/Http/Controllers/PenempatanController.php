@@ -681,6 +681,62 @@ class PenempatanController extends Controller
         }
     }
 
+    public function getHistory($id)
+    {
+        $history = [];
+        $currentId = $id;
+        
+        // Loop untuk mencari history ke belakang (limit 50 untuk mencegah infinite loop)
+        for ($i = 0; $i < 50; $i++) {
+            // Ambil data karyawan saat ini
+            $karyawan = DB::table('md_karyawan')
+                ->where('karyawan_id', $currentId)
+                ->first();
+
+            if (!$karyawan) break;
+
+            // Cek apakah ada catatan_pengganti yang menunjukkan ID sebelumnya
+            // Format: "Pengganti ID 123, Nama Lama, TMT ..."
+            if (preg_match('/Pengganti ID (\d+)/', $karyawan->catatan_pengganti, $matches)) {
+                $prevId = $matches[1];
+                
+                // Ambil data karyawan sebelumnya
+                $prevKaryawan = DB::table('md_karyawan')
+                    ->join('users', 'md_karyawan.diberhentikan_oleh', '=', 'users.id')
+                    ->where('karyawan_id', $prevId)
+                    ->select('md_karyawan.*', 'users.name as deleted_by_name')
+                    ->first();
+
+                if ($prevKaryawan) {
+                    $history[] = [
+                        'nama' => $prevKaryawan->nama_tk,
+                        'osis_id' => $prevKaryawan->osis_id,
+                        'tanggal_berhenti' => $prevKaryawan->tanggal_berhenti,
+                        'diberhentikan_oleh' => $prevKaryawan->deleted_by_name,
+                        'catatan' => $prevKaryawan->catatan_berhenti
+                    ];
+                    
+                    // Lanjut ke ID sebelumnya
+                    $currentId = $prevId;
+                } else {
+                    break; 
+                }
+            } else {
+                // Cek di riwayat_karyawan (jika ada update in-place/Snapshot)
+                // Logika: Cari riwayat yang tanggal berhentinya sebelum hari ini ATAU statusnya Berhenti
+                // Namun riwayat_karyawan mencatat state SEBELUM berubah.
+                
+                // Implementasi sederhana: Cek apakah ada riwayat untuk ID ini yang statusnya 'Berhenti' ? 
+                // Tidak, riwayat di-create SAAT ganti.
+                
+                // Jika tidak ada link ke ID lain, kita stop.
+                break;
+            }
+        }
+
+        return response()->json($history);
+    }
+
     /**
      * Ganti karyawan dengan data baru
      * Opsi 1: Ganti data personal saja (jabatan, lokasi, paket tetap)
