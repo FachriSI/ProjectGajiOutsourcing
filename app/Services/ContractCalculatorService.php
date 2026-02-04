@@ -177,7 +177,8 @@ class ContractCalculatorService
             $bpjs_ketenagakerjaan = round(0.0689 * $komponen_gaji);
 
             $perusahaan_id = $karyawan->perusahaan_id ?? 0;
-            $uang_jasa = $perusahaan_id == 38 ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12) : 0;
+            // Updated Uang Jasa: Upah Pokok + T.Tetap + T.Tdk.Tetap + Tj.Lokasi
+            $uang_jasa = $perusahaan_id == 38 ? round(($upah_pokok + $t_tetap + $t_tdk_tetap + $tj_lokasi) / 12) : 0;
             $kompensasi = round($komponen_gaji / 12);
 
             $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
@@ -237,9 +238,9 @@ class ContractCalculatorService
                 'tj_tetap' => $t_tetap,
                 'tj_tidak_tetap' => $t_tdk_tetap,
                 'tj_lokasi' => $tj_lokasi,
-                'bpjs_kesehatan' => $bpjs_kesehatan,
                 'bpjs_ketenagakerjaan' => $bpjs_ketenagakerjaan,
                 'kompensasi' => $kompensasi,
+                'uang_jasa' => $uang_jasa,
                 'fix_cost' => $jumlah_fix_cost,
                 'lembur' => $total_variabel,
                 'total' => $total_kontrak

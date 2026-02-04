@@ -10,12 +10,23 @@
     <div class="row">
         <div class="row">
             <!-- Tren Karyawan per Tahun (Posisi Paling Atas) -->
-            <div class="col-lg-12 mb-4">
+            <div class="col-lg-6 mb-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h6 class="text-center font-weight-bold mb-4">Tren Karyawan Masuk per Tahun</h6>
                         <div style="height: 300px;">
                             <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tren Nilai Kontrak per Tahun -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-center font-weight-bold mb-4">Tren Total Nilai Kontrak per Tahun</h6>
+                        <div style="height: 300px;">
+                            <canvas id="contractChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -291,6 +302,58 @@
                         y: {
                             beginAtZero: true,
                             ticks: { precision: 0 }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+
+            // === Chart Tren Nilai Kontrak (Bar Chart) ===
+            const contractCtx = document.getElementById('contractChart').getContext('2d');
+            new Chart(contractCtx, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($contractTrend->pluck('tahun')) !!},
+                    datasets: [{
+                        label: 'Total Nilai Kontrak (Rp)',
+                        data: {!! json_encode($contractTrend->pluck('total_nilai')) !!},
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.raw;
+                                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#000',
+                            font: { size: 10, weight: 'bold' },
+                            formatter: function(value) {
+                                return 'Rp' + (value/1000000000).toFixed(1) + 'M';
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + (value/1000000000).toFixed(0) + 'M';
+                                }
+                            }
                         }
                     }
                 },

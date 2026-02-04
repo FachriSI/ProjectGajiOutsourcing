@@ -246,7 +246,19 @@ class PaketController extends Controller
             }
         }
         
-        return view('paket_detail', compact('data', 'paketList')); 
+
+        // Data for Chart: Contract History
+        $contractHistory = \App\Models\NilaiKontrak::where('paket_id', $paketId)
+            ->orderBy('periode', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'period' => \Carbon\Carbon::parse($item->periode)->format('F Y'),
+                    'total' => $item->total_nilai_kontrak
+                ];
+            });
+        
+        return view('paket_detail', compact('data', 'paketList', 'contractHistory'));  
     }
 
     //chatgpt salah

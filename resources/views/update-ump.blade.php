@@ -15,7 +15,16 @@
     
             <div class="mb-3">
                 <label for="tahun" class="form-label">Tahun</label>
-                <input type="number" class="form-control" name="tahun" id="tahun" value="{{$data->tahun}}">
+                <select class="form-control" name="tahun" id="tahun">
+                    @php
+                        $currentYear = date('Y');
+                        $startYear = 2022;
+                        $endYear = $currentYear + 5;
+                    @endphp
+                    @for ($i = $startYear; $i <= $endYear; $i++)
+                        <option value="{{ $i }}" {{ (isset($data->tahun) && $data->tahun == $i) ? 'selected' : '' }}>{{ $i }}</option>
+                    @endfor
+                </select>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>

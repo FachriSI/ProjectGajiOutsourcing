@@ -41,6 +41,13 @@ class DashboardController extends Controller
         ->whereNotNull('tanggal_bekerja')
         ->groupBy('tahun')
         ->orderBy('tahun', 'asc')
+        ->orderBy('tahun', 'asc')
+        ->get();
+
+    // Data Tren Nilai Kontrak Tahunan
+    $contractTrend = \App\Models\NilaiKontrak::selectRaw('tahun, SUM(total_nilai_kontrak) as total_nilai')
+        ->groupBy('tahun')
+        ->orderBy('tahun', 'asc')
         ->get();
 
     $paketList = Paket::with(['paketKaryawan.karyawan.perusahaan', 'paketKaryawan.paket.unitKerja.departemen'])->get();
@@ -223,7 +230,7 @@ class DashboardController extends Controller
     logger()->info('Total Terpilih: ' . $totalActual);
     logger()->info('Detail Paket yang Kurang:', $errorLog);
 
-    return view('dashboard', compact('data', 'jabatanCount', 'genderCount', 'statusAktifCount','departemenCount','perusahaanCount','fungsiCount','asalKecamatanCount', 'trendData'));
+    return view('dashboard', compact('data', 'jabatanCount', 'genderCount', 'statusAktifCount','departemenCount','perusahaanCount','fungsiCount','asalKecamatanCount', 'trendData', 'contractTrend'));
 }
 
 }

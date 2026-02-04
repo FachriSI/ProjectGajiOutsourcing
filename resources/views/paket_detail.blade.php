@@ -529,5 +529,71 @@
         $('#datatablesSimple').wrap('<div class="table-responsive" style="border:none; width:100%; margin-top: 10px;"></div>');
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('historyChart').getContext('2d');
+    const historyData = {!! json_encode($contractHistory ?? []) !!};
+    
+    // Safety check if no history
+    if(historyData.length > 0) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: historyData.map(item => item.period),
+                datasets: [{
+                    label: 'Nilai Kontrak (Rp)',
+                    data: historyData.map(item => item.total),
+                    borderColor: '#4e73df',
+                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                    pointRadius: 5,
+                    pointBackgroundColor: '#4e73df',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 7,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return new Intl.NumberFormat('id-ID', { notation: "compact", compactDisplay: "short" }).format(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endsection

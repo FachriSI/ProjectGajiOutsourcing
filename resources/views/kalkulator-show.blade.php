@@ -419,6 +419,7 @@
                                                 <th class="text-end">BPJS Kes</th>
                                                 <th class="text-end">BPJS TK</th>
                                                 <th class="text-end">Kompensasi</th>
+                                                <th class="text-end">Uang Jasa</th>
                                                 <th class="text-end">Total</th>
                                             </tr>
                                         </thead>
@@ -445,6 +446,7 @@
                                                 <td class="text-end">{{ number_format($karyawan['bpjs_kesehatan'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end">{{ number_format($karyawan['bpjs_ketenagakerjaan'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end">{{ number_format($karyawan['kompensasi'] ?? 0, 0, ',', '.') }}</td>
+                                                <td class="text-end">{{ number_format($karyawan['uang_jasa'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end"><strong>{{ number_format($karyawan['total'] ?? 0, 0, ',', '.') }}</strong></td>
                                             </tr>
                                             @endforeach
@@ -471,6 +473,7 @@
                                                 <th class="text-end">BPJS Kes</th>
                                                 <th class="text-end">BPJS TK</th>
                                                 <th class="text-end">Kompensasi</th>
+                                                <th class="text-end">Uang Jasa</th>
                                                 <th class="text-end">Total</th>
                                             </tr>
                                         </thead>
@@ -498,6 +501,7 @@
                                                 <td class="text-end">{{ number_format($karyawan['bpjs_kesehatan'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end">{{ number_format($karyawan['bpjs_ketenagakerjaan'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end">{{ number_format($karyawan['kompensasi'] ?? 0, 0, ',', '.') }}</td>
+                                                <td class="text-end">{{ number_format($karyawan['uang_jasa'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end"><strong>{{ number_format($karyawan['total'] ?? 0, 0, ',', '.') }}</strong></td>
                                             </tr>
                                             @endif
@@ -525,6 +529,7 @@
                                                 <th class="text-end">BPJS Kes</th>
                                                 <th class="text-end">BPJS TK</th>
                                                 <th class="text-end">Kompensasi</th>
+                                                <th class="text-end">Uang Jasa</th>
                                                 <th class="text-end">Total</th>
                                             </tr>
                                         </thead>
@@ -552,6 +557,7 @@
                                                 <td class="text-end">{{ number_format($karyawan['bpjs_kesehatan'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end">{{ number_format($karyawan['bpjs_ketenagakerjaan'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end">{{ number_format($karyawan['kompensasi'] ?? 0, 0, ',', '.') }}</td>
+                                                <td class="text-end">{{ number_format($karyawan['uang_jasa'] ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-end"><strong>{{ number_format($karyawan['total'] ?? 0, 0, ',', '.') }}</strong></td>
                                             </tr>
                                             @endif
@@ -583,56 +589,79 @@
                 </div>
                 <div class="modal-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
+                        <table class="table table-bordered table-hover text-center align-middle">
                             <thead class="table-light">
-                                <tr class="text-center">
-                                    <th class="align-middle">Komponen</th>
-                                    <th class="align-middle">{{ \Carbon\Carbon::parse($previousNilai->periode)->format('F Y') }}</th>
-                                    <th class="align-middle">{{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('F Y') }}</th>
-                                    <th class="align-middle">Selisih (Rp)</th>
-                                    <th class="align-middle">Selisih (%)</th>
+                                <tr>
+                                    <th>Komponen</th>
+                                    <th>{{ \Carbon\Carbon::parse($previousNilai->periode)->format('F Y') }}</th>
+                                    <th>{{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('F Y') }}</th>
+                                    <th>Selisih (Rp)</th>
+                                    <th>Selisih (%)</th>
+                                    <th>Keterangan</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Total Pengawas -->
-                                <tr>
-                                    <td><strong>Biaya Pengawas</strong></td>
-                                    <td class="text-end">Rp {{ number_format($previousNilai->total_pengawas, 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($nilaiKontrak->total_pengawas, 0, ',', '.') }}</td>
+                                @php
+                                    $components = [
+                                        'upah_pokok' => 'Upah Pokok',
+                                        'tj_tetap' => 'Tunjangan Tetap',
+                                        'tj_tidak_tetap' => 'Tunjangan Tidak Tetap',
+                                        'tj_lokasi' => 'Tunjangan Lokasi',
+                                        'bpjs_kesehatan' => 'BPJS Kesehatan',
+                                        'bpjs_ketenagakerjaan' => 'BPJS Ketenagakerjaan',
+                                        'kompensasi' => 'Kompensasi',
+                                        'uang_jasa' => 'Uang Jasa',
+                                        'lembur' => 'Biaya Lembur'
+                                    ];
+
+                                    // Helper function inside blade to sum breakdown
+                                    $getSum = function($json, $key) {
+                                        $pengawas = $json['pengawas'][$key] ?? 0;
+                                        $pelaksana = $json['pelaksana'][$key] ?? 0;
+                                        return $pengawas + $pelaksana;
+                                    };
+                                @endphp
+
+                                @foreach($components as $key => $label)
                                     @php
-                                        $deltaPengawas = $nilaiKontrak->total_pengawas - $previousNilai->total_pengawas;
-                                        $percPengawas = $previousNilai->total_pengawas > 0 ? ($deltaPengawas / $previousNilai->total_pengawas) * 100 : 0;
+                                        $valPrev = $getSum($previousNilai->breakdown_json ?? [], $key);
+                                        $valCurr = $getSum($nilaiKontrak->breakdown_json ?? [], $key);
+                                        $diff = $valCurr - $valPrev;
+                                        $perc = $valPrev > 0 ? ($diff / $valPrev) * 100 : 0;
+                                        
+                                        // Logic Keterangan Sederhana
+                                        $note = '-';
+                                        if ($diff != 0) {
+                                            if ($key == 'upah_pokok' && $nilaiKontrak->ump_sumbar != $previousNilai->ump_sumbar) {
+                                                $note = 'Perubahan UMP';
+                                            } elseif ($nilaiKontrak->jumlah_karyawan_total != $previousNilai->jumlah_karyawan_total) {
+                                                $note = 'Jumlah Karyawan Berubah';
+                                            } else {
+                                                $note = 'Perubahan Komponen/Bobot';
+                                            }
+                                        }
                                     @endphp
-                                    <td class="text-end text-{{ $deltaPengawas >= 0 ? 'success' : 'danger' }}">
-                                        {{ $deltaPengawas >= 0 ? '+' : '' }}Rp {{ number_format($deltaPengawas, 0, ',', '.') }}
-                                    </td>
-                                    <td class="text-end text-{{ $deltaPengawas >= 0 ? 'success' : 'danger' }}">
-                                        {{ $deltaPengawas >= 0 ? '+' : '' }}{{ number_format($percPengawas, 2) }}%
-                                    </td>
-                                </tr>
-                                <!-- Total Pelaksana -->
-                                <tr>
-                                    <td><strong>Biaya Pelaksana</strong></td>
-                                    <td class="text-end">Rp {{ number_format($previousNilai->total_pelaksana, 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($nilaiKontrak->total_pelaksana, 0, ',', '.') }}</td>
-                                    @php
-                                        $deltaPelaksana = $nilaiKontrak->total_pelaksana - $previousNilai->total_pelaksana;
-                                        $percPelaksana = $previousNilai->total_pelaksana > 0 ? ($deltaPelaksana / $previousNilai->total_pelaksana) * 100 : 0;
-                                    @endphp
-                                    <td class="text-end text-{{ $deltaPelaksana >= 0 ? 'success' : 'danger' }}">
-                                        {{ $deltaPelaksana >= 0 ? '+' : '' }}Rp {{ number_format($deltaPelaksana, 0, ',', '.') }}
-                                    </td>
-                                    <td class="text-end text-{{ $deltaPelaksana >= 0 ? 'success' : 'danger' }}">
-                                        {{ $deltaPelaksana >= 0 ? '+' : '' }}{{ number_format($percPelaksana, 2) }}%
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td class="text-start fw-bold">{{ $label }}</td>
+                                        <td class="text-end">Rp {{ number_format($valPrev, 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format($valCurr, 0, ',', '.') }}</td>
+                                        <td class="text-end text-{{ $diff >= 0 ? 'success' : 'danger' }}">
+                                            {{ $diff >= 0 ? '+' : '' }}Rp {{ number_format($diff, 0, ',', '.') }}
+                                        </td>
+                                        <td class="text-end text-{{ $diff >= 0 ? 'success' : 'danger' }}">
+                                            {{ $diff >= 0 ? '+' : '' }}{{ number_format($perc, 2) }}%
+                                        </td>
+                                        <td class="text-start text-muted small">{{ $note }}</td>
+                                    </tr>
+                                @endforeach
+
                                 <!-- Separator -->
                                 <tr class="table-active">
-                                    <td colspan="5"></td>
+                                    <td colspan="6"></td>
                                 </tr>
                                 <!-- Grand Total -->
                                 <tr class="table-primary">
-                                    <td><strong>Grand Total</strong></td>
+                                    <td class="text-start"><strong>Grand Total</strong></td>
                                     <td class="text-end fw-bold">Rp {{ number_format($previousNilai->total_nilai_kontrak, 0, ',', '.') }}</td>
                                     <td class="text-end fw-bold">Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}</td>
                                     @php
@@ -645,6 +674,7 @@
                                     <td class="text-end fw-bold text-{{ $deltaTotal >= 0 ? 'success' : 'danger' }}">
                                         {{ $deltaTotal >= 0 ? '+' : '' }}{{ number_format($percTotal, 2) }}%
                                     </td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
