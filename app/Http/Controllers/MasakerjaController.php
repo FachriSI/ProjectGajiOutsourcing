@@ -10,21 +10,24 @@ class MasakerjaController extends Controller
 {
     public function index()
     {
-        // $data = DB::table('masa_kerja')
-        //     ->join('md_karyawan', 'masa_kerja.karyawan_id', '=', 'md_karyawan.karyawan_id')
         $data = DB::table('masa_kerja')
             ->join('md_karyawan', 'masa_kerja.karyawan_id', '=', 'md_karyawan.karyawan_id')
+            ->where('masa_kerja.is_deleted', 0)
+            ->where('md_karyawan.is_deleted', 0)
             ->select('masa_kerja.*', 'md_karyawan.nama_tk as nama')
-            // ->where('is_deleted', 0) // Table does not support soft deletes
-             ->get();
+            ->get();
 
-        $hasDeleted = false; // Table does not support soft deletes
+        $hasDeleted = DB::table('masa_kerja')->where('is_deleted', 1)->exists();
         return view('masakerja', ['data' => $data, 'hasDeleted' => $hasDeleted]);
     }
 
     public function trash()
     {
-        $data = Masakerja::where('is_deleted', 1)->get();
+        $data = DB::table('masa_kerja')
+            ->where('masa_kerja.is_deleted', 1)
+            ->join('md_karyawan', 'masa_kerja.karyawan_id', '=', 'md_karyawan.karyawan_id')
+            ->select('masa_kerja.*', 'md_karyawan.nama_tk as nama')
+            ->get();
         return view('masakerja-sampah', ['data' => $data]);
     }
 
@@ -73,7 +76,21 @@ class MasakerjaController extends Controller
 
     public function destroy($id)
     {
-        Masakerja::where('id', $id)->delete();
+        Masakerja::where('id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Masakerja::where('id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return redirect('/masakerja')->with('success', 'Data berhasil dipulihkan!');
     }
 }

@@ -27,12 +27,12 @@
       @foreach ($data as $item)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $item->nama_penyesuaian }}</td>
-          <td>Rp. {{ number_format($item->jumlah, 0, ',', '.') }}</td>
+          <td>{{ $item->keterangan }}</td>
+          <td>Rp. {{ number_format($item->tunjangan_penyesuaian, 0, ',', '.') }}</td>
           <td>{{ $item->deleted_by }}</td>
           <td>{{ $item->deleted_at }}</td>
           <td>
-            <a href="{{ url('restore-penyesuaian', $item->penyesuaian_id) }}" class="btn btn-sm btn-success"
+            <a href="{{ url('restore-penyesuaian', $item->kode_suai) }}" class="btn btn-sm btn-success"
               data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
               <i class="fas fa-trash-restore"></i> Pulihkan
             </a>

@@ -143,7 +143,8 @@ class PaketController extends Controller
             ->orderBy('paket_id', 'asc')
             ->get();
 
-        $hasDeleted = Paket::where('is_deleted', 1)->exists();
+        //$hasDeleted = Paket::where('is_deleted', 1)->exists();
+        $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
         
         return view('paket', compact(
             'data', 'hasDeleted', 
@@ -177,7 +178,7 @@ class PaketController extends Controller
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
 
         // Filter: Only for this package
-        $paketList = Paket::where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
+        $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
         
         if($paketList->isEmpty()) {
             return redirect('/paket')->with('error', 'Paket tidak ditemukan');
@@ -770,7 +771,8 @@ class PaketController extends Controller
             ->get();
         //  dd($data);
 
-        $hasDeleted = Paket::where('is_deleted', 1)->exists();
+        // $hasDeleted = Paket::where('is_deleted', 1)->exists();
+        $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
         return view('data_paket', ['data' => $data, 'hasDeleted' => $hasDeleted]);
 
     }
@@ -842,7 +844,8 @@ class PaketController extends Controller
 
     public function trash()
     {
-        $data = Paket::where('md_paket.is_deleted', 1)
+        $data = DB::table('md_paket')
+            ->where('md_paket.is_deleted', 1)
             ->join('md_unit_kerja', 'md_unit_kerja.unit_id', '=', 'md_paket.unit_id')
             ->select('md_paket.*', 'md_unit_kerja.*')
             ->get();

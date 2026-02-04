@@ -16,7 +16,12 @@ class Kuotajam extends Model
         'kuota_id',
         'karyawan_id',
         'kuota',
-        'beg_date'
+        'beg_date',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'deleted_by',
+        'is_deleted'
     ];
 
     public function karyawan()

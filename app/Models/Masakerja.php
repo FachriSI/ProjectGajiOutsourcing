@@ -16,7 +16,12 @@ class Masakerja extends Model
         'id',
         'karyawan_id',
         'tunjangan_masakerja',
-        'beg_date'
+        'beg_date',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'deleted_by',
+        'is_deleted'
     ];
 
     public function karyawan()

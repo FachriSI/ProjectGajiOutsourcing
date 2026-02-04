@@ -17,8 +17,8 @@
             $ump = $item->lokasi['ump']['ump'] ?? 0;
             $ump_sumbar = $item->ump_sumbar ?? 0;
 
-            $upah_pokok = round($ump_sumbar * 0.92);
-            $tj_umum = round($ump_sumbar * 0.08);
+            $upah_pokok = $ump_sumbar;
+            $tj_umum = 0; // Removed/Merged into Upah Pokok
 
             $selisih_ump = round($ump - $ump_sumbar);
             $tj_lokasi = $item->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
@@ -30,8 +30,8 @@
             $tj_resiko = ($item->kode_resiko == 2) ? 0 : round($item->resiko['tunjangan_resiko'] ?? 0);
             $tj_presensi = round($upah_pokok * 0.08);
 
-            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
-            $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
+            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi + $tj_resiko;
+            $t_tetap = $tj_jabatan + $tj_masakerja;
 
             $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
             $bpjs_kesehatan = round(0.04 * $komponen_gaji);
@@ -92,59 +92,139 @@
     </div>
 
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">Total Jml Fix Cost/Bln</div>
-                <div class="card-footer" id="sum-fix-cost">
-                    Rp{{ number_format($total_jml_fix_cost, 0, ',', '.') }}
+        <!-- Main Card: Total Kontrak / Tahun -->
+        <div class="col-xl-6 col-12 mb-3">
+            <div class="card border-0 shadow-lg overflow-hidden position-relative h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px;">
+                <div class="card-body p-4 position-relative d-flex align-items-center">
+                    <div class="row flex-fill align-items-center">
+                        <div class="col-lg-7">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                                    <i class="fas fa-star fa-2x text-warning"></i>
+                                </div>
+                                <div>
+                                    <div class="text-white fw-bold" style="font-size: 1.1rem;">TOTAL KONTRAK / TAHUN</div>
+                                    <div class="text-white-50 mt-1" style="font-size: 0.9rem;">
+                                        <i class="fas fa-chart-line me-1"></i> Data Tahunan
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+                            <div class="display-6 fw-bold text-white mb-0" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+                                Rp{{ number_format($total_kontrak_tahunan_all, 0, ',', '.') }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">Total Variabel Cost/Bln</div>
-                <div class="card-footer" id="sum-variabel">
-                    Rp{{ number_format($total_seluruh_variabel, 0, ',', '.') }}
+
+        <!-- Annual Stat: THR / Tahun -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                <div class="card-body p-4" style="background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);">
+                    <div class="d-flex justify-content-between align-items-start h-100 flex-column">
+                        <div class="w-100 d-flex justify-content-between mb-3">
+                            <div class="text-white fw-bold" style="font-size: 0.95rem;">Total THR/Tahun</div>
+                            <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                <i class="fas fa-gift fa-lg text-white"></i>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="h4 mb-0 fw-bold text-white">Rp{{ number_format($total_thr_thn, 0, ',', '.') }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">Total Kontrak/Bln</div>
-                <div class="card-footer" id="sum-kontrak-bln">
-                    Rp{{ number_format($total_kontrak_all, 0, ',', '.') }}
+        
+        <!-- Annual Stat: Pakaian / Tahun -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                <div class="card-body p-4" style="background: linear-gradient(135deg, #4A5568 0%, #2D3748 100%);">
+                    <div class="d-flex justify-content-between align-items-start h-100 flex-column">
+                        <div class="w-100 d-flex justify-content-between mb-3">
+                            <div class="text-white fw-bold" style="font-size: 0.95rem;">Total Pakaian/Tahun</div>
+                            <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                <i class="fas fa-tshirt fa-lg text-white"></i>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="h4 mb-0 fw-bold text-white">Rp{{ number_format($total_pakaian_all, 0, ',', '.') }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">Total Kontrak/Thn</div>
-                <div class="card-footer" id="sum-kontrak-thn">
-                    Rp{{ number_format($total_kontrak_tahunan_all, 0, ',', '.') }}
+    </div>
+
+    <!-- ROW 2: MONTHLY BREAKDOWN -->
+    <div class="row mb-4">
+        <!-- Monthly 1: Fix Cost -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                <div class="card-body p-4" style="background: linear-gradient(135deg, #3DD9E2 0%, #17a2b8 100%);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total Fix Cost/Bln</div>
+                            <div class="h4 mb-0 fw-bold text-white">Rp{{ number_format($total_jml_fix_cost, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-tags fa-lg text-white"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">Total THR/Bln</div>
-                <div class="card-footer" id="sum-thr-bln">
-                    Rp{{ number_format($total_thr_bln, 0, ',', '.') }}
+        
+        <!-- Monthly 2: Variabel -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                <div class="card-body p-4" style="background: linear-gradient(135deg, #868e96 0%, #6c757d 100%);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total Variabel/Bln</div>
+                            <div class="h4 mb-0 fw-bold text-white">Rp{{ number_format($total_seluruh_variabel, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-chart-area fa-lg text-white"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">Total THR/Thn</div>
-                <div class="card-footer" id="sum-thr-thn">
-                    Rp{{ number_format($total_thr_thn, 0, ',', '.') }}
+        
+        <!-- Monthly 3: Total Kontrak/Bln -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                <div class="card-body p-4" style="background: linear-gradient(135deg, #38D39F 0%, #28a745 100%);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total Kontrak/Bln</div>
+                            <div class="h4 mb-0 fw-bold text-white">Rp{{ number_format($total_kontrak_all, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-file-contract fa-lg text-white"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">Total Pakaian/Thn</div>
-                <div class="card-footer" id="sum-pakaian">
-                    Rp{{ number_format($total_pakaian_all, 0, ',', '.') }}
+        
+        <!-- Monthly 4: THR/Bln -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 15px; transition: all 0.3s ease;">
+                <div class="card-body p-4" style="background: linear-gradient(135deg, #F5A623 0%, #F2994A 100%);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="text-white fw-bold mb-2" style="font-size: 0.95rem;">Total THR/Bln</div>
+                            <div class="h4 mb-0 fw-bold text-white">Rp{{ number_format($total_thr_bln, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-hand-holding-usd fa-lg text-white"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -201,8 +281,8 @@
                 <tbody>
                     @foreach ($data as $item)
                             @php 
-                                            $upah_pokok = $item->ump_sumbar * 0.92;
-                                    $tj_umum = $item->ump_sumbar * 0.08;
+                                    $upah_pokok = $item->ump_sumbar;
+                                    $tj_umum = 0;
                                     $selisih_ump = round(($item->lokasi['ump']['ump'] ?? 0) - ($item->ump_sumbar ?? 0));
                                     $tj_lokasi = $item->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
                                     $tj_jabatan = $item->tunjangan_jabatan;
@@ -212,8 +292,8 @@
                                     $tj_harianshift = $item->tunjangan_shift ?? 0;
                                     $tj_masakerja = $item->tunjangan_masakerja ?? 0;
 
-                                    $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
-                                    $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
+                                    $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi + $tj_resiko;
+                                    $t_tetap = $tj_jabatan + $tj_masakerja;
 
                                     $bpjs_kesehatan = 0.04 * ($upah_pokok + $t_tetap + $tj_lokasi);
                                     $bpjs_ketenagakerjaan = 0.0689 * ($upah_pokok + $t_tetap + $tj_lokasi);

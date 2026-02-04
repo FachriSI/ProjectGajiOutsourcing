@@ -142,6 +142,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getupdate-kuotajam/{id}', [KuotajamController::class, 'getUpdate']);
     Route::post('/update-kuotajam/{id}', [KuotajamController::class, 'setUpdate']);
     Route::get('/delete-kuotajam/{id}', [KuotajamController::class, 'destroy']);
+    Route::get('/restore-kuotajam/{id}', [KuotajamController::class, 'restore']);
 
     Route::get('/masakerja', [MasakerjaController::class, 'index']);
     Route::get('/gettambah-masakerja', [MasakerjaController::class, 'getTambah']);
@@ -150,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getupdate-masakerja/{id}', [MasakerjaController::class, 'getUpdate']);
     Route::post('/update-masakerja/{id}', [MasakerjaController::class, 'setUpdate']);
     Route::get('/delete-masakerja/{id}', [MasakerjaController::class, 'destroy']);
+    Route::get('/restore-masakerja/{id}', [MasakerjaController::class, 'restore']);
 
     Route::get('/pakaian', [PakaianController::class, 'index']);
     Route::get('/gettambah-pakaian', [PakaianController::class, 'getTambah']);
@@ -225,6 +227,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/templates/karyawan', [App\Http\Controllers\TemplateController::class, 'downloadKaryawan'])->name('template.karyawan');
 
     Route::get('/paket', [PaketController::class, 'index']);
+    Route::get('/paket/sampah', [PaketController::class, 'trash']);
     Route::get('/paket/{id}', [PaketController::class, 'show']);
     Route::get('/datapaket', [PaketController::class, 'indexpaket']);
     Route::get('/gettambah-paket', [PaketController::class, 'getTambah']);
@@ -233,7 +236,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update-paket/{id}', [PaketController::class, 'setUpdate']);
     Route::get('/delete-paket/{id}', [PaketController::class, 'destroy']);
     Route::get('/restore-paket/{id}', [PaketController::class, 'restore']);
-    Route::get('/paket/sampah', [PaketController::class, 'trash']);
 
     Route::get('/ump', [UmpController::class, 'index']);
     Route::get('/gettambah-ump-tahunan', [UmpController::class, 'getTambah']);

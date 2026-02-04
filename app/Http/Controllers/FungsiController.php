@@ -63,6 +63,12 @@ class FungsiController extends Controller
         return redirect('/fungsi')->with('success', 'Data Berhasil Diupdate');
     }
 
+    public function trash()
+    {
+        $data = DB::table('md_fungsi')->where('is_deleted', 1)->get();
+        return view('fungsi-sampah', ['data' => $data]);
+    }
+
     public function destroy($id)
     {
         Fungsi::where('kode_fungsi', $id)->update([

@@ -12,25 +12,29 @@
     <a href="/kuotajam" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali</a>
   </div>
 
-  <table class="table datatable" id="datatableSimple">
+  <table class="table datatable">
     <thead>
       <tr>
         <th>No.</th>
-        <th>Kuota Jam</th>
+        <th>Karyawan</th>
+        <th>Kuota</th>
+        <th>Tanggal Mulai</th>
         <th>Dihapus Oleh</th>
         <th>Waktu Hapus</th>
-        <th>Aksi</th>
+        <th class="text-center">Aksi</th>
       </tr>
     </thead>
     <tbody>
       @foreach ($data as $item)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $item->kuotajam }}</td>
+          <td>{{ $item->nama }}</td>
+          <td>{{ $item->kuota }}</td>
+           <td>{{ $item->beg_date }}</td>
           <td>{{ $item->deleted_by }}</td>
           <td>{{ $item->deleted_at }}</td>
-          <td>
-            <a href="{{ url('restore-kuotajam', $item->kuotajam_id) }}" class="btn btn-sm btn-success"
+          <td class="text-center">
+            <a href="{{ url('restore-kuotajam', $item->kuota_id) }}" class="btn btn-sm btn-success"
               data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
               <i class="fas fa-trash-restore"></i> Pulihkan
             </a>

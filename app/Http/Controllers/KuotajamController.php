@@ -12,17 +12,22 @@ class KuotajamController extends Controller
     {
         $data = DB::table('kuota_jam')
             ->join('md_karyawan', 'kuota_jam.karyawan_id', '=', 'md_karyawan.karyawan_id')
+            ->where('kuota_jam.is_deleted', 0)
             ->where('md_karyawan.is_deleted', 0)
             ->select('kuota_jam.*', 'md_karyawan.nama_tk as nama')
             ->get();
 
-        $hasDeleted = false; // Table does not support soft deletes
+        $hasDeleted = DB::table('kuota_jam')->where('is_deleted', 1)->exists();
         return view('kuotajam', ['data' => $data, 'hasDeleted' => $hasDeleted]);
     }
 
     public function trash()
     {
-        $data = Kuotajam::where('is_deleted', 1)->get();
+        $data = DB::table('kuota_jam')
+            ->where('kuota_jam.is_deleted', 1)
+            ->join('md_karyawan', 'kuota_jam.karyawan_id', '=', 'md_karyawan.karyawan_id')
+            ->select('kuota_jam.*', 'md_karyawan.nama_tk as nama')
+            ->get();
         return view('kuotajam-sampah', ['data' => $data]);
     }
 
@@ -71,7 +76,21 @@ class KuotajamController extends Controller
 
     public function destroy($id)
     {
-        Kuotajam::where('kuota_id', $id)->delete();
+        Kuotajam::where('kuota_id', $id)->update([
+            'is_deleted' => 1,
+            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
+            'deleted_at' => now()
+        ]);
         return back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function restore($id)
+    {
+        Kuotajam::where('kuota_id', $id)->update([
+            'is_deleted' => 0,
+            'deleted_by' => null,
+            'deleted_at' => null
+        ]);
+        return redirect('/kuotajam')->with('success', 'Data berhasil dipulihkan!');
     }
 }

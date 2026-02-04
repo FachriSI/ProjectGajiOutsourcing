@@ -12,27 +12,29 @@
     <a href="/masakerja" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali</a>
   </div>
 
-  <table class="table datatable" id="datatableSimple">
+  <table class="table datatable">
     <thead>
       <tr>
         <th>No.</th>
-        <th>Masa Kerja</th>
-        <th>Tunjangan</th>
+        <th>Karyawan</th>
+        <th>Tunjangan Masa Kerja</th>
+        <th>Tanggal Mulai</th>
         <th>Dihapus Oleh</th>
         <th>Waktu Hapus</th>
-        <th>Aksi</th>
+        <th class="text-center">Aksi</th>
       </tr>
     </thead>
     <tbody>
       @foreach ($data as $item)
         <tr>
-          <td>{{ $loop->iteration }}</td>
-          <td>{{ $item->masa_kerja }}</td>
-          <td>Rp. {{ number_format($item->tunjangan_masa_kerja, 0, ',', '.') }}</td>
-          <td>{{ $item->deleted_by }}</td>
-          <td>{{ $item->deleted_at }}</td>
-          <td>
-            <a href="{{ url('restore-masakerja', $item->masakerja_id) }}" class="btn btn-sm btn-success"
+            <td>{{ $loop->iteration }}.</td>
+            <td>{{ $item->nama }}</td>
+            <td>Rp {{ number_format($item->tunjangan_masakerja, 0, ',', '.') }}</td>
+            <td>{{ $item->beg_date }}</td>
+            <td>{{ $item->deleted_by }}</td>
+            <td>{{ $item->deleted_at }}</td>
+          <td class="text-center">
+            <a href="{{ url('restore-masakerja', $item->id) }}" class="btn btn-sm btn-success"
               data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
               <i class="fas fa-trash-restore"></i> Pulihkan
             </a>
@@ -46,11 +48,7 @@
     $(document).ready(function () {
       $('.datatable').each(function () {
         if (!$.fn.DataTable.isDataTable(this)) {
-          $(this).DataTable({
-            "columnDefs": [
-              { "type": "num", "targets": 0 }
-            ]
-          });
+          $(this).DataTable();
         }
       });
     });
