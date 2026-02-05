@@ -43,12 +43,19 @@ class UmpController extends Controller
         foreach ($umpData as $lokasi => $nilaiUmp) {
              $nilai = str_replace('.', '', $nilaiUmp);
             // Simpan ke database atau lakukan proses lain
-            // Misal:
-            Ump::create([
-                'kode_lokasi' => $lokasi,
-                'ump' => $nilai,
-                'tahun' => $request->input('tahun'),
-            ]);
+            // Simpan ke database atau lakukan proses lain
+            // Menggunakan updateOrInsert untuk mencegah duplikasi (Upsert)
+            Ump::updateOrInsert(
+                [
+                    'kode_lokasi' => $lokasi,
+                    'tahun' => $request->input('tahun')
+                ],
+                [
+                    'ump' => $nilai,
+                    'updated_at' => now(),
+                    'is_deleted' => 0 // Ensure it's active if it was previously soft-deleted? Or just leave as is. Assuming we just want to update value.
+                ]
+            );
         }
 
         return redirect('/ump')->with('success', 'Data Berhasil Tersimpan');
@@ -70,11 +77,20 @@ class UmpController extends Controller
         ]);
         
         $nilai = str_replace('.', '', $request->ump);
-        Ump::create([
-            'kode_lokasi' => $request->kode_lokasi,
-            'ump' => $nilai,
-            'tahun' => $request->tahun,
-        ]);
+        $nilai = str_replace('.', '', $request->ump);
+
+        // Menggunakan updateOrInsert untuk mencegah duplikasi
+        Ump::updateOrInsert(
+            [
+                'kode_lokasi' => $request->kode_lokasi,
+                'tahun' => $request->tahun
+            ],
+            [
+                'ump' => $nilai,
+                'updated_at' => now(),
+                 'is_deleted' => 0
+            ]
+        );
     
 
         return redirect('/ump')->with('success', 'Data Berhasil Tersimpan');

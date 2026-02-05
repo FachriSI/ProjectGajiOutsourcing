@@ -3,13 +3,18 @@
 @section('title', 'Kontrak')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mt-4">
-        <h3>Nilai Kontrak</h3>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
-            <i class="fas fa-file-excel"></i> Export Laporan
-        </button>
+    <!-- Modern Header -->
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-file-contract me-2 text-primary"></i> Nilai Kontrak</h1>
+                <p class="text-muted small mb-0 mt-1">Hitung dan kelola nilai kontrak per paket berdasarkan UMP dan distribusi karyawan</p>
+            </div>
+            <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#exportModal">
+                <i class="fas fa-file-excel me-1"></i> Export Laporan
+            </button>
+        </div>
     </div>
-    <p class="text-muted">Hitung dan kelola nilai kontrak per paket berdasarkan UMP dan distribusi karyawan</p>
 
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -28,18 +33,18 @@
     <div class="row">
         <!-- Form Kalkulator -->
         <div class="col-md-5">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-file-contract"></i> Form Perhitungan</h5>
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom fw-bold text-primary py-3">
+                    <i class="fas fa-calculator me-1"></i> Form Perhitungan
                 </div>
                 <div class="card-body">
                     <form action="{{ route('kalkulator.calculate') }}" method="POST" id="formKalkulator">
                         @csrf
 
                         <div class="mb-3">
-                            <label for="paket_id" class="form-label">Pilih Paket <span class="text-danger">*</span></label>
-                            <select name="paket_id" id="paket_id" class="form-select" required>
-                                <option value="">-- Pilih Paket --</option>
+                            <label for="paket_id" class="form-label fw-bold small text-uppercase text-muted">Pilih Paket <span class="text-danger">*</span></label>
+                            <select name="paket_id" id="paket_id" class="form-select select2" required>
+                                <option value="">-- Cari Paket --</option>
                                 @foreach ($pakets as $paket)
                                     <option value="{{ $paket->paket_id }}">
                                         {{ $paket->paket }} ({{ $paket->unitKerja->unit_kerja ?? '-' }})
@@ -48,145 +53,127 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="periode" class="form-label">Periode <span class="text-danger">*</span></label>
+                        <div class="mb-4">
+                            <label for="periode" class="form-label fw-bold small text-uppercase text-muted">Periode <span class="text-danger">*</span></label>
                             <input type="month" name="periode" id="periode" class="form-control"
                                 value="{{ $currentPeriode }}" required>
-                            <small class="text-muted">Format: Bulan-Tahun</small>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-calculator"></i> Hitung Nilai Kontrak
+                            <button type="submit" class="btn btn-primary py-2 shadow-sm">
+                                <i class="fas fa-calculator me-2"></i> Hitung Nilai Kontrak
                             </button>
                         </div>
                     </form>
 
-                    <hr>
-
-                    <form action="{{ route('kalkulator.recalculate') }}" method="POST"
-                        onsubmit="return confirm('Hitung ulang semua paket? Proses ini bisa memakan waktu.')">
-                        @csrf
-                        <input type="hidden" name="periode" value="{{ $currentPeriode }}">
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-warning">
-                                <i class="fas fa-sync"></i> Hitung Ulang Semua Paket
+                    <div class="mt-4 pt-4 border-top text-center">
+                        <small class="text-muted d-block mb-3">Opsi Lanjutan</small>
+                        <form action="{{ route('kalkulator.recalculate') }}" method="POST"
+                            onsubmit="return confirm('Hitung ulang semua paket? Proses ini bisa memakan waktu.')">
+                            @csrf
+                            <input type="hidden" name="periode" value="{{ $currentPeriode }}">
+                            <button type="submit" class="btn btn-outline-warning btn-sm w-100">
+                                <i class="fas fa-sync me-1"></i> Hitung Ulang Semua Paket
                             </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-
-
         </div>
 
         <!-- Result Display (AJAX) -->
         <div class="col-md-7">
-            <div class="card shadow h-100" id="resultCard" style="display: none;">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Hasil Perhitungan</h5>
+            <!-- Loading Spinner -->
+            <div class="card shadow-sm border-0 h-100" id="loadingSpinner" style="display: none;">
+                 <div class="card-body d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Memuat...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Sedang menghitung nilai kontrak...</p>
+                </div>
+            </div>
+
+            <!-- Empty State (Information) -->
+             <div class="card shadow-sm border-0 h-100 bg-light" id="infoCard">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
+                    <div class="mb-3 text-muted">
+                        <i class="fas fa-info-circle fa-4x"></i>
+                    </div>
+                    <h5 class="text-muted">Informasi Perhitungan</h5>
+                    <p class="small text-muted mb-0" style="max-width: 400px;">
+                        Pilih paket dan periode di sebelah kiri, lalu klik "Hitung" untuk melihat rincian nilai kontrak. Data dihitung berdasarkan UMP tahun berjalan dan distribusi karyawan.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Result Card -->
+            <div class="card shadow-sm border-primary h-100" id="resultCard" style="display: none;">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i> Hasil Perhitungan</h5>
                 </div>
                 <div class="card-body">
-                    <div id="loadingSpinner" class="text-center" style="display: none;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Memuat...</span>
-                        </div>
-                        <p class="mt-2">Menghitung nilai kontrak...</p>
-                    </div>
-
-                    <div id="resultContent" style="display: none;">
+                    <div id="resultContent">
                         <!-- Total Nilai Kontrak -->
-                        <div class="alert alert-success text-center">
-                            <h2 class="mb-0">
-                                <i class="fas fa-money-bill-wave"></i>
-                                Rp <span id="totalNilaiKontrak">0</span>
-                            </h2>
-                            <small>Total Nilai Kontrak per Bulan</small>
+                        <div class="alert alert-success d-flex align-items-center shadow-sm border-0">
+                            <div class="display-4 me-3"><i class="fas fa-money-bill-wave"></i></div>
+                            <div>
+                                <small class="text-uppercase fw-bold opacity-75">Total Nilai Kontrak / Bulan</small>
+                                <h2 class="mb-0 fw-bold">Rp <span id="totalNilaiKontrak">0</span></h2>
+                            </div>
                         </div>
 
                         <!-- Breakdown Pengawas vs Pelaksana -->
-                        <div class="row">
+                        <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <div class="card border-primary">
-                                    <div class="card-header bg-primary text-white">
-                                        <strong>Pengawas</strong>
+                                <div class="p-3 border rounded bg-light h-100 position-relative overflow-hidden">
+                                    <div class="position-absolute end-0 top-0 p-3 opacity-25">
+                                        <i class="fas fa-user-tie fa-3x text-primary"></i>
                                     </div>
-                                    <div class="card-body">
-                                        <p class="mb-1">
-                                            <strong>Jumlah:</strong> <span id="jumlahPengawas">0</span> orang
-                                        </p>
-                                        <p class="mb-0">
-                                            <strong>Total:</strong> Rp <span id="totalPengawas">0</span>
-                                        </p>
-                                    </div>
+                                    <strong class="text-primary d-block mb-2">Pengawas</strong>
+                                    <h5 class="mb-1">Rp <span id="totalPengawas">0</span></h5>
+                                    <small class="text-muted"><span id="jumlahPengawas">0</span> Orang</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card border-secondary">
-                                    <div class="card-header bg-secondary text-white">
-                                        <strong>Pelaksana</strong>
+                                <div class="p-3 border rounded bg-light h-100 position-relative overflow-hidden">
+                                     <div class="position-absolute end-0 top-0 p-3 opacity-25">
+                                        <i class="fas fa-users fa-3x text-success"></i>
                                     </div>
-                                    <div class="card-body">
-                                        <p class="mb-1">
-                                            <strong>Jumlah:</strong> <span id="jumlahPelaksana">0</span> orang
-                                        </p>
-                                        <p class="mb-0">
-                                            <strong>Total:</strong> Rp <span id="totalPelaksana">0</span>
-                                        </p>
-                                    </div>
+                                    <strong class="text-success d-block mb-2">Pelaksana</strong>
+                                    <h5 class="mb-1">Rp <span id="totalPelaksana">0</span></h5>
+                                    <small class="text-muted"><span id="jumlahPelaksana">0</span> Orang</small>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Detail Info -->
-                        <div class="card mt-3">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p class="mb-1"><strong>Karyawan Aktif:</strong> <span id="karyawanAktif">0</span>
-                                        </p>
-                                        <p class="mb-1"><strong>Total Karyawan:</strong> <span id="karyawanTotal">0</span>
-                                        </p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p class="mb-1"><strong>Kuota Paket:</strong> <span id="kuotaPaket">0</span></p>
-                                        <p class="mb-1"><strong>UMP Sumbar:</strong> Rp <span id="umpSumbar">0</span></p>
-                                    </div>
-                                </div>
+                        <!-- Detail Grid -->
+                        <div class="row small mb-4">
+                            <div class="col-6 mb-2">
+                                <span class="text-muted">Karyawan Aktif:</span> <strong class="text-dark" id="karyawanAktif">0</strong>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <span class="text-muted">Total Terdaftar:</span> <strong class="text-dark" id="karyawanTotal">0</strong>
+                            </div>
+                             <div class="col-6 mb-2">
+                                <span class="text-muted">Kuota Paket:</span> <strong class="text-dark" id="kuotaPaket">0</strong>
+                            </div>
+                             <div class="col-6 mb-2">
+                                <span class="text-muted">UMP Acuan:</span> <strong class="text-dark">Rp <span id="umpSumbar">0</span></strong>
                             </div>
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="mt-3 d-flex gap-2">
-                            <a href="#" id="btnLihatDetail" class="btn btn-info">
-                                <i class="fas fa-eye"></i> Lihat Detail
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="#" id="btnLihatDetail" class="btn btn-info shadow-sm text-white">
+                                <i class="fas fa-eye me-1"></i> Lihat Detail Rincian
                             </a>
-                            <a href="#" id="btnLihatHistory" class="btn btn-secondary">
-                                <i class="fas fa-history"></i> Lihat Riwayat
+                            <a href="#" id="btnLihatHistory" class="btn btn-secondary shadow-sm">
+                                <i class="fas fa-history me-1"></i> Riwayat
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Info Card (Always Visible) -->
-            <div class="card shadow h-100">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Informasi</h6>
-                </div>
-                <div class="card-body">
-                    <small>
-                        <ul class="mb-0">
-                            <li>Nilai kontrak dihitung berdasarkan UMP tahun berjalan</li>
-                            <li>Distribusi karyawan sesuai kuota paket</li>
-                            <li>Breakdown: Pengawas dan Pelaksana</li>
-                            <li>Data otomatis tersimpan untuk tracking</li>
-                        </ul>
-                    </small>
-                </div>
-            </div>
-
-
         </div>
     </div>
 
@@ -528,8 +515,8 @@
                 }
 
                 // Show loading
-                $('#resultCard').show();
-                $('#resultContent').hide();
+                $('#resultCard').hide();
+                $('#infoCard').hide();
                 $('#loadingSpinner').show();
 
                 // AJAX Request
@@ -570,6 +557,8 @@
                         }
                         alert(errorMsg);
                         alert(errorMsg);
+                        $('#loadingSpinner').hide();
+                        $('#infoCard').show();
                         $('#resultCard').hide();
                     }
                 });
