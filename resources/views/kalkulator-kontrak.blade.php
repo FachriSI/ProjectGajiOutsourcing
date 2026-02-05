@@ -3,7 +3,12 @@
 @section('title', 'Kontrak')
 
 @section('content')
-    <h3 class="mt-4">Nilai Kontrak</h3>
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <h3>Nilai Kontrak</h3>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
+            <i class="fas fa-file-excel"></i> Export Laporan
+        </button>
+    </div>
     <p class="text-muted">Hitung dan kelola nilai kontrak per paket berdasarkan UMP dan distribusi karyawan</p>
 
     @if (session('success'))
@@ -304,9 +309,174 @@
         </div>
     </div>
 
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="exportModalLabel"><i class="fas fa-file-excel"></i> Export Laporan Kontrak</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('kalkulator.export') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Periode -->
+                        <div class="mb-3">
+                            <label for="exportPeriode" class="form-label">Periode</label>
+                            <input type="month" name="periode" id="exportPeriode" class="form-control" value="{{ $currentPeriode }}" required>
+                        </div>
+
+                        <!-- Scope Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Lingkup Laporan</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="scope" id="scopeAll" value="all" checked onchange="togglePaketSelect(this.value)">
+                                <label class="form-check-label" for="scopeAll">
+                                    Semua Paket
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="scope" id="scopeSingle" value="single" onchange="togglePaketSelect(this.value)">
+                                <label class="form-check-label" for="scopeSingle">
+                                    Per Paket
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Paket Select (Hidden by default) -->
+                        <div class="mb-3" id="paketSelectDiv" style="display: none;">
+                            <label for="exportPaketId" class="form-label">Pilih Paket</label>
+                            <select name="paket_id" id="exportPaketId" class="form-select">
+                                <option value="">-- Pilih Paket --</option>
+                                @foreach ($pakets as $paket)
+                                    <option value="{{ $paket->paket_id }}">{{ $paket->paket }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <hr>
+
+                        <!-- Column Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Pilih Kolom</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="paket_nama" id="colPaket" checked>
+                                        <label class="form-check-label" for="colPaket">Nama Paket</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="unit_kerja" id="colUnit" checked>
+                                        <label class="form-check-label" for="colUnit">Unit Kerja</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="periode" id="colPeriode" checked>
+                                        <label class="form-check-label" for="colPeriode">Periode</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="total_nilai_kontrak" id="colTotal" checked>
+                                        <label class="form-check-label" for="colTotal">Total Nilai</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="ump_sumbar" id="colUmp">
+                                        <label class="form-check-label" for="colUmp">UMP</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_karyawan_total" id="colKaryawan" checked>
+                                        <label class="form-check-label" for="colKaryawan">Total Karyawan</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_pengawas" id="colJmlPengawas">
+                                        <label class="form-check-label" for="colJmlPengawas">Jml Pengawas</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_pelaksana" id="colJmlPelaksana">
+                                        <label class="form-check-label" for="colJmlPelaksana">Jml Pelaksana</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="total_pengawas" id="colBiayaPengawas">
+                                        <label class="form-check-label" for="colBiayaPengawas">Biaya Pengawas</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="total_pelaksana" id="colBiayaPelaksana">
+                                        <label class="form-check-label" for="colBiayaPelaksana">Biaya Pelaksana</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <label class="form-label text-muted small fw-bold">Rincian Komponen (Bobot)</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="upah_pokok" id="colUpah">
+                                        <label class="form-check-label small" for="colUpah">Upah Pokok</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tetap" id="colTjTetap">
+                                        <label class="form-check-label small" for="colTjTetap">Tj. Tetap</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tidak_tetap" id="colTjTidakTetap">
+                                        <label class="form-check-label small" for="colTjTidakTetap">Tj. Tidak Tetap</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_lokasi" id="colTjLokasi">
+                                        <label class="form-check-label small" for="colTjLokasi">Tj. Lokasi</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="bpjs_kesehatan" id="colBpjsKes">
+                                        <label class="form-check-label small" for="colBpjsKes">BPJS Kese.</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="bpjs_ketenagakerjaan" id="colBpjsTk">
+                                        <label class="form-check-label small" for="colBpjsTk">BPJS TK</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="kompensasi" id="colKompen">
+                                        <label class="form-check-label small" for="colKompen">Kompensasi</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="uang_jasa" id="colUangJasa">
+                                        <label class="form-check-label small" for="colUangJasa">Uang Jasa</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="lembur" id="colLembur">
+                                        <label class="form-check-label small" for="colLembur">Lembur</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-file-export"></i> Export Excel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript untuk AJAX -->
     <script>
+        function togglePaketSelect(val) {
+            if (val === 'single') {
+                $('#paketSelectDiv').show();
+                $('#exportPaketId').attr('required', true);
+            } else {
+                $('#paketSelectDiv').hide();
+                $('#exportPaketId').attr('required', false);
+            }
+        }
+
         $(document).ready(function () {
+
             // Initialize DataTable for paket list
             $('.datatable-paket').DataTable({
                 processing: true,

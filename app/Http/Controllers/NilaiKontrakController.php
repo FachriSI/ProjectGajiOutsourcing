@@ -6,6 +6,8 @@ use App\Services\ContractCalculatorService;
 use App\Models\NilaiKontrak;
 use App\Models\KontrakHistory;
 use App\Models\Paket;
+use App\Exports\NilaiKontrakExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -230,5 +232,46 @@ class NilaiKontrakController extends Controller
 
         $pdf = \PDF::loadView('pdf.thr', compact('data', 'nilaiKontrak'));
         return $pdf->stream('THR_' . $nilaiKontrak->paket->paket . '_' . $nilaiKontrak->tahun . '.pdf');
+    }
+
+    /**
+     * Export Laporan Kontrak ke Excel
+     */
+    public function export(Request $request)
+    {
+        $request->validate([
+            'scope' => 'required|in:all,single',
+            'paket_id' => 'required_if:scope,single|nullable|exists:md_paket,paket_id',
+            'periode' => 'required|date_format:Y-m',
+            'columns' => 'required|array|min:1'
+        ]);
+
+        $periode = $request->periode;
+        $scope = $request->scope;
+        $paketId = $request->paket_id;
+        $columns = $request->columns;
+
+        // Query Data based on scope
+        if ($scope === 'all') {
+            // Get all pakets first to ensure we cover everything, then get latest/specific periode value
+            $query = NilaiKontrak::with(['paket.unitKerja'])
+                ->where('periode', $periode);
+        } else {
+            $query = NilaiKontrak::with(['paket.unitKerja'])
+                ->where('paket_id', $paketId)
+                ->where('periode', $periode);
+        }
+
+        $data = $query->get();
+
+        if ($data->isEmpty()) {
+            return back()->with('error', 'Tidak ada data untuk periode terpilih.');
+        }
+
+        // Generate filename
+        $timestamp = Carbon::now()->format('Ymd_His');
+        $filename = "Laporan_Kontrak_{$periode}_{$timestamp}.xlsx";
+
+        return Excel::download(new NilaiKontrakExport($data, $columns), $filename);
     }
 }

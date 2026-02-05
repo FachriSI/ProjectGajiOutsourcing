@@ -262,6 +262,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/kalkulator-kontrak/recalculate-all', [App\Http\Controllers\NilaiKontrakController::class, 'recalculateAll'])->name('kalkulator.recalculate');
     Route::get('/kalkulator-kontrak/history/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'history'])->name('kalkulator.history');
     Route::get('/kalkulator-kontrak/cetak-thr/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'cetakThr'])->name('kalkulator.cetak-thr');
+    Route::post('/kalkulator-kontrak/export', [App\Http\Controllers\NilaiKontrakController::class, 'export'])->name('kalkulator.export');
 
     // API untuk AJAX
     Route::get('/api/nilai-kontrak/calculate/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'apiCalculate'])->name('api.kalkulator.calculate');
