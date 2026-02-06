@@ -263,6 +263,42 @@
                         </div>
                     </div>
                 </div>
+                <!-- NEW: Detailed UMP Pivot Table -->
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-center font-weight-bold mb-4">Detail UMP per Daerah dan Tahun</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Lokasi</th>
+                                            @foreach($umpYears as $year)
+                                                <th class="text-center">{{ $year }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($umpMatrix as $lokasi => $years)
+                                            <tr>
+                                                <td>{{ $lokasi }}</td>
+                                                @foreach($umpYears as $year)
+                                                    <td class="text-end">
+                                                        @if(isset($years[$year]))
+                                                            Rp {{ number_format($years[$year], 0, ',', '.') }}
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

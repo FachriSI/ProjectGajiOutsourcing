@@ -24,19 +24,38 @@ class NilaiKontrakController extends Controller
     /**
      * Halaman kalkulator kontrak utama
      */
-    public function index()
+    public function index(Request $request)
     {
         $pakets = Paket::with('unitKerja')->orderBy('paket')->get();
         $currentPeriode = Carbon::now()->format('Y-m');
         
-        // Load latest nilai kontrak for each paket
+        // Get available periods for filter
+        $availablePeriods = NilaiKontrak::select('periode')
+            ->distinct()
+            ->orderBy('periode', 'desc')
+            ->pluck('periode')
+            ->map(function($date) {
+                return Carbon::parse($date)->format('Y-m');
+            });
+
+        $selectedPeriode = $request->query('filter_periode');
+
+        // Load nilai kontrak data
         $nilaiKontrakData = [];
         foreach ($pakets as $paket) {
-            $latestNilai = NilaiKontrak::getLatestForPaket($paket->paket_id);
-            $nilaiKontrakData[$paket->paket_id] = $latestNilai;
+            if ($selectedPeriode) {
+                // Get specific period
+                $nilai = NilaiKontrak::where('paket_id', $paket->paket_id)
+                    ->where('periode', $selectedPeriode)
+                    ->first();
+            } else {
+                // Default: Latest
+                $nilai = NilaiKontrak::getLatestForPaket($paket->paket_id);
+            }
+            $nilaiKontrakData[$paket->paket_id] = $nilai;
         }
         
-        return view('kalkulator-kontrak', compact('pakets', 'currentPeriode', 'nilaiKontrakData'));
+        return view('kalkulator-kontrak', compact('pakets', 'currentPeriode', 'nilaiKontrakData', 'availablePeriods', 'selectedPeriode'));
     }
 
     /**

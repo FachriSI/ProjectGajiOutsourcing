@@ -171,9 +171,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/delete-penyesuaian/{id}', [PenyesuaianController::class, 'destroy']);
     Route::get('/restore-penyesuaian/{id}', [PenyesuaianController::class, 'restore']);
 
-    Route::get('/medical-checkup', function () {
-        return view('medical-checkup');
-    })->name('medical-checkup');
+    Route::get('/medical-checkup', [App\Http\Controllers\MedicalCheckupController::class, 'index'])->name('medical-checkup');
+    Route::post('/tambah-medical-checkup', [App\Http\Controllers\MedicalCheckupController::class, 'setTambah'])->name('medical-checkup.store');
+    Route::get('/getupdate-medical-checkup/{id}', [App\Http\Controllers\MedicalCheckupController::class, 'getUpdate']);
+    Route::post('/update-medical-checkup/{id}', [App\Http\Controllers\MedicalCheckupController::class, 'setUpdate'])->name('medical-checkup.update');
+    Route::get('/delete-medical-checkup/{id}', [App\Http\Controllers\MedicalCheckupController::class, 'destroy'])->name('medical-checkup.destroy');
+    Route::get('/medical-checkup/sampah', [App\Http\Controllers\MedicalCheckupController::class, 'trash'])->name('medical-checkup.trash');
+    Route::get('/restore-medical-checkup/{id}', [App\Http\Controllers\MedicalCheckupController::class, 'restore'])->name('medical-checkup.restore');
 
     Route::get('/unit-kerja', [UnitKerjaController::class, 'index']);
     Route::get('/gettambah-unit', [UnitKerjaController::class, 'getTambah']);

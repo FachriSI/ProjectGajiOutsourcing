@@ -14,9 +14,9 @@
         $total_seluruh_variabel = 0;
 
         foreach ($data as $item) {
-            $ump = $item->lokasi['ump']['ump'] ?? 0;
+            $ump = $item->lokasi['ump'][0]['ump'] ?? ($item->lokasi['ump']['ump'] ?? 0); // Fix array access if collection
             $ump_sumbar = $item->ump_sumbar ?? 0;
-
+            
             $upah_pokok = $ump_sumbar;
             $tj_umum = 0; // Removed/Merged into Upah Pokok
 
@@ -83,10 +83,15 @@
 
     <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
         <h3>Detail Paket: {{ $paketList->first()->paket ?? 'Nama Paket' }}</h3>
-        <div>
-            <button class="btn btn-primary" onclick="window.print()">
-                <i class="fas fa-print"></i> Print
-            </button>
+        <div class="d-flex align-items-center gap-2">
+            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center">
+                <input type="month" name="periode" class="form-control form-control-sm me-2" 
+                       value="{{ $selectedPeriode }}" onchange="this.form.submit()">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </form>
+
             <a href="/paket" class="btn btn-secondary">Kembali</a>
         </div>
     </div>

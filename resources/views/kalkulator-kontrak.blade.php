@@ -181,8 +181,20 @@
     <div class="row mt-4">
         <div class="col-md-12">
             <div class="card shadow">
-                <div class="card-header bg-dark text-white">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-list"></i> Daftar Paket Kontrak</h5>
+                    
+                    <form action="{{ route('kalkulator.index') }}" method="GET" class="d-flex align-items-center">
+                        <label for="filter_periode" class="text-white me-2 small">Filter Periode:</label>
+                        <select name="filter_periode" id="filter_periode" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                            <option value="">-- Tampilkan Terbaru --</option>
+                            @foreach($availablePeriods as $p)
+                                <option value="{{ $p }}" {{ $selectedPeriode == $p ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::parse($p)->translatedFormat('F Y') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

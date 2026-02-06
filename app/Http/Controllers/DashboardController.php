@@ -262,7 +262,25 @@ class DashboardController extends Controller
             $previousUmp = $data->ump;
         }
         $umpGrowth = collect($umpGrowth);
-        // 12. Organizational Analysis
+        
+        // 12. Detailed UMP Matrix (Pivot: Location x Year)
+        $umpRaw = \App\Models\Ump::join('md_lokasi', 'md_ump.kode_lokasi', '=', 'md_lokasi.kode_lokasi')
+            ->where('md_ump.is_deleted', 0)
+            ->select('md_lokasi.lokasi', 'md_ump.tahun', 'md_ump.ump') // ump is string/int
+            ->get();
+
+        // Extract unique years and sort them
+        $umpYears = $umpRaw->pluck('tahun')->unique()->sort()->values();
+        
+        // Build Matrix: [Location => [Year => Value]]
+        $umpMatrix = [];
+        foreach ($umpRaw as $row) {
+            $umpMatrix[$row->lokasi][$row->tahun] = $row->ump;
+        }
+        // Key sort locations for neatness
+        ksort($umpMatrix);
+
+        // 13. Organizational Analysis
         // Top 10 Job Titles (Jabatan)
         $jabatanCount = \DB::table('riwayat_jabatan')
             ->join('md_jabatan', 'riwayat_jabatan.kode_jabatan', '=', 'md_jabatan.kode_jabatan')
@@ -296,7 +314,7 @@ class DashboardController extends Controller
             'usiaCount', 'masaKerjaCount', 'shiftCount', 'resikoCount',
             'topPaket', 'paketStats', 'unitKerjaCost',
             'trendData', 'contractTrend', 'attritionTrend', 'exitReasons',
-            'umpTrend', 'umpPerLokasi',
+            'umpTrend', 'umpPerLokasi', 'umpMatrix', 'umpYears',
             'employeeDynamics', 'umpGrowth', 'jabatanCount', 'departemenCount'
         ));
     }

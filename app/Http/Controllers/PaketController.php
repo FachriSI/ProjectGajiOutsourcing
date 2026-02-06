@@ -161,7 +161,11 @@ class PaketController extends Controller
         $errorLog = [];
         $totalExpected = 0;
         $totalActual = 0;
-        $currentYear = date('Y');
+        
+        $selectedPeriode = request('periode');
+        // Parse year from selected period, or default to current year
+        $currentYear = $selectedPeriode ? \Carbon\Carbon::parse($selectedPeriode)->year : date('Y');
+        
         $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
 
         // Ambil semua data di awal untuk efisiensi
@@ -258,7 +262,10 @@ class PaketController extends Controller
                 ];
             });
         
-        return view('paket_detail', compact('data', 'paketList', 'contractHistory'));  
+        
+        $selectedPeriode = request('periode'); // Get period from request
+
+        return view('paket_detail', compact('data', 'paketList', 'contractHistory', 'selectedPeriode'));  
     }
 
     //chatgpt salah

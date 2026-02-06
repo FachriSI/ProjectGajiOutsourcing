@@ -4,18 +4,31 @@
 
 @section('content')
 
-  <h3 class="mt-4">Karyawan</h3>
-  <div class="d-flex align-items-center mb-3 gap-2">
-    <a href="/gettambah-karyawan" class="btn btn-primary">Tambah Data</a>
-    @if($hasDeleted)
-      <a href="/karyawan/sampah" class="btn btn-secondary"><i class="fas fa-trash-restore"></i> Sampah</a>
-    @endif
+    <!-- Header -->
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-users me-2 text-primary"></i> Data Karyawan</h1>
+                <p class="text-muted small mb-0 mt-1">Manajemen data karyawan, mutasi, promosi, dan jadwal.</p>
+            </div>
+            <div class="d-flex gap-2">
+                @if($hasDeleted)
+                    <a href="/karyawan/sampah" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-trash-restore me-1"></i> Sampah
+                    </a>
+                @endif
 
-    <!-- Button Template & Import -->
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#templateModal" title="Template & Import Data">
-        <i class="fas fa-file-excel fa-lg"></i>
-    </button>
-  </div>
+                <!-- Button Template & Import -->
+                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#templateModal" title="Template & Import Data">
+                    <i class="fas fa-file-excel me-1"></i> Import / Template
+                </button>
+
+                <a href="/gettambah-karyawan" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-plus me-1"></i> Tambah Karyawan
+                </a>
+            </div>
+        </div>
+    </div>
 
   <!-- Modal Template & Import -->
   <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
@@ -89,78 +102,100 @@
       </div>
     </div>
   </div>
-  <br>
 
-  <!-- <input type="text" id="search-id" placeholder="Cari berdasarkan ID"> -->
-  <table class="table datatable" id="datatableSimple">
-    <thead>
-      <tr>
-        <th>No.</th>
-        <th>OSIS ID</th>
-        <th>KTP</th>
-        <th>Nama</th>
-        <th>Perusahaan</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach ($data as $item)
-        <tr>
-          <td>{{ $loop->iteration }}</td>
-          <td>{{ $item->osis_id }}</td>
-          <td>{{ $item->ktp }}</td>
-          <td>{{ $item->nama_tk }}</td>
-          <td>{{ $item->perusahaan->perusahaan }}</td>
-          <td>
-            <a href="/detail-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip"
-              data-bs-placement="top" title="Detail">
-              <i class="fas fa-info-circle"></i>
-            </a>
-            <a href="/getupdate-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
-              data-bs-placement="top" title="Edit">
-              <i class="fas fa-edit"></i>
-            </a>
-            <a href="{{ url('delete-karyawan', $item->karyawan_id) }}" class="btn btn-sm btn-danger btn-delete"
-              data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-              <i class="fas fa-trash"></i>
-            </a>
-            <button type="button" class="btn btn-sm btn-secondary btn-mutasi" data-bs-toggle="modal"
-              data-bs-target="#mutasiModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
-              data-paket="{{ $paketKaryawan[$item->karyawan_id]->nama_paket ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Paket Pekerjaan">
-              <i class="fas fa-random"></i>
-            </button>
-            <button type="button" class="btn btn-sm btn-secondary btn-promosi" data-bs-toggle="modal"
-              data-bs-target="#promosiModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
-              data-jabatan="{{ $jabatan[$item->karyawan_id]->jabatan ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Promosi">
-              <i class="fas fa-arrow-up"></i>
-            </button>
-            <button type="button" class="btn btn-sm btn-warning btn-edit-shift" data-bs-toggle="modal"
-              data-bs-target="#editShiftModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
-              data-shift="{{ $harianShift[$item->karyawan_id]->harianshift ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Jadwal Kerja">
-              <i class="fas fa-clock"></i>
-            </button>
-            <button type="button" class="btn btn-sm btn-success btn-edit-area" data-bs-toggle="modal"
-              data-bs-target="#editAreaModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
-              data-area="{{ $area[$item->karyawan_id]->area ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Penempatan">
-              <i class="fas fa-map-marker-alt"></i>
-            </button>
-            <button type="button" class="btn btn-sm btn-primary btn-edit-pakaian" data-bs-toggle="modal"
-              data-bs-target="#editPakaianModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
-              data-nilai="{{ $item->pakaianTerakhir->nilai_jatah ?? 'Belum ada' }}"
-              data-baju="{{ $item->pakaianTerakhir->ukuran_baju ?? 'Belum ada' }}"
-              data-celana="{{ $item->pakaianTerakhir->ukuran_celana ?? 'Belum ada' }}" data-bs-tooltip="tooltip"
-              data-bs-placement="top" title="Pakaian">
-              <i class="fas fa-tshirt"></i>
-            </button>
-          </td>
-        </tr>
-      @endforeach
-    </tbody>
-  </table>
+  <div class="card shadow border-0 mb-4">
+      <div class="card-header bg-dark text-white py-3">
+          <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Daftar Karyawan</h6>
+      </div>
+      <div class="card-body">
+          <div class="table-responsive">
+              <table class="table table-bordered table-hover datatable" id="datatableSimple" width="100%" cellspacing="0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="text-center" width="5%">No.</th>
+                    <th>OSIS ID</th>
+                    <th>KTP</th>
+                    <th>Nama</th>
+                    <th>Perusahaan</th>
+                    <th class="text-center" width="20%">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach ($data as $item)
+                    <tr>
+                      <td class="text-center">{{ $loop->iteration }}</td>
+                      <td>{{ $item->osis_id }}</td>
+                      <td>{{ $item->ktp }}</td>
+                      <td class="fw-bold">{{ $item->nama_tk }}</td>
+                      <td>{{ $item->perusahaan->perusahaan }}</td>
+                      <td class="text-center">
+                        <div class="d-flex gap-1 justify-content-center">
+                            <a href="/detail-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-info text-white" data-bs-toggle="tooltip"
+                              title="Detail">
+                              <i class="fas fa-info-circle"></i>
+                            </a>
+                            <a href="/getupdate-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
+                              title="Edit">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url('delete-karyawan', $item->karyawan_id) }}" class="btn btn-sm btn-danger btn-delete"
+                              data-bs-toggle="tooltip" title="Hapus">
+                              <i class="fas fa-trash"></i>
+                            </a>
+                            
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Lainnya">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button type="button" class="dropdown-item btn-mutasi" data-bs-toggle="modal"
+                                          data-bs-target="#mutasiModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
+                                          data-paket="{{ $paketKaryawan[$item->karyawan_id]->nama_paket ?? 'Belum ada' }}">
+                                          <i class="fas fa-random me-2 text-secondary"></i> Mutasi Paket
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item btn-promosi" data-bs-toggle="modal"
+                                          data-bs-target="#promosiModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
+                                          data-jabatan="{{ $jabatan[$item->karyawan_id]->jabatan ?? 'Belum ada' }}">
+                                          <i class="fas fa-arrow-up me-2 text-primary"></i> Promosi Jabatan
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item btn-edit-shift" data-bs-toggle="modal"
+                                          data-bs-target="#editShiftModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
+                                          data-shift="{{ $harianShift[$item->karyawan_id]->harianshift ?? 'Belum ada' }}">
+                                          <i class="fas fa-clock me-2 text-warning"></i> Jadwal Kerja
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item btn-edit-area" data-bs-toggle="modal"
+                                          data-bs-target="#editAreaModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
+                                          data-area="{{ $area[$item->karyawan_id]->area ?? 'Belum ada' }}">
+                                          <i class="fas fa-map-marker-alt me-2 text-danger"></i> Penempatan
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item btn-edit-pakaian" data-bs-toggle="modal"
+                                          data-bs-target="#editPakaianModal" data-id="{{ $item->karyawan_id }}" data-nama="{{ $item->nama_tk }}"
+                                          data-nilai="{{ $item->pakaianTerakhir->nilai_jatah ?? 'Belum ada' }}"
+                                          data-baju="{{ $item->pakaianTerakhir->ukuran_baju ?? 'Belum ada' }}"
+                                          data-celana="{{ $item->pakaianTerakhir->ukuran_celana ?? 'Belum ada' }}">
+                                          <i class="fas fa-tshirt me-2 text-success"></i> Pakaian
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                      </td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
 
   <!-- Modal mutasi -->
   <div class="modal fade" id="mutasiModal" tabindex="-1" aria-hidden="true">
@@ -342,7 +377,6 @@
       $('.datatable').each(function () {
         if (!$.fn.DataTable.isDataTable(this)) {
           $(this).DataTable({
-            // Semua fitur default: search, sort, paging aktif
             processing: true,
             serverSide: false,
             language: {
@@ -370,32 +404,14 @@
                 }
             }
           });
-    }
+        }
+      });
+
+        // Initialize Bootstrap Tooltips for links
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-
-    // Initialize Bootstrap Tooltips for links
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Initialize Bootstrap Tooltips for modal buttons (using title attribute)
-    var modalButtons = [].slice.call(document.querySelectorAll('.btn-mutasi, .btn-promosi, .btn-edit-shift, .btn-edit-area, .btn-edit-pakaian'));
-    modalButtons.forEach(function (btn) {
-      new bootstrap.Tooltip(btn, {
-        trigger: 'hover',
-        placement: 'top'
-      });
-    });
-      });
-
-    $(document).ready(function () {
-      var table = $('#datatableSimple').DataTable();
-
-      // Buat search khusus untuk kolom ke-0 (ID)
-      $('#search-id').on('keyup', function () {
-        table.column(1).search(this.value).draw(); // Kolom ke-0 berarti kolom ID
-      });
     });
 
     $(document).on('click', '.btn-mutasi', function () {
@@ -451,9 +467,6 @@
       $('#baju_saat_ini').text(baju);
       $('#celana_saat_ini').text(celana);
     });
-
-
-
   </script>
 
 @endsection
