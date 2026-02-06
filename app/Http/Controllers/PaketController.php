@@ -180,6 +180,7 @@ class PaketController extends Controller
             }
         ])->latest('beg_date')->get()->groupBy('karyawan_id');
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
+        $mcu = \App\Models\MedicalCheckup::latest()->first();
 
         // Filter: Only for this package
         $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
@@ -245,7 +246,8 @@ class PaketController extends Controller
                     $lokasi?->toArray() ?? [],
                     ['ump_sumbar' => $umpSumbar],
                     $paket->toArray(),
-                    $masakerja?->toArray() ?? []
+                    $masakerja?->toArray() ?? [],
+                    ['mcu' => $mcu->biaya ?? 0]
                 );
             }
         }

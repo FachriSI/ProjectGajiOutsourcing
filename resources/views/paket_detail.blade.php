@@ -281,6 +281,7 @@
                         <th>Nilai Kontrak/Orang/Bln</th>
                         <th>Tarif Lembur/Jam</th>
                         <th>Nilai Lembur/Orang/Bln</th>
+                        <th>MCU</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -328,6 +329,7 @@
                                     $fee_pakaian = round(0.05 * $pakaian);
                                     $total_pakaian = $pakaian + $fee_pakaian;
 
+                                    $mcu = $item->mcu ?? 0;
                                 @endphp
            <tr class="parent-row" 
             data-tj-umum="{{ number_format($tj_umum, 0, ',', '.') }}"
@@ -374,6 +376,7 @@
             <td>{{ number_format($jumlah_fix_cost, 0, ',', '.') }}</td>
             <td>{{ number_format($tarif_lembur, 0, ',', '.') }}</td>
             <td>{{ number_format($nilai_lembur, 0, ',', '.') }}</td>
+            <td>{{ number_format($mcu, 0, ',', '.') }}</td>
         </tr>
 
                     @endforeach 
