@@ -3,105 +3,193 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <h1 class="mt-4">Report</h1>
+    <h1 class="mt-4">Laporan</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item active">Report Overview & Analytics</li>
+        <li class="breadcrumb-item active">Ringkasan & Analisis Laporan</li>
     </ol>
 
     <!-- Tabs Navigation (Pills Style with Container) -->
     <div class="bg-white p-3 rounded shadow-sm mb-4">
         <ul class="nav nav-pills" id="reportTabs" role="tablist">
             <li class="nav-item me-2" role="presentation">
-                <button class="nav-link active" id="paket-tab" data-bs-toggle="pill" data-bs-target="#paket" type="button" role="tab">
+                <button class="nav-link active" id="paket-tab" data-bs-toggle="pill" data-bs-target="#paket" type="button"
+                    role="tab">
                     <i class="fas fa-box me-1"></i> Analisis Paket
                 </button>
             </li>
             <li class="nav-item me-2" role="presentation">
-                <button class="nav-link" id="karyawan-tab" data-bs-toggle="pill" data-bs-target="#karyawan" type="button" role="tab">
+                <button class="nav-link" id="karyawan-tab" data-bs-toggle="pill" data-bs-target="#karyawan" type="button"
+                    role="tab">
                     <i class="fas fa-users me-1"></i> Analisis Karyawan
                 </button>
             </li>
-            <li class="nav-item me-2" role="presentation">
-                <button class="nav-link" id="organisasi-tab" data-bs-toggle="pill" data-bs-target="#organisasi" type="button" role="tab">
-                    <i class="fas fa-sitemap me-1"></i> Analisis Organisasi
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="ump-tab" data-bs-toggle="pill" data-bs-target="#ump" type="button" role="tab">
-                    <i class="fas fa-coins me-1"></i> UMP
-                </button>
-            </li>
+
         </ul>
+    </div>
+
+    <!-- Strategic Global KPIs -->
+    <div class="row mb-4">
+        <!-- Total Karyawan -->
+        <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Karyawan</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ number_format($totalKaryawan) }}
+                            </div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-users fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Paket -->
+        <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Paket</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ number_format($totalPaket) }}
+                            </div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-box fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Tabs Content -->
     <div class="tab-content" id="reportTabsContent">
-        
+
         <!-- 1. Analisis Paket Tab -->
         <div class="tab-pane fade show active" id="paket" role="tabpanel">
+
+            <!-- Top Row: Quota Analysis -->
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan Jumlah Karyawan Terbanyak</h6>
+                            <div style="height: 300px;">
+                                <canvas id="topQuotaChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan % Kuota Kosong Tertinggi</h6>
+                            <div style="height: 300px;">
+                                <canvas id="emptyQuotaChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Cost & Trend -->
             <div class="row">
-                 <!-- Top 10 Paket (Kuota) -->
-                 <div class="col-lg-6 mb-4">
+                <div class="col-lg-6 mb-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Top 10 Paket (Kuota Terbesar)</h6>
+                            <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan Total Nilai Kontrak Tertinggi
+                            </h6>
                             <div style="height: 300px;">
-                                <canvas id="topPacketChart"></canvas>
+                                <canvas id="costChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Realisasi Kuota (New) -->
                 <div class="col-lg-6 mb-4">
-                     <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Realisasi Kuota (Terisi vs Kosong)</h6>
-                            <div style="height: 300px;">
-                                <canvas id="quotaRealizationChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Analisis Biaya (Cost) -->
-                <div class="col-lg-6 mb-4">
-                     <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Top 10 Unit Kerja (Nilai Kontrak)</h6>
-                            <div style="height: 300px;">
-                                <canvas id="unitCostChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                 <!-- NEW: Tren Nilai Kontrak -->
-                 <div class="col-lg-6 mb-4">
                     <div class="card shadow-sm h-100">
-                       <div class="card-body">
-                           <h6 class="text-center font-weight-bold mb-3">Tren Total Nilai Kontrak (Tahunan)</h6>
-                           <div style="height: 300px;">
-                               <canvas id="contractTrendChart"></canvas>
-                           </div>
-                       </div>
-                   </div>
-               </div>
+                        <div class="card-body">
+                            <h6 class="text-center font-weight-bold mb-3">Tren Total Nilai Kontrak per Tahun</h6>
+                            <div style="height: 300px;">
+                                <canvas id="contractTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- 2. Analisis Karyawan Tab (Consolidated) -->
         <div class="tab-pane fade" id="karyawan" role="tabpanel">
-             <!-- NEW ROW: Trend Dynamics -->
-             <div class="row mb-4">
-                <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Dinamika Karyawan (Masuk vs Keluar)</h6>
-                            <div style="height: 300px;">
-                                <canvas id="dynamicsChart"></canvas>
+            <!-- Ringkasan Demografis -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="row text-center">
+                                <div class="col-lg-3 col-md-3 col-6 mb-2">
+                                    <div class="border-end">
+                                        <i class="fas fa-mars text-primary d-block mb-2"></i>
+                                        <div class="h4 mb-0 font-weight-bold text-primary">
+                                            {{ number_format($genderCount['Laki-laki'] ?? 0) }}
+                                            @php
+                                                $total = array_sum($genderCount);
+                                                $pct = $total > 0 ? round((($genderCount['Laki-laki'] ?? 0) / $total) * 100, 1) : 0;
+                                            @endphp
+                                            <small class="text-muted">({{ $pct }}%)</small>
+                                        </div>
+                                        <small class="text-muted">Laki-laki</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-6 mb-2">
+                                    <div class="border-end">
+                                        <i class="fas fa-venus text-info d-block mb-2"></i>
+                                        <div class="h4 mb-0 font-weight-bold text-info">
+                                            {{ number_format($genderCount['Perempuan'] ?? 0) }}
+                                            @php
+                                                $pct2 = $total > 0 ? round((($genderCount['Perempuan'] ?? 0) / $total) * 100, 1) : 0;
+                                            @endphp
+                                            <small class="text-muted">({{ $pct2 }}%)</small>
+                                        </div>
+                                        <small class="text-muted">Perempuan</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-6 mb-2">
+                                    <div class="border-end">
+                                        <i class="fas fa-user-check text-success d-block mb-2"></i>
+                                        <div class="h4 mb-0 font-weight-bold text-success">
+                                            {{ number_format($statusAktifCount['Aktif'] ?? 0) }}
+                                            @php
+                                                $totalStatus = array_sum($statusAktifCount);
+                                                $pct3 = $totalStatus > 0 ? round((($statusAktifCount['Aktif'] ?? 0) / $totalStatus) * 100, 1) : 0;
+                                            @endphp
+                                            <small class="text-muted">({{ $pct3 }}%)</small>
+                                        </div>
+                                        <small class="text-muted">Aktif</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-6 mb-2">
+                                    <i class="fas fa-user-times text-warning d-block mb-2"></i>
+                                    <div class="h4 mb-0 font-weight-bold text-warning">
+                                        {{ number_format($statusAktifCount['Tidak Aktif'] ?? 0) }}
+                                        @php
+                                            $pct4 = $totalStatus > 0 ? round((($statusAktifCount['Tidak Aktif'] ?? 0) / $totalStatus) * 100, 1) : 0;
+                                        @endphp
+                                        <small class="text-muted">({{ $pct4 }}%)</small>
+                                    </div>
+                                    <small class="text-muted">Tidak Aktif</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 mb-4">
+            </div>
+
+
+            <!-- Pertumbuhan Populasi (Full Width) -->
+            <div class="row mb-4">
+                <div class="col-lg-12 mb-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Pertumbuhan Populasi Karyawan (Akumulasi)</h6>
@@ -111,58 +199,37 @@
                         </div>
                     </div>
                 </div>
+                <!-- Department Distribution (New) -->
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-center font-weight-bold mb-3">Sebaran per Departemen</h6>
+                            <div style="height: 300px;">
+                                <canvas id="departemenChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
                 <!-- Demographics Row -->
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Gender</h6>
-                            <div style="height: 200px;">
-                                <canvas id="genderChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Status Aktif</h6>
-                            <div style="height: 200px;">
-                                <canvas id="statusChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Sebaran Usia</h6>
-                            <div style="height: 200px;">
+                            <div style="height: 300px;">
                                 <canvas id="ageChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Masa Kerja</h6>
-                            <div style="height: 200px;">
-                                <canvas id="tenureChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Asal Daerah Full Width -->
-                <div class="col-lg-12 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Top 10 Asal Daerah (Kecamatan)</h6>
                             <div style="height: 300px;">
-                                <canvas id="originChart"></canvas>
+                                <canvas id="tenureChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -179,436 +246,330 @@
                         </div>
                     </div>
                 </div>
-                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Distribusi Tingkat Resiko</h6>
-                            <div style="height: 300px;">
-                                <canvas id="resikoChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                 <div class="col-lg-12 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Alasan Berhenti</h6>
-                            <div style="height: 300px;">
-                                <canvas id="reasonChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. Analisis Organisasi Tab -->
-        <div class="tab-pane fade" id="organisasi" role="tabpanel">
-             <div class="row">
+                <!-- Job Distribution -->
                 <div class="col-lg-6 mb-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Top 10 Jabatan (Populasi Terbanyak)</h6>
-                            <div style="height: 350px;">
+                            <h6 class="text-center font-weight-bold mb-3">Distribusi Jabatan</h6>
+                            <div style="height: 300px;">
                                 <canvas id="jabatanChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Sebaran Karyawan per Departemen</h6>
-                            <div style="height: 350px;">
-                                <canvas id="departemenChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
+
+
+
         </div>
 
-        <!-- 4. UMP Tab -->
-        <div class="tab-pane fade" id="ump" role="tabpanel">
-            <div class="row">
-                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-4">Tren UMP Sumbar per Tahun</h6>
-                            <div style="height: 350px;">
-                                <canvas id="umpChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- NEW: UMP Growth % -->
-                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-4">Kenaikan UMP (%) per Tahun</h6>
-                            <div style="height: 350px;">
-                                <canvas id="umpGrowthChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-12 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-4">UMP per Lokasi (2024)</h6>
-                            <div style="height: 350px;">
-                                <canvas id="umpLocationChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- NEW: Detailed UMP Pivot Table -->
-                <div class="col-lg-12 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-4">Detail UMP per Daerah dan Tahun</h6>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped table-hover">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th>Lokasi</th>
-                                            @foreach($umpYears as $year)
-                                                <th class="text-center">{{ $year }}</th>
-                                            @endforeach
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($umpMatrix as $lokasi => $years)
-                                            <tr>
-                                                <td>{{ $lokasi }}</td>
-                                                @foreach($umpYears as $year)
-                                                    <td class="text-end">
-                                                        @if(isset($years[$year]))
-                                                            Rp {{ number_format($years[$year], 0, ',', '.') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                @endforeach
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Load Chart.js dan Plugin Label -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-    </div>
-
-    <!-- Load Chart.js dan Plugin Label -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Safety check for Chart.js
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js not loaded');
-                return;
-            }
-
-            const chartInstances = {};
-
-            function makeBarChart(canvasId, labels, data, label, options = {}) {
-                try {
-                    const canvas = document.getElementById(canvasId);
-                    if (!canvas) return;
-                    
-                    if (chartInstances[canvasId]) {
-                         chartInstances[canvasId].destroy();
-                         delete chartInstances[canvasId];
-                    }
-
-                    const ctx = canvas.getContext('2d');
-                    const defaultConfig = {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true } }
-                    };
-                    const finalOptions = { ...defaultConfig, ...options };
-                    
-                    chartInstances[canvasId] = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels || [],
-                            datasets: [{
-                                label: label,
-                                data: data || [],
-                                backgroundColor: options.backgroundColor || 'rgba(54, 162, 235, 0.7)',
-                                borderColor: options.borderColor || 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: finalOptions
-                    });
-                } catch (e) {
-                    console.error('Error rendering chart ' + canvasId, e);
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Safety check for Chart.js
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded');
+                    return;
                 }
-            }
 
-             function makePieChart(canvasId, labels, data, bgColors) {
-                 try {
-                     const canvas = document.getElementById(canvasId);
-                     if (!canvas) return;
+                const chartInstances = {};
 
-                     if (chartInstances[canvasId]) {
-                         chartInstances[canvasId].destroy();
-                         delete chartInstances[canvasId];
+                function makeBarChart(canvasId, labels, data, label, options = {}) {
+                    try {
+                        const canvas = document.getElementById(canvasId);
+                        if (!canvas) return;
+
+                        if (chartInstances[canvasId]) {
+                            chartInstances[canvasId].destroy();
+                            delete chartInstances[canvasId];
+                        }
+
+                        const ctx = canvas.getContext('2d');
+                        const defaultConfig = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true } }
+                        };
+                        const finalOptions = { ...defaultConfig, ...options };
+
+                        chartInstances[canvasId] = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels || [],
+                                datasets: [{
+                                    label: label,
+                                    data: data || [],
+                                    backgroundColor: options.backgroundColor || 'rgba(54, 162, 235, 0.7)',
+                                    borderColor: options.borderColor || 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: finalOptions
+                        });
+                    } catch (e) {
+                        console.error('Error rendering chart ' + canvasId, e);
                     }
+                }
 
-                     const ctx = canvas.getContext('2d');
-                     chartInstances[canvasId] = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: labels || [],
-                            datasets: [{
-                                data: data || [],
-                                backgroundColor: bgColors,
-                                hoverOffset: 4
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                function makePieChart(canvasId, labels, data, bgColors) {
+                    try {
+                        const canvas = document.getElementById(canvasId);
+                        if (!canvas) return;
+
+                        if (chartInstances[canvasId]) {
+                            chartInstances[canvasId].destroy();
+                            delete chartInstances[canvasId];
+                        }
+
+                        const ctx = canvas.getContext('2d');
+                        chartInstances[canvasId] = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: labels || [],
+                                datasets: [{
+                                    data: data || [],
+                                    backgroundColor: bgColors,
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                        });
+                    } catch (e) {
+                        console.error('Error rendering pie ' + canvasId, e);
+                    }
+                }
+
+                // renderPacketCharts() function removed - charts were deleted during cleanup
+
+
+                function renderKaryawanCharts() {
+                    try {
+                        // Demographics (Gender & Status moved to summary card - charts removed)
+                        makeBarChart('ageChart', {!! json_encode(array_keys($usiaCount)) !!}, {!! json_encode(array_values($usiaCount)) !!}, 'Jumlah');
+                        makeBarChart('tenureChart', {!! json_encode(array_keys($masaKerjaCount)) !!}, {!! json_encode(array_values($masaKerjaCount)) !!}, 'Jumlah');
+                        // originChart removed - no decision-making value
+
+                        // Dynamics
+                        const dynCtx = document.getElementById('dynamicsChart');
+                        if (dynCtx) {
+                            if (chartInstances['dynamicsChart']) chartInstances['dynamicsChart'].destroy();
+                            chartInstances['dynamicsChart'] = new Chart(dynCtx.getContext('2d'), {
+                                type: 'line',
+                                data: {
+                                    labels: {!! json_encode($employeeDynamics->pluck('tahun') ?? []) !!},
+                                    datasets: [
+                                        {
+                                            label: 'Masuk',
+                                            data: {!! json_encode($employeeDynamics->pluck('masuk') ?? []) !!},
+                                            borderColor: 'rgb(75, 192, 192)',
+                                            tension: 0.1
+                                        },
+                                        {
+                                            label: 'Keluar',
+                                            data: {!! json_encode($employeeDynamics->pluck('keluar') ?? []) !!},
+                                            borderColor: 'rgb(255, 99, 132)',
+                                            tension: 0.1
+                                        }
+                                    ]
+                                },
+                                options: { responsive: true, maintainAspectRatio: false }
+                            });
+                        }
+
+                        // Population
+                        const popCtx = document.getElementById('populationChart');
+                        if (popCtx) {
+                            if (chartInstances['populationChart']) chartInstances['populationChart'].destroy();
+                            chartInstances['populationChart'] = new Chart(popCtx.getContext('2d'), {
+                                type: 'line',
+                                data: {
+                                    labels: {!! json_encode($employeeDynamics->pluck('tahun') ?? []) !!},
+                                    datasets: [{
+                                        label: 'Total Populasi',
+                                        data: {!! json_encode($employeeDynamics->pluck('populasi') ?? []) !!},
+                                        borderColor: 'rgb(153, 102, 255)',
+                                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                        fill: true,
+                                        tension: 0.4
+                                    }]
+                                },
+                                options: { responsive: true, maintainAspectRatio: false }
+                            });
+                        }
+
+
+                        makeBarChart('shiftChart', {!! json_encode(array_keys($shiftCount)) !!}, {!! json_encode(array_values($shiftCount)) !!}, 'Jumlah Karyawan', { indexAxis: 'y' });
+
+
+                        // Added Jabatan Chart
+                        makeBarChart('jabatanChart', {!! json_encode(array_keys($jabatanCount)) !!}, {!! json_encode(array_values($jabatanCount)) !!}, 'Jumlah Karyawan', { indexAxis: 'y' });
+
+                        // Added Departemen Chart (Vertical Bar for better readability with many depts)
+                        makeBarChart('departemenChart', {!! json_encode(array_keys($departemenCount)) !!}, {!! json_encode(array_values($departemenCount)) !!}, 'Jumlah Karyawan', {
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            borderColor: 'rgba(75, 192, 192, 1)'
+                        });
+
+                    } catch (e) { console.error('Error rendering karyawan charts', e); }
+                }
+
+
+
+
+
+                // Event Listeners
+                const triggerTabList = [].slice.call(document.querySelectorAll('#reportTabs button'));
+                triggerTabList.forEach(function (triggerEl) {
+                    triggerEl.addEventListener('shown.bs.tab', function (event) {
+                        const targetId = event.target.getAttribute('data-bs-target');
+                        if (targetId === '#paket') renderPacketCharts();
+                        if (targetId === '#karyawan') renderKaryawanCharts();
+
                     });
-                 } catch (e) {
-                     console.error('Error rendering pie ' + canvasId, e);
-                 }
-            }
-
-            // === Render Functions Wrapped in Try-Catch ===
-            function renderPacketCharts() {
-                try {
-                    // Top Packet
-                    makeBarChart('topPacketChart', {!! json_encode($topPaket->pluck('nama_paket') ?? []) !!}, {!! json_encode($topPaket->pluck('kuota') ?? []) !!}, 'Kuota', { indexAxis: 'y' });
-
-                    // Cost
-                    const unitCostCtx = document.getElementById('unitCostChart');
-                    if (unitCostCtx) {
-                        if (chartInstances['unitCostChart']) chartInstances['unitCostChart'].destroy();
-                        chartInstances['unitCostChart'] = new Chart(unitCostCtx.getContext('2d'), {
-                            type: 'bar',
-                            data: {
-                                labels: {!! json_encode($unitKerjaCost->keys() ?? []) !!},
-                                datasets: [{
-                                    label: 'Total Nilai Kontrak',
-                                    data: {!! json_encode($unitKerjaCost->values() ?? []) !!},
-                                    backgroundColor: 'rgba(255, 159, 64, 0.7)'
-                                }]
-                            },
-                            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} } }
-                        });
-                    }
-
-                    // Contract Trend
-                    const trendCtx = document.getElementById('contractTrendChart');
-                    if (trendCtx) {
-                         if (chartInstances['contractTrendChart']) chartInstances['contractTrendChart'].destroy();
-                         chartInstances['contractTrendChart'] = new Chart(trendCtx.getContext('2d'), {
-                            type: 'line',
-                            data: {
-                                labels: {!! json_encode($contractTrend->pluck('tahun') ?? []) !!},
-                                datasets: [{
-                                    label: 'Total Nilai Kontrak (Rp)',
-                                    data: {!! json_encode($contractTrend->pluck('total_nilai') ?? []) !!},
-                                    borderColor: 'rgb(54, 162, 235)',
-                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                    fill: true,
-                                    tension: 0.3
-                                }]
-                            },
-                            options: {
-                                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-                                scales: { y: { ticks: { callback: value => 'Rp ' + (value/1000000000).toFixed(1) + 'M' } } }
-                            }
-                         });
-                    }
-                    
-                    // Realisasi Kuota
-                    const quotaCtx = document.getElementById('quotaRealizationChart');
-                    if (quotaCtx) {
-                         const labels = {!! json_encode($topPaket->pluck('nama_paket') ?? []) !!};
-                         const terisi = {!! json_encode($topPaket->pluck('terisi') ?? []) !!};
-                         const kuota = {!! json_encode($topPaket->pluck('kuota') ?? []) !!};
-                         const kosong = kuota.map((k, i) => k - (terisi[i] || 0));
-
-                         if (chartInstances['quotaRealizationChart']) chartInstances['quotaRealizationChart'].destroy();
-                         chartInstances['quotaRealizationChart'] = new Chart(quotaCtx.getContext('2d'), {
-                            type: 'bar',
-                            data: {
-                                labels: labels,
-                                datasets: [
-                                    { label: 'Terisi', data: terisi, backgroundColor: 'rgba(75, 192, 192, 0.7)' },
-                                    { label: 'Kosong', data: kosong, backgroundColor: 'rgba(255, 99, 132, 0.7)' }
-                                ]
-                            },
-                             options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
-                         });
-                    }
-                } catch (e) { console.error('Error rendering packet charts', e); }
-            }
-
-            function renderKaryawanCharts() {
-                try {
-                    // Demographics
-                    makePieChart('genderChart', {!! json_encode(array_keys($genderCount)) !!}, {!! json_encode(array_values($genderCount)) !!}, ['#36A2EB', '#FF6384']);
-                    makePieChart('statusChart', {!! json_encode(array_keys($statusAktifCount)) !!}, {!! json_encode(array_values($statusAktifCount)) !!}, ['#4BC0C0', '#FFCD56']);
-                    makeBarChart('ageChart', {!! json_encode(array_keys($usiaCount)) !!}, {!! json_encode(array_values($usiaCount)) !!}, 'Jumlah');
-                    makeBarChart('tenureChart', {!! json_encode(array_keys($masaKerjaCount)) !!}, {!! json_encode(array_values($masaKerjaCount)) !!}, 'Jumlah');
-                    makeBarChart('originChart', {!! json_encode(array_keys($asalKecamatanCount)) !!}, {!! json_encode(array_values($asalKecamatanCount)) !!}, 'Jumlah', { indexAxis: 'y' });
-
-                    // Dynamics
-                    const dynCtx = document.getElementById('dynamicsChart');
-                    if (dynCtx) {
-                         if (chartInstances['dynamicsChart']) chartInstances['dynamicsChart'].destroy();
-                         chartInstances['dynamicsChart'] = new Chart(dynCtx.getContext('2d'), {
-                            type: 'line',
-                            data: {
-                                labels: {!! json_encode($employeeDynamics->pluck('tahun') ?? []) !!},
-                                datasets: [
-                                    {
-                                        label: 'Masuk',
-                                        data: {!! json_encode($employeeDynamics->pluck('masuk') ?? []) !!},
-                                        borderColor: 'rgb(75, 192, 192)',
-                                        tension: 0.1
-                                    },
-                                    {
-                                        label: 'Keluar',
-                                        data: {!! json_encode($employeeDynamics->pluck('keluar') ?? []) !!},
-                                        borderColor: 'rgb(255, 99, 132)',
-                                        tension: 0.1
-                                    }
-                                ]
-                            },
-                            options: { responsive: true, maintainAspectRatio: false }
-                         });
-                    }
-                    
-                    // Population
-                    const popCtx = document.getElementById('populationChart');
-                    if (popCtx) {
-                        if (chartInstances['populationChart']) chartInstances['populationChart'].destroy();
-                        chartInstances['populationChart'] = new Chart(popCtx.getContext('2d'), {
-                            type: 'line',
-                            data: {
-                                labels: {!! json_encode($employeeDynamics->pluck('tahun') ?? []) !!},
-                                datasets: [{
-                                    label: 'Total Populasi',
-                                    data: {!! json_encode($employeeDynamics->pluck('populasi') ?? []) !!},
-                                    borderColor: 'rgb(153, 102, 255)',
-                                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                                    fill: true,
-                                    tension: 0.4
-                                }]
-                            },
-                            options: { responsive: true, maintainAspectRatio: false }
-                        });
-                    }
-
-                    makeBarChart('shiftChart', {!! json_encode(array_keys($shiftCount)) !!}, {!! json_encode(array_values($shiftCount)) !!}, 'Jumlah Karyawan', { indexAxis: 'y' });
-                    makeBarChart('resikoChart', {!! json_encode(array_keys($resikoCount)) !!}, {!! json_encode(array_values($resikoCount)) !!}, 'Jumlah Karyawan', { indexAxis: 'y', backgroundColor: 'rgba(255, 99, 132, 0.7)' });
-                    makeBarChart('reasonChart', {!! json_encode($exitReasons->keys()) !!}, {!! json_encode($exitReasons->values()) !!}, 'Jumlah', { indexAxis: 'y' });
-
-                } catch (e) { console.error('Error rendering karyawan charts', e); }
-            }
-
-            function renderUmpCharts() {
-                try {
-                    const umpCtx = document.getElementById('umpChart');
-                    if (umpCtx) {
-                        if (chartInstances['umpChart']) chartInstances['umpChart'].destroy();
-                        chartInstances['umpChart'] = new Chart(umpCtx.getContext('2d'), {
-                            type: 'line',
-                            data: {
-                                labels: {!! json_encode($umpTrend->pluck('tahun') ?? []) !!},
-                                datasets: [{
-                                    label: 'Nilai UMP (Rp)',
-                                    data: {!! json_encode($umpTrend->pluck('ump') ?? []) !!},
-                                    borderColor: 'rgb(255, 99, 132)',
-                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                    fill: true
-                                }]
-                            },
-                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                        });
-                    }
-
-                    const growthCtx = document.getElementById('umpGrowthChart');
-                    if (growthCtx) {
-                        if (chartInstances['umpGrowthChart']) chartInstances['umpGrowthChart'].destroy();
-                        chartInstances['umpGrowthChart'] = new Chart(growthCtx.getContext('2d'), {
-                            type: 'bar',
-                            data: {
-                                labels: {!! json_encode($umpGrowth->pluck('tahun') ?? []) !!},
-                                datasets: [{
-                                    label: 'Kenaikan (%)',
-                                    data: {!! json_encode($umpGrowth->pluck('growth') ?? []) !!},
-                                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                                }]
-                            },
-                             options: {
-                                responsive: true, maintainAspectRatio: false,
-                                plugins: { legend: { display: false } },
-                                scales: { y: { ticks: { callback: value => value + '%' } } }
-                            }
-                        });
-                    }
-
-                   makeBarChart('umpLocationChart', {!! json_encode(array_keys($umpPerLokasi->toArray())) !!}, {!! json_encode(array_values($umpPerLokasi->toArray())) !!}, 'Nilai UMP', {
-                        indexAxis: 'y',
-                        scales: { x: { ticks: { callback: value => 'Rp ' + (value/1000).toFixed(0) + 'k' } } }
-                     });
-                } catch(e) { console.error('Error rendering UMP charts', e); }
-            }
-
-            function renderOrganisasiCharts() {
-                try {
-                     makeBarChart('jabatanChart', {!! json_encode(array_keys($jabatanCount)) !!}, {!! json_encode(array_values($jabatanCount)) !!}, 'Jumlah Karyawan', { indexAxis: 'y' });
-                     
-                     // Pie Chart for Department
-                     const deptCtx = document.getElementById('departemenChart');
-                     if (deptCtx) {
-                         // Generate random colors for departments
-                         const deptLabels = {!! json_encode(array_keys($departemenCount)) !!};
-                         const deptData = {!! json_encode(array_values($departemenCount)) !!};
-                         const bgColors = deptLabels.map(() => `hsla(${Math.random() * 360}, 70%, 50%, 0.7)`);
-
-                         if (chartInstances['departemenChart']) chartInstances['departemenChart'].destroy();
-                         chartInstances['departemenChart'] = new Chart(deptCtx.getContext('2d'), {
-                             type: 'doughnut',
-                             data: {
-                                 labels: deptLabels,
-                                 datasets: [{ data: deptData, backgroundColor: bgColors }]
-                             },
-                             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-                         });
-                    }
-                } catch(e) { console.error('Error rendering organization charts', e); }
-            }
-
-            // Event Listeners
-            const triggerTabList = [].slice.call(document.querySelectorAll('#reportTabs button'));
-            triggerTabList.forEach(function (triggerEl) {
-                triggerEl.addEventListener('shown.bs.tab', function (event) {
-                    const targetId = event.target.getAttribute('data-bs-target');
-                    if (targetId === '#paket') renderPacketCharts();
-                    if (targetId === '#karyawan') renderKaryawanCharts();
-                    if (targetId === '#organisasi') renderOrganisasiCharts();
-                    if (targetId === '#ump') renderUmpCharts();
                 });
-            });
 
-            // Initial Render
-            renderPacketCharts();
-        });
-    </script>
+                // Packet Charts Rendering
+                function renderPacketCharts() {
+                    try {
+                        // 1. Top Quota (Jumlah Karyawan Terbanyak)
+                        makeBarChart('topQuotaChart',
+                            {!! json_encode($topPaketKuota->pluck('nama_paket')) !!},
+                            {!! json_encode($topPaketKuota->pluck('terisi')) !!},
+                            'Jumlah Karyawan',
+                            { indexAxis: 'y' }
+                        );
+
+                        // 2. Empty Quota (Stacked: Terisi vs Kosong)
+                        const emptyCtx = document.getElementById('emptyQuotaChart');
+                        if (emptyCtx) {
+                            if (chartInstances['emptyQuotaChart']) chartInstances['emptyQuotaChart'].destroy();
+
+                            // Prepare Data
+                            const paketNames = {!! json_encode($topPaketKosong->pluck('nama_paket')) !!};
+                            const paketTerisi = {!! json_encode($topPaketKosong->pluck('terisi')) !!};
+                            const paketKosong = {!! json_encode($topPaketKosong->pluck('kosong')) !!};
+                            const paketTotal = {!! json_encode($topPaketKosong->pluck('kuota')) !!};
+                            const paketPersen = {!! json_encode($topPaketKosong->pluck('persen_kosong')) !!};
+
+
+                            // Revert to Percentage Chart based on User Request
+                            chartInstances['emptyQuotaChart'] = new Chart(emptyCtx.getContext('2d'), {
+                                type: 'bar',
+                                data: {
+                                    labels: paketNames,
+                                    datasets: [{
+                                        label: '% Kekosongan',
+                                        data: paketPersen,
+                                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    indexAxis: 'y',
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: { position: 'top' },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    return tooltipItem.formattedValue + '%';
+                                                },
+                                                footer: function (tooltipItems) {
+                                                    let index = tooltipItems[0].dataIndex;
+                                                    let total = paketTotal[index];
+                                                    let terisi = paketTerisi[index];
+                                                    let kosong = paketKosong[index];
+                                                    return `Total Kuota: ${total}\nTerisi: ${terisi}\nKosong: ${kosong}`;
+                                                }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            stacked: false,
+                                            ticks: { callback: value => value + '%' }
+                                        },
+                                        y: { stacked: false }
+                                    }
+                                }
+                            });
+                        }
+
+                        // 3. Cost Analysis
+                        // 3. Cost Analysis (Estimation per Paket)
+                        makeBarChart('costChart',
+                            {!! json_encode(array_keys($unitKerjaCost->toArray())) !!},
+                            {!! json_encode(array_values($unitKerjaCost->toArray())) !!},
+                            'Total Nilai (Rp)',
+                            {
+                                indexAxis: 'y',
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                scales: { x: { ticks: { callback: value => 'Rp ' + (value / 1000000).toFixed(0) + ' Jt' } } }
+                            }
+                        );
+
+                        // 4. Contract Trend
+                            // 4. Contract Trend (Adjusted for Clarity)
+                            const trendCtx = document.getElementById('contractTrendChart');
+                            if (trendCtx) {
+                                if (chartInstances['contractTrendChart']) chartInstances['contractTrendChart'].destroy();
+                                const trendLabels = {!! json_encode($contractTrend->pluck('tahun')) !!};
+                                const trendData = {!! json_encode($contractTrend->pluck('total_nilai')) !!};
+                                
+                                // Use Bar chart if less than 2 data points for better visibility
+                                const chartType = trendLabels.length < 2 ? 'bar' : 'line';
+                                
+                                chartInstances['contractTrendChart'] = new Chart(trendCtx.getContext('2d'), {
+                                    type: chartType,
+                                    data: {
+                                        labels: trendLabels,
+                                        datasets: [{
+                                            label: 'Total Nilai Kontrak',
+                                            data: trendData,
+                                            borderColor: 'rgb(54, 162, 235)',
+                                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                            fill: true,
+                                            tension: 0.1,
+                                            barPercentage: 0.5 // For single bar width control
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        scales: { 
+                                            y: { 
+                                                title: { display: true, text: 'Total Nilai (Rp)' },
+                                                ticks: { 
+                                                    callback: function(value) {
+                                                        if (value >= 1000000000) {
+                                                            return 'Rp ' + (value / 1000000000).toFixed(1) + ' M';
+                                                        } else {
+                                                            return 'Rp ' + (value / 1000000).toFixed(0) + ' Jt';
+                                                        }
+                                                    }
+                                                } 
+                                            },
+                                            x: {
+                                                title: { display: true, text: 'Tahun' }
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+
+                    } catch (e) { console.error('Error rendering packet charts', e); }
+                }
+
+                // Initial Render
+                renderPacketCharts();
+            });
+        </script>
 @endsection
-```
+    ```

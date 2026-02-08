@@ -5,7 +5,7 @@
 
                 <!-- Dashboard (Standalone) -->
                 <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
-                    <i class="fas fa-tachometer-alt"></i> Report
+                    <i class="fas fa-tachometer-alt"></i> Laporan
                 </a>
 
                 <!-- SDM & Vendor (Dropdown) -->

@@ -231,7 +231,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/templates/perusahaan', [App\Http\Controllers\TemplateController::class, 'downloadPerusahaan'])->name('template.perusahaan');
     Route::get('/templates/karyawan', [App\Http\Controllers\TemplateController::class, 'downloadKaryawan'])->name('template.karyawan');
 
-    Route::get('/paket', [PaketController::class, 'index']);
+    Route::get('/paket', [PaketController::class, 'index'])->name('paket.index');
     Route::get('/paket/sampah', [PaketController::class, 'trash']);
     Route::get('/paket/{id}', [PaketController::class, 'show']);
     Route::get('/datapaket', [PaketController::class, 'indexpaket']);
