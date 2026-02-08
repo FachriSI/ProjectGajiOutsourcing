@@ -28,6 +28,7 @@ class DashboardController extends Controller
                     WHEN jenis_kelamin = 'P' THEN 'Perempuan' 
                     ELSE 'Lainnya' 
                 END as label, count(*) as total")
+            ->where('status_aktif', 'Aktif')
             ->groupBy('label')
             ->pluck('total', 'label')
             ->toArray();
@@ -74,6 +75,7 @@ class DashboardController extends Controller
         // 2. Age Distribution (SQL Calculation)
         $usiaRaw = \App\Models\Karyawan::selectRaw("timestampdiff(YEAR, tanggal_lahir, CURDATE()) as age")
             ->whereNotNull('tanggal_lahir')
+            ->where('status_aktif', 'Aktif')
             ->get();
 
         $usiaCount = [
@@ -87,6 +89,7 @@ class DashboardController extends Controller
         // 3. Tenure Distribution (Masa Kerja)
         $masaKerjaRaw = \App\Models\Karyawan::selectRaw("timestampdiff(YEAR, tanggal_bekerja, CURDATE()) as tenure")
             ->whereNotNull('tanggal_bekerja')
+            ->where('status_aktif', 'Aktif')
             ->get();
 
         $masaKerjaCount = [
@@ -106,6 +109,7 @@ class DashboardController extends Controller
         // PK: riwayat_shift.id
         $shiftCount = \DB::table('riwayat_shift')
             ->join('md_harianshift', 'riwayat_shift.kode_harianshift', '=', 'md_harianshift.kode_harianshift')
+            ->join('md_karyawan', 'riwayat_shift.karyawan_id', '=', 'md_karyawan.karyawan_id')
             ->select('md_harianshift.harianshift', \DB::raw('count(*) as total'))
             ->whereIn('riwayat_shift.id', function ($query) {
                 // Get Max ID per Karyawan to find latest
@@ -113,6 +117,7 @@ class DashboardController extends Controller
                     ->from('riwayat_shift')
                     ->groupBy('karyawan_id');
             })
+            ->where('md_karyawan.status_aktif', 'Aktif')
             ->groupBy('md_harianshift.harianshift')
             ->pluck('total', 'harianshift')
             ->toArray();
@@ -294,13 +299,17 @@ class DashboardController extends Controller
                     ->orWhereNull('tanggal_bekerja');
             })
                 ->where(function ($q) use ($year) {
-                    // Still active OR left after this year OR unknown exit date
+                    // STILL ACTIVE:
+                    // 1. Status is directly 'Aktif' (covers current active employees)
+                    // OR
+                    // 2. We allow them if they have a termination date AFTER this year (meaning they were active during this year)
                     $q->where('status_aktif', 'Aktif')
                         ->orWhere(function ($q2) use ($year) {
                         $q2->whereNotNull('tanggal_berhenti')
                             ->whereYear('tanggal_berhenti', '>', $year);
-                    })
-                        ->orWhereNull('tanggal_berhenti');
+                    });
+                    // REMOVED: orWhereNull('tanggal_berhenti') 
+                    // Reason: IF status is NOT 'Aktif' AND date is NULL, they are effectively inactive/unknown and should NOT be counted as active population.
                 })
                 ->count();
 
@@ -347,13 +356,14 @@ class DashboardController extends Controller
         // Top 10 Job Titles (Jabatan)
         $jabatanCount = \DB::table('riwayat_jabatan')
             ->join('md_jabatan', 'riwayat_jabatan.kode_jabatan', '=', 'md_jabatan.kode_jabatan')
+            ->join('md_karyawan', 'riwayat_jabatan.karyawan_id', '=', 'md_karyawan.karyawan_id')
             ->select('md_jabatan.jabatan', \DB::raw('count(*) as total'))
             ->whereIn('riwayat_jabatan.id', function ($q) {
                 $q->select(\DB::raw('MAX(id)'))->from('riwayat_jabatan')->groupBy('karyawan_id');
             })
+            ->where('md_karyawan.status_aktif', 'Aktif')
             ->groupBy('md_jabatan.jabatan')
             ->orderByDesc('total')
-
             ->pluck('total', 'jabatan')
             ->toArray();
 
@@ -362,9 +372,11 @@ class DashboardController extends Controller
             ->join('md_paket', 'paket_karyawan.paket_id', '=', 'md_paket.paket_id')
             ->join('md_unit_kerja', 'md_paket.unit_id', '=', 'md_unit_kerja.unit_id')
             ->join('md_departemen', 'md_unit_kerja.departemen_id', '=', 'md_departemen.departemen_id')
+            ->join('md_karyawan', 'paket_karyawan.karyawan_id', '=', 'md_karyawan.karyawan_id')
             ->whereIn('paket_karyawan.paket_karyawan_id', function ($q) {
                 $q->select(\DB::raw('MAX(paket_karyawan_id)'))->from('paket_karyawan')->groupBy('karyawan_id');
             })
+            ->where('md_karyawan.status_aktif', 'Aktif')
             ->select('md_departemen.departemen', \DB::raw('count(*) as total'))
             ->groupBy('md_departemen.departemen')
             ->orderByDesc('total')
