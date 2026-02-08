@@ -31,15 +31,13 @@
     @endif
 
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Daftar UMP</h6>
-        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-bordered datatable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="table-light">
                         <tr>
-                            <th  width="5%" class="text-center">No.</th>
+                            <th width="5%" class="text-center">No.</th>
                             <th>Lokasi</th>
                             <th class="text-end">UMP</th>
                             <th class="text-center">Tahun</th>
@@ -66,10 +64,13 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        <a href="/getupdate-ump/{{ $item->id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">
+                                        <a href="/getupdate-ump/{{ $item->id }}" class="btn btn-sm btn-warning"
+                                            data-bs-toggle="tooltip" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{{ url('delete-ump', $item->id) }}" class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                        <a href="{{ url('delete-ump', $item->id) }}" class="btn btn-sm btn-danger btn-delete"
+                                            data-bs-toggle="tooltip" title="Hapus"
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -92,13 +93,14 @@
             justify-content: center;
             font-size: 14px;
         }
+
         .bg-primary-light {
             background-color: rgba(78, 115, 223, 0.1);
         }
     </style>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Enable tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

@@ -7,7 +7,7 @@
     <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-info border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-tags me-2 text-info"></i> Data Paket</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-tags me-2 text-info"></i> Paket</h1>
                 <p class="text-muted small mb-0 mt-1">Dashboard dan Detail Paket Kontrak</p>
             </div>
             <div class="d-flex gap-2">
@@ -25,24 +25,22 @@
 
     <!-- ROW 1: ANNUAL OVERVIEW -->
     <!-- ROW 1: ANNUAL OVERVIEW -->
+    <!-- ROW 1: ANNUAL OVERVIEW -->
     <div class="row mb-4">
-        <!-- Main Card: Total Kontrak / Tahun -->
-        <div class="col-xl-6 col-12 mb-3">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
-                <div class="card-body p-4 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-4"
-                        style="width: 70px; height: 70px; background-color: #e0e7ff; color: #4e73df; min-width: 70px;">
-                        <i class="fas fa-star fa-2x"></i>
-                    </div>
-                    <div>
-                        <div class="text-uppercase fw-bold text-muted small mb-1" style="letter-spacing: 0.5px;">TOTAL
-                            KONTRAK / TAHUN</div>
-                        <div class="display-6 fw-bold text-dark mb-0">
-                            Rp{{ number_format($total_kontrak_tahunan_all, 0, ',', '.') }}</div>
-                        <div class="text-muted small mt-2">
-                            <i class="fas fa-calendar-alt me-1 text-primary"></i> Tahun {{ date('Y') }}
+        <!-- Annual Stat: Total Kontrak / Tahun -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                            style="width: 50px; height: 50px; background-color: #d1e7dd; color: #0f5132;">
+                            <i class="fas fa-file-contract fa-lg"></i>
                         </div>
+                        <div class="text-uppercase fw-bold text-muted small">Total Kontrak/Tahun</div>
                     </div>
+                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_kontrak_tahunan_all, 0, ',', '.') }}
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -53,12 +51,29 @@
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
-                            style="width: 50px; height: 50px; background-color: #ffe2e5; color: #e74a3b;">
+                            style="width: 50px; height: 50px; background-color: #fff3cd; color: #856404;">
                             <i class="fas fa-gift fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total THR/Tahun</div>
                     </div>
                     <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_thr_thn, 0, ',', '.') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Annual Stat: MCU / Tahun -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                            style="width: 50px; height: 50px; background-color: #e0f7fa; color: #00bcd4;">
+                            <i class="fas fa-heartbeat fa-lg"></i>
+                        </div>
+                        <div class="text-uppercase fw-bold text-muted small">Total MCU/Tahun</div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_mcu_all, 0, ',', '.') }}</div>
+
                 </div>
             </div>
         </div>
@@ -147,6 +162,8 @@
         </div>
     </div>
 
+
+
     <style>
         .card-hover:hover {
             transform: translateY(-5px);
@@ -156,9 +173,7 @@
 
     <!-- Data Table -->
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Daftar Paket Kontrak</h6>
-        </div>
+
         <div class="card-body">
             <table class="table table-bordered table-hover display nowrap" id="datatablesSimple" style="width:100%">
                 <thead class="table-light">
@@ -167,7 +182,7 @@
                         <th>Nama Paket</th>
                         <th class="text-center">Kuota (Orang)</th>
                         <th>Unit Kerja</th>
-                        <th class="text-center">Detail</th>
+
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -178,17 +193,22 @@
                             <td class="fw-bold">{{ $item->paket }}</td>
                             <td class="text-center">{{ $item->kuota_paket }}</td>
                             <td>{{ $item->unit_kerja }}</td>
-                            <td class="text-center">
-                                <a href="{{ url('/paket/' . $item->paket_id) }}"
-                                    class="btn btn-sm btn-info text-white shadow-sm" title="Lihat Detail">
-                                    <i class="fas fa-eye me-1"></i> Detail
-                                </a>
-                            </td>
+
                             <td class="text-center">
                                 <div class="btn-group" role="group">
+                                    <a href="{{ url('/paket/' . $item->paket_id) }}"
+                                        class="btn btn-sm btn-info text-white shadow-sm" data-bs-toggle="tooltip"
+                                        title="Lihat Paket">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <a href="/getupdate-paket/{{ $item->paket_id }}" class="btn btn-sm btn-warning"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-paket', $item->paket_id) }}"
+                                        class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Delete"
+                                        onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
                             </td>
@@ -205,19 +225,64 @@
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#datatablesSimple').DataTable({
+            var table = $('#datatablesSimple').DataTable({
+                "lengthChange": false,
                 "language": {
-                    "search": "Cari:",
-                    "lengthMenu": "Tampilkan _MENU_ entri",
+                    "decimal": "",
+                    "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
                     "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    "infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+                    "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Tampilkan _MENU_ entri",
+                    "loadingRecords": "Memuat...",
+                    "processing": "Memproses...",
+                    "search": "",
+                    "searchPlaceholder": "Cari data...",
+                    "zeroRecords": "Tidak ditemukan data yang sesuai",
                     "paginate": {
-                        "first": "Awal",
-                        "last": "Akhir",
+                        "first": "Pertama",
+                        "last": "Terakhir",
                         "next": "Selanjutnya",
                         "previous": "Sebelumnya"
-                    }
+                    },
                 },
-                "autoWidth": false
+                "autoWidth": false,
+                initComplete: function () {
+                    const tableApi = this.api();
+                    const container = $(tableApi.table().container());
+                    const infoDiv = container.find('.dataTables_info');
+
+                    // Create the checkbox HTML with separator
+                    const switchId = 'showAllSwitch_paket';
+                    const checkboxHtml = `
+                                <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                    <div class="form-check d-inline-block me-2">
+                                        <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                        <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                    </div>
+                                    <span class="text-muted me-2">|</span>
+                                </div>
+                            `;
+
+                    // Create a wrapper for same-line alignment without affecting siblings (pagination)
+                    const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
+                    infoDiv.before(flexWrapper);
+                    flexWrapper.append(checkboxHtml);
+                    flexWrapper.append(infoDiv);
+                    
+                    infoDiv.addClass('mb-0 ms-1');
+                    infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
+
+                    container.on('change', '.btn-show-all-switch', function () {
+                        if (this.checked) {
+                            tableApi.page.len(-1).draw();
+                        } else {
+                            tableApi.page.len(10).draw();
+                        }
+                    });
+                }
             });
         });
     </script>

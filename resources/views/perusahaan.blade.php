@@ -8,7 +8,8 @@
     <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-building me-2 text-primary"></i> Data Vendor/Perusahaan</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-building me-2 text-primary"></i> Data Vendor/Perusahaan
+                </h1>
                 <p class="text-muted small mb-0 mt-1">Manajemen data vendor dan perusahaan mitra.</p>
             </div>
             <div class="d-flex gap-2">
@@ -19,7 +20,8 @@
                 @endif
 
                 <!-- Button Template & Import -->
-                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#importTemplateBaruModal" title="Template & Import Data">
+                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#importTemplateBaruModal" title="Template & Import Data">
                     <i class="fas fa-file-excel me-1"></i> Import / Template
                 </button>
 
@@ -56,8 +58,10 @@
                         <hr>
                         <div class="mb-3">
                             <label for="file" class="form-label">2. Upload File Excel:</label>
-                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv" required>
-                            <div class="form-text">Pastikan format kolom: No, Nama, Alamat, CP, CPJAB, CPTelp, CPEmail, idMesin, Deleted, TKP, NPP</div>
+                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv"
+                                required>
+                            <div class="form-text">Pastikan format kolom: No, Nama, Alamat, CP, CPJAB, CPTelp, CPEmail,
+                                idMesin, Deleted, TKP, NPP</div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -72,9 +76,7 @@
     </div>
 
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Daftar Perusahaan</h6>
-        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover datatable" id="datatableSimple" width="100%" cellspacing="0">
@@ -110,13 +112,12 @@
                                 <td>{{ $item->npp }}</td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1">
-                                        <a href="/getupdate-perusahaan/{{ $item->perusahaan_id }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" title="Edit">
+                                        <a href="/getupdate-perusahaan/{{ $item->perusahaan_id }}"
+                                            class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="{{ url('delete-perusahaan', $item->perusahaan_id) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
-                                            title="Hapus">
+                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Hapus">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -137,6 +138,7 @@
                         // Semua fitur default: search, sort, paging aktif
                         processing: true,
                         serverSide: false,
+                        lengthChange: false,
                         language: {
                             "decimal": "",
                             "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
@@ -146,9 +148,10 @@
                             "infoPostFix": "",
                             "thousands": ",",
                             "lengthMenu": "Tampilkan _MENU_ entri",
-                            "loadingRecords": "Sedang memuat...",
-                            "processing": "Sedang memproses...",
-                            "search": "Cari:",
+                            "loadingRecords": "Memuat...",
+                            "processing": "Memproses...",
+                            "search": "",
+                            "searchPlaceholder": "Cari data...",
                             "zeroRecords": "Tidak ditemukan data yang sesuai",
                             "paginate": {
                                 "first": "Pertama",
@@ -156,10 +159,39 @@
                                 "next": "Selanjutnya",
                                 "previous": "Sebelumnya"
                             },
-                            "aria": {
-                                "sortAscending": ": aktifkan untuk mengurutkan kolom ke atas",
-                                "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
-                            }
+                        },
+                        initComplete: function () {
+                            const table = this.api();
+                            const container = $(table.table().container());
+                            const infoDiv = container.find('.dataTables_info');
+
+                            // Create the checkbox HTML with separator
+                            const switchId = 'showAllSwitch_perusahaan';
+                            const checkboxHtml = `
+                                            <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                                <div class="form-check d-inline-block me-2">
+                                                    <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                                    <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                                </div>
+                                                <span class="text-muted me-2">|</span>
+                                            </div>
+                                        `;
+
+                            // Create a wrapper for same-line alignment without affecting siblings (pagination)
+                            const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
+                            infoDiv.before(flexWrapper);
+                            flexWrapper.append(checkboxHtml).append(infoDiv);
+
+                            infoDiv.addClass('mb-0 ms-1');
+                            infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
+
+                            container.on('change', '.btn-show-all-switch', function () {
+                                if (this.checked) {
+                                    table.page.len(-1).draw();
+                                } else {
+                                    table.page.len(10).draw();
+                                }
+                            });
                         }
                     });
                 }

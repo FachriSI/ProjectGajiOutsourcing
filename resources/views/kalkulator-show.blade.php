@@ -9,23 +9,6 @@
     <div class="container-fluid px-0">
         <!-- Header Actions -->
         <div class="card shadow mb-4">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-file-contract me-2"></i>
-                    {{ $nilaiKontrak->paket->paket }}
-                </h5>
-                <div>
-                    <a href="{{ route('paket.tagihan', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-light me-2">
-                        <i class="fas fa-file-invoice me-2"></i>Lihat Tagihan Lengkap
-                    </a>
-                    <a href="{{ route('kalkulator.cetak-thr', $nilaiKontrak->paket_id) }}" class="btn btn-sm btn-light me-2" target="_blank">
-                        <i class="fas fa-print me-2"></i>Cetak THR
-                    </a>
-                    <a href="{{ route('kalkulator.index') }}" class="btn btn-sm btn-light">
-                        <i class="fas fa-arrow-left me-1"></i> Kembali
-                    </a>
-                </div>
-            </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
@@ -380,14 +363,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card shadow">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-users-cog me-2"></i>Detail Breakdown per Karyawan
-                        </h5>
-                        <span class="badge bg-light text-dark">
-                            {{ count($nilaiKontrak->breakdown_json['karyawan'] ?? []) }} Karyawan
-                        </span>
-                    </div>
+
                     <div class="card-body">
                         <ul class="nav nav-tabs mb-3" id="employeeTabs" role="tablist">
                             <li class="nav-item" role="presentation">

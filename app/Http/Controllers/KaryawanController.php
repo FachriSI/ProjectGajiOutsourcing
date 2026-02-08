@@ -103,7 +103,7 @@ class KaryawanController extends Controller
             'harianShift' => $harianShift,
             'jabatan' => $jabatan,
             'jabatanList' => $jabatanList,
-            'jabatanList' => $jabatanList,
+
             'area' => $area,
             'masterUkuran' => $masterUkuran,
             'hasDeleted' => $hasDeleted
@@ -133,34 +133,94 @@ class KaryawanController extends Controller
 
     public function getTambah()
     {
-        $dataP = DB::table('md_perusahaan')
-            ->get();
-        $dataU = Db::table('md_unit_kerja')
-            ->get();
+        $dataP = DB::table('md_perusahaan')->get();
+        $dataU = Db::table('md_unit_kerja')->get();
+        $paketList = DB::table('md_paket')->where('is_deleted', 0)->get();
 
-        return view('tambah-karyawan', ['dataP' => $dataP, 'dataU' => $dataU]);
+        // Calculate remaining quota for each package
+        foreach ($paketList as $paket) {
+            $currentActive = DB::table('paket_karyawan as pk')
+                ->join('md_karyawan as k', 'pk.karyawan_id', '=', 'k.karyawan_id')
+                ->where('pk.paket_id', $paket->paket_id)
+                ->where('k.status_aktif', 'Aktif')
+                ->distinct('pk.karyawan_id')
+                ->count();
+
+            $paket->sisa_kuota = max(0, $paket->kuota_paket - $currentActive);
+        }
+
+        // Filter packages that are full (sisa_kuota <= 0)
+        $paketList = $paketList->filter(function ($paket) {
+            return $paket->sisa_kuota > 0;
+        });
+
+        // Fetch existing unique fields for client-side validation
+        $existingOsis = Karyawan::pluck('osis_id')->toArray();
+        $existingKtp = Karyawan::pluck('ktp')->toArray();
+
+        return view('tambah-karyawan', [
+            'dataP' => $dataP,
+            'dataU' => $dataU,
+            'paketList' => $paketList,
+            'existingOsis' => $existingOsis,
+            'existingKtp' => $existingKtp
+        ]);
     }
 
     public function setTambah(Request $request)
     {
         $request->validate([
-            'osis_id' => 'required',
-            'ktp' => 'required',
+            'osis_id' => 'required|numeric|digits:4|unique:md_karyawan,osis_id',
+            'ktp' => 'required|numeric|digits:16|unique:md_karyawan,ktp',
             'nama' => 'required',
             'perusahaan' => 'required',
-            'tanggal_lahir' => 'required',
+            'tanggal_lahir' => 'required|date|before:-18 years|after:-56 years',
             'jenis_kelamin' => 'required',
             'agama' => 'required',
             'status' => 'required',
             'alamat' => 'required',
             'asal' => 'nullable',
+            'paket_id' => 'required|exists:md_paket,paket_id',
+        ], [
+            'osis_id.unique' => 'OSIS ID sudah terdaftar.',
+            'osis_id.digits' => 'OSIS ID harus 4 digit angka.',
+            'ktp.unique' => 'Nomor KTP sudah terdaftar.',
+            'ktp.digits' => 'Nomor KTP harus 16 digit angka.',
+            'tanggal_lahir.before' => 'Usia minimal harus 18 tahun.',
+            'tanggal_lahir.after' => 'Usia maksimal harus 56 tahun.',
         ]);
+
+        // QUOTA CHECK
+        $paket = DB::table('md_paket')->where('paket_id', $request->paket_id)->first();
+        if ($paket) {
+            $kuota = $paket->kuota_paket;
+
+            // Count active employees in this package
+            // Logic matches PaketController: count 'Aktif' status in paket_karyawan (latest beg_date per employee)
+            // Simplified check: Count all 'Aktif' employees currently assigned to this package
+
+            // Complex query to get current active count specifically for this package
+            // Or simple approach: query paket_karyawan for this paket, get unique employees, check their status
+            // Keeping it consistent with PaketController logic is best, but for now let's do a direct verification
+
+            $currentActive = DB::table('paket_karyawan as pk')
+                ->join('md_karyawan as k', 'pk.karyawan_id', '=', 'k.karyawan_id')
+                ->where('pk.paket_id', $request->paket_id)
+                ->where('k.status_aktif', 'Aktif')
+                ->distinct('pk.karyawan_id') // Ensure unique employees
+                ->count();
+
+            if ($currentActive >= $kuota) {
+                return redirect()->back()->with('error', 'Gagal menambah karyawan. Kuota Paket Penuh! (' . $currentActive . '/' . $kuota . ')')->withInput();
+            }
+        }
+
         $tanggal_lahir = Carbon::parse($request->tanggal_lahir);
         $tanggal_umur56 = $tanggal_lahir->copy()->addYears(56);
         $tanggal_pensiun = $tanggal_umur56->addMonth()->startOfMonth();
         $tahun_pensiun = $tanggal_umur56->format('Y-m-d');
 
-        Karyawan::create([
+        $karyawan = Karyawan::create([
             'osis_id' => $request->osis_id,
             'ktp' => $request->ktp,
             'nama_tk' => $request->nama,
@@ -173,6 +233,15 @@ class KaryawanController extends Controller
             'asal' => $request->asal ?: null,
             'tahun_pensiun' => $tahun_pensiun,
             'tanggal_pensiun' => $tanggal_pensiun,
+            'status_aktif' => 'Aktif', // Set default active
+            'tanggal_bekerja' => now() // Set default join date to now, or add input field if needed
+        ]);
+
+        // Assign to Paket
+        DB::table('paket_karyawan')->insert([
+            'paket_id' => $request->paket_id,
+            'karyawan_id' => $karyawan->karyawan_id,
+            'beg_date' => now()->format('Y-m-d'), // Start date in package
         ]);
 
         return redirect('/karyawan')->with('success', 'Data Berhasil Tersimpan');

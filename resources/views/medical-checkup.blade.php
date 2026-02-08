@@ -30,12 +30,10 @@
     @endif
 
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Riwayat Medical Checkup</h6>
-        </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover table-bordered {{ (isset($data) && count($data) > 0) ? 'datatable' : '' }}" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-hover table-bordered {{ (isset($data) && count($data) > 0) ? 'datatable' : '' }}"
+                    id="dataTable" width="100%" cellspacing="0">
                     <thead class="table-light">
                         <tr>
                             <th width="5%" class="text-center">No.</th>
@@ -53,10 +51,13 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <button onclick="editData({{ $item->id }})" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <button onclick="editData({{ $item->id }})" class="btn btn-sm btn-warning"
+                                                data-bs-toggle="tooltip" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <a href="{{ route('medical-checkup.destroy', $item->id) }}" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
+                                            <a href="{{ route('medical-checkup.destroy', $item->id) }}"
+                                                class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Delete"
+                                                onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
@@ -142,13 +143,14 @@
             justify-content: center;
             font-size: 14px;
         }
+
         .bg-danger-light {
             background-color: rgba(231, 74, 59, 0.1);
         }
     </style>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -157,7 +159,7 @@
 
         function editData(id) {
             // Fetch data via AJAX
-            $.get('/getupdate-medical-checkup/' + id, function(data) {
+            $.get('/getupdate-medical-checkup/' + id, function (data) {
                 $('#edit_biaya').val(data.biaya);
                 $('#editForm').attr('action', '/update-medical-checkup/' + id);
                 var myModal = new bootstrap.Modal(document.getElementById('editModal'));

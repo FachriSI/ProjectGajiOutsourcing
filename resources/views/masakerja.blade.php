@@ -29,9 +29,7 @@
     @endif
 
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Daftar Masa Kerja & Tunjangan</h6>
-        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-bordered datatable" id="dataTable" width="100%" cellspacing="0">
@@ -68,8 +66,10 @@
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{{ url('delete-masakerja', $item->id) }}" class="btn btn-sm btn-danger btn-delete"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete" onclick="return confirm('Hapus data masa kerja ini?')">
+                                        <a href="{{ url('delete-masakerja', $item->id) }}"
+                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" title="Delete"
+                                            onclick="return confirm('Hapus data masa kerja ini?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -92,13 +92,14 @@
             justify-content: center;
             font-size: 14px;
         }
+
         .bg-success-light {
             background-color: rgba(28, 200, 138, 0.1);
         }
     </style>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)

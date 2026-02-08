@@ -6,7 +6,7 @@
 
   <h3 class="mt-4">Sampah Jabatan</h3>
   <div class="alert alert-warning">
-      <i class="fas fa-info-circle"></i> Data di bawah ini adalah data yang telah dihapus. Anda dapat memulihkannya kembali.
+    <i class="fas fa-info-circle"></i> Data di bawah ini adalah data yang telah dihapus. Anda dapat memulihkannya kembali.
   </div>
   <div class="d-flex align-items-center mb-3 gap-2">
     <a href="/jabatan" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali</a>
@@ -41,19 +41,5 @@
       @endforeach
     </tbody>
   </table>
-
-  <script>
-    $(document).ready(function () {
-      $('.datatable').each(function () {
-        if (!$.fn.DataTable.isDataTable(this)) {
-          $(this).DataTable({
-            "columnDefs": [
-              { "type": "num", "targets": 0 }
-            ]
-          });
-        }
-      });
-    });
-  </script>
 
 @endsection

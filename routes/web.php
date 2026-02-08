@@ -234,7 +234,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/paket', [PaketController::class, 'index'])->name('paket.index');
     Route::get('/paket/sampah', [PaketController::class, 'trash']);
     Route::get('/paket/{id}', [PaketController::class, 'show']);
-    Route::get('/datapaket', [PaketController::class, 'indexpaket']);
+    // Redirect legacy route
+    Route::redirect('/datapaket', '/paket');
+
     Route::get('/gettambah-paket', [PaketController::class, 'getTambah']);
     Route::post('/tambah-paket', [PaketController::class, 'setTambah']);
     Route::get('/getupdate-paket/{id}', [PaketController::class, 'getUpdate']);

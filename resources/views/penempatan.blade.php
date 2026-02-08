@@ -68,48 +68,29 @@
                         <select id="filterPaket" class="form-select border-start-0 ps-0">
                             <option value="">Semua Paket</option>
                             @php
-                                $paket = collect($data)->pluck('paket')->unique()->toArray();
-                                usort($paket, function ($a, $b) {
+                                $paketList = $allPaketNames->toArray();
+                                usort($paketList, function ($a, $b) {
                                     preg_match('/\d+/', $a, $matchesA);
                                     preg_match('/\d+/', $b, $matchesB);
-                                    return $matchesA[0] - $matchesB[0];
+                                    $numA = isset($matchesA[0]) ? (int)$matchesA[0] : 0;
+                                    $numB = isset($matchesB[0]) ? (int)$matchesB[0] : 0;
+                                    return $numA - $numB;
                                 });
                             @endphp
-                            @foreach ($paket as $paket)
-                                <option value="{{ $paket }}">{{ $paket }}</option>
+                            @foreach ($paketList as $pkt)
+                                <option value="{{ $pkt }}">{{ $pkt }}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <label for="filterAktifMulai" class="form-label fw-bold small text-muted text-uppercase">Filter Aktif Mulai</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-calendar text-muted"></i></span>
-                        <select id="filterAktifMulai" class="form-select border-start-0 ps-0">
-                            <option value="">Semua Tanggal</option>
-                            @php
-                                $tanggal = collect($data)->pluck('aktif_mulai')->unique()->toArray();
-                                usort($tanggal, function ($a, $b) {
-                                    $dateA = DateTime::createFromFormat('F Y', $a);
-                                    $dateB = DateTime::createFromFormat('F Y', $b);
-                                    return $dateA <=> $dateB;
-                                });
-                            @endphp
-                            @foreach ($tanggal as $tgl)
-                                <option value="{{ $tgl }}">{{ $tgl }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
 
     <!-- Data Table -->
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Data Penempatan Karyawan</h6>
-        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-bordered" id="datatablesSimple" width="100%" cellspacing="0">
@@ -261,6 +242,7 @@
                 var table = $('#datatablesSimple').DataTable({
                     processing: true,
                     serverSide: false,
+                    lengthChange: false,
                     language: {
                         "decimal": "",
                         "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
@@ -272,7 +254,8 @@
                         "lengthMenu": "Tampilkan _MENU_ entri",
                         "loadingRecords": "Sedang memuat...",
                         "processing": "Sedang memproses...",
-                        "search": "Cari:",
+                        "search": "",
+                        "searchPlaceholder": "Cari data...",
                         "zeroRecords": "Tidak ditemukan data yang sesuai",
                         "paginate": {
                             "first": "Pertama",
@@ -284,6 +267,38 @@
                             "sortAscending": ": aktifkan untuk mengurutkan kolom ke atas",
                             "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
                         }
+                    },
+                    initComplete: function () {
+                        const tableApi = this.api();
+                        const container = $(tableApi.table().container());
+                        const infoDiv = container.find('.dataTables_info');
+
+                        // Create the checkbox HTML with separator
+                        const switchId = 'showAllSwitch_penempatan';
+                        const checkboxHtml = `
+                            <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                <div class="form-check d-inline-block me-2">
+                                    <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                    <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                </div>
+                                <span class="text-muted me-2">|</span>
+                            </div>
+                        // Create a wrapper for same-line alignment without affecting siblings (pagination)
+                        const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
+                        infoDiv.before(flexWrapper);
+                        flexWrapper.append(checkboxHtml);
+                        flexWrapper.append(infoDiv);
+                        
+                        infoDiv.addClass('mb-0 ms-1'); 
+                        infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
+
+                        container.on('change', '.btn-show-all-switch', function () {
+                            if (this.checked) {
+                                tableApi.page.len(-1).draw();
+                            } else {
+                                tableApi.page.len(10).draw();
+                            }
+                        });
                     }
                 });
 
@@ -292,10 +307,7 @@
                     table.column(5).search(val ? '^' + val + '$' : '', true, false).draw();
                 });
 
-                $('#filterAktifMulai').on('change', function () {
-                    var val = this.value;
-                    table.column(7).search(val ? '^' + val + '$' : '', true, false).draw();
-                });
+
             }
         });
     </script>

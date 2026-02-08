@@ -30,9 +30,7 @@
 
     <!-- Data Table -->
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Daftar Lokasi</h6>
-        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-bordered datatable" id="dataTable" width="100%" cellspacing="0">
@@ -52,10 +50,13 @@
                                 <td><span class="badge bg-info text-dark">{{ $item->jenis }}</span></td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        <a href="/getupdate-lokasi/{{ $item->kode_lokasi }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">
+                                        <a href="/getupdate-lokasi/{{ $item->kode_lokasi }}" class="btn btn-sm btn-warning"
+                                            data-bs-toggle="tooltip" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{{ url('delete-lokasi', $item->kode_lokasi) }}" class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <a href="{{ url('delete-lokasi', $item->kode_lokasi) }}"
+                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Delete"
+                                            onclick="return confirm('Yakin ingin menghapus data ini?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -69,7 +70,7 @@
     </div>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -77,4 +78,3 @@
         });
     </script>
 @endsection
-

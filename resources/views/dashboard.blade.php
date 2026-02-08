@@ -42,7 +42,7 @@
                             KARYAWAN</div>
                         <div class="display-6 fw-bold text-dark mb-0">{{ number_format($totalKaryawan) }}</div>
                         <div class="text-muted small mt-2">
-                            Data Aktif Saat Ini
+                            Pekerja Aktif
                         </div>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                         </div>
                         <div class="display-6 fw-bold text-dark mb-0">{{ number_format($totalPaket) }}</div>
                         <div class="text-muted small mt-2">
-                            Total Paket Terdaftar
+                            Paket Terdaftar
                         </div>
                     </div>
                 </div>
