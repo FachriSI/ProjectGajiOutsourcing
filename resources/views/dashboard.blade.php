@@ -31,16 +31,19 @@
     <div class="row mb-4">
         <!-- Total Karyawan -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Karyawan</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ number_format($totalKaryawan) }}
-                            </div>
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-4"
+                        style="width: 70px; height: 70px; background-color: #e0e7ff; color: #4e73df; min-width: 70px;">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <div>
+                        <div class="text-uppercase fw-bold text-muted small mb-1" style="letter-spacing: 0.5px;">TOTAL
+                            KARYAWAN</div>
+                        <div class="display-6 fw-bold text-dark mb-0">{{ number_format($totalKaryawan) }}</div>
+                        <div class="text-muted small mt-2">
+                            Data Aktif Saat Ini
                         </div>
-                        <div class="col-auto"><i class="fas fa-users fa-2x text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
@@ -48,16 +51,19 @@
 
         <!-- Total Paket -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Paket</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ number_format($totalPaket) }}
-                            </div>
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-4"
+                        style="width: 70px; height: 70px; background-color: #ccf6ff; color: #17a2b8; min-width: 70px;">
+                        <i class="fas fa-box fa-2x"></i>
+                    </div>
+                    <div>
+                        <div class="text-uppercase fw-bold text-muted small mb-1" style="letter-spacing: 0.5px;">TOTAL PAKET
                         </div>
-                        <div class="col-auto"><i class="fas fa-box fa-2x text-gray-300"></i></div>
+                        <div class="display-6 fw-bold text-dark mb-0">{{ number_format($totalPaket) }}</div>
+                        <div class="text-muted small mt-2">
+                            Total Paket Terdaftar
+                        </div>
                     </div>
                 </div>
             </div>
@@ -73,7 +79,7 @@
             <!-- Top Row: Quota Analysis -->
             <div class="row mb-4">
                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan Jumlah Karyawan Terbanyak</h6>
                             <div style="height: 300px;">
@@ -83,7 +89,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan % Kuota Kosong Tertinggi</h6>
                             <div style="height: 300px;">
@@ -97,7 +103,7 @@
             <!-- Bottom Row: Cost & Trend -->
             <div class="row">
                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan Total Nilai Kontrak Tertinggi
                             </h6>
@@ -108,7 +114,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Tren Total Nilai Kontrak per Tahun</h6>
                             <div style="height: 300px;">
@@ -125,7 +131,7 @@
             <!-- Ringkasan Demografis -->
             <div class="row mb-3">
                 <div class="col-12">
-                    <div class="card shadow-sm">
+                    <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                         <div class="card-body p-3">
                             <div class="row text-center">
                                 <div class="col-lg-3 col-md-3 col-6 mb-2">
@@ -190,7 +196,7 @@
             <!-- Pertumbuhan Populasi (Full Width) -->
             <div class="row mb-4">
                 <div class="col-lg-12 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Pertumbuhan Populasi Karyawan (Akumulasi)</h6>
                             <div style="height: 300px;">
@@ -201,7 +207,7 @@
                 </div>
                 <!-- Department Distribution (New) -->
                 <div class="col-lg-12 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Sebaran per Departemen</h6>
                             <div style="height: 300px;">
@@ -215,7 +221,7 @@
             <div class="row">
                 <!-- Demographics Row -->
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Sebaran Usia</h6>
                             <div style="height: 300px;">
@@ -225,7 +231,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Masa Kerja</h6>
                             <div style="height: 300px;">
@@ -237,7 +243,7 @@
 
                 <!-- Operational & Risk -->
                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Distribusi Jenis Shift</h6>
                             <div style="height: 300px;">
@@ -248,7 +254,7 @@
                 </div>
                 <!-- Job Distribution -->
                 <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
                             <h6 class="text-center font-weight-bold mb-3">Distribusi Jabatan</h6>
                             <div style="height: 300px;">
@@ -516,53 +522,53 @@
                         );
 
                         // 4. Contract Trend
-                            // 4. Contract Trend (Adjusted for Clarity)
-                            const trendCtx = document.getElementById('contractTrendChart');
-                            if (trendCtx) {
-                                if (chartInstances['contractTrendChart']) chartInstances['contractTrendChart'].destroy();
-                                const trendLabels = {!! json_encode($contractTrend->pluck('tahun')) !!};
-                                const trendData = {!! json_encode($contractTrend->pluck('total_nilai')) !!};
-                                
-                                // Use Bar chart if less than 2 data points for better visibility
-                                const chartType = trendLabels.length < 2 ? 'bar' : 'line';
-                                
-                                chartInstances['contractTrendChart'] = new Chart(trendCtx.getContext('2d'), {
-                                    type: chartType,
-                                    data: {
-                                        labels: trendLabels,
-                                        datasets: [{
-                                            label: 'Total Nilai Kontrak',
-                                            data: trendData,
-                                            borderColor: 'rgb(54, 162, 235)',
-                                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                                            fill: true,
-                                            tension: 0.1,
-                                            barPercentage: 0.5 // For single bar width control
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        scales: { 
-                                            y: { 
-                                                title: { display: true, text: 'Total Nilai (Rp)' },
-                                                ticks: { 
-                                                    callback: function(value) {
-                                                        if (value >= 1000000000) {
-                                                            return 'Rp ' + (value / 1000000000).toFixed(1) + ' M';
-                                                        } else {
-                                                            return 'Rp ' + (value / 1000000).toFixed(0) + ' Jt';
-                                                        }
+                        // 4. Contract Trend (Adjusted for Clarity)
+                        const trendCtx = document.getElementById('contractTrendChart');
+                        if (trendCtx) {
+                            if (chartInstances['contractTrendChart']) chartInstances['contractTrendChart'].destroy();
+                            const trendLabels = {!! json_encode($contractTrend->pluck('tahun')) !!};
+                            const trendData = {!! json_encode($contractTrend->pluck('total_nilai')) !!};
+
+                            // Use Bar chart if less than 2 data points for better visibility
+                            const chartType = trendLabels.length < 2 ? 'bar' : 'line';
+
+                            chartInstances['contractTrendChart'] = new Chart(trendCtx.getContext('2d'), {
+                                type: chartType,
+                                data: {
+                                    labels: trendLabels,
+                                    datasets: [{
+                                        label: 'Total Nilai Kontrak',
+                                        data: trendData,
+                                        borderColor: 'rgb(54, 162, 235)',
+                                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                        fill: true,
+                                        tension: 0.1,
+                                        barPercentage: 0.5 // For single bar width control
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            title: { display: true, text: 'Total Nilai (Rp)' },
+                                            ticks: {
+                                                callback: function (value) {
+                                                    if (value >= 1000000000) {
+                                                        return 'Rp ' + (value / 1000000000).toFixed(1) + ' M';
+                                                    } else {
+                                                        return 'Rp ' + (value / 1000000).toFixed(0) + ' Jt';
                                                     }
-                                                } 
-                                            },
-                                            x: {
-                                                title: { display: true, text: 'Tahun' }
+                                                }
                                             }
+                                        },
+                                        x: {
+                                            title: { display: true, text: 'Tahun' }
                                         }
                                     }
-                                });
-                            }
+                                }
+                            });
+                        }
 
                     } catch (e) { console.error('Error rendering packet charts', e); }
                 }

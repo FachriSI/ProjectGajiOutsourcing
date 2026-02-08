@@ -13527,3 +13527,25 @@ td:first-child {
 .sb-sidenav-menu-nested .nav-link:hover:not(.active) {
     background-color: rgba(255, 255, 255, 0.1) !important;
 }
+
+/* =========================================================================
+   MODERN CARD STYLES - GLOBAL OVERRIDE
+   ========================================================================= */
+.card {
+    border-radius: 20px !important;
+    border: 0 !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    /* Soft shadow */
+    overflow: hidden;
+    /* Ensures content doesn't spill out of rounded corners */
+}
+
+/* Ensure card headers also respect the top rounded corners */
+.card-header:first-child {
+    border-radius: 20px 20px 0 0 !important;
+}
+
+/* Ensure card footers also respect the bottom rounded corners */
+.card-footer:last-child {
+    border-radius: 0 0 20px 20px !important;
+}
