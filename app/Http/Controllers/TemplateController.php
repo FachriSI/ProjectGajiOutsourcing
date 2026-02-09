@@ -110,6 +110,69 @@ class TemplateController extends Controller
         return Excel::download(new TemplateExport($headings, $data), 'template_import_karyawan.xlsx');
     }
 
+    public function downloadKaryawanBaru()
+    {
+        // Headers based on KaryawanBaruImport logic
+        /*
+            0: OSIS ID (4 digit)
+            1: No KTP (16 digit)
+            2: Nama Lengkap
+            3: ID Paket
+            4: ID Perusahaan
+            5: Tanggal Lahir (YYYY-MM-DD)
+            6: Jenis Kelamin (L/P)
+            7: Agama
+            8: Status Pernikahan (S/M/D/J)
+            9: Alamat
+            10: Asal
+        */
+
+        $headings = [
+            'OSIS ID (4 Digit)',
+            'No KTP (16 Digit)',
+            'Nama Lengkap',
+            'ID Paket',
+            'ID Perusahaan',
+            'Tanggal Lahir (YYYY-MM-DD)',
+            'Jenis Kelamin (L/P)',
+            'Agama',
+            'Status Pernikahan (S/M/D/J)',
+            'Alamat Domisili',
+            'Asal (Kota/Kab)'
+        ];
+
+        $data = [
+            [
+                '1001',
+                '1371000000000001',
+                'Budi Santoso',
+                '1', // ID Paket
+                '1', // ID Perusahaan
+                '1990-01-01',
+                'L',
+                'Islam',
+                'K0',
+                'Jl. Sudirman No. 1',
+                'Padang'
+            ],
+            [
+                '1002',
+                '1371000000000002',
+                'Siti Aminah',
+                '1',
+                '1',
+                '1995-05-05',
+                'P',
+                'Islam',
+                'S',
+                'Jl. Khatib No. 5',
+                'Bukittinggi'
+            ]
+        ];
+
+        return Excel::download(new TemplateExport($headings, $data), 'template_import_karyawan_baru.xlsx');
+    }
+
     public function downloadPaket()
     {
         // Headers based on Paket table structure

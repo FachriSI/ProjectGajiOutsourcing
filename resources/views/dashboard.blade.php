@@ -31,7 +31,8 @@
     <div class="row mb-4">
         <!-- Total Karyawan -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100"
+                style="border-radius: 20px; border-left: 5px solid #4e73df !important;">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="rounded-circle d-flex align-items-center justify-content-center me-4"
                         style="width: 70px; height: 70px; background-color: #e0e7ff; color: #4e73df; min-width: 70px;">
@@ -42,16 +43,18 @@
                             KARYAWAN</div>
                         <div class="display-6 fw-bold text-dark mb-0">{{ number_format($totalKaryawan) }}</div>
                         <div class="text-muted small mt-2">
-                            Pekerja Aktif
+                            Karyawan Terdaftar
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
 
         <!-- Total Paket -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100"
+                style="border-radius: 20px; border-left: 5px solid #17a2b8 !important;">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="rounded-circle d-flex align-items-center justify-content-center me-4"
                         style="width: 70px; height: 70px; background-color: #ccf6ff; color: #17a2b8; min-width: 70px;">
@@ -198,7 +201,7 @@
                 <div class="col-lg-12 mb-4">
                     <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Pertumbuhan Populasi Karyawan (Akumulasi)</h6>
+                            <h6 class="text-center font-weight-bold mb-3">Tren Jumlah Karyawan Aktif per Tahun</h6>
                             <div style="height: 300px;">
                                 <canvas id="populationChart"></canvas>
                             </div>
@@ -356,7 +359,10 @@
                     try {
                         // Demographics (Gender & Status moved to summary card - charts removed)
                         makeBarChart('ageChart', {!! json_encode(array_keys($usiaCount)) !!}, {!! json_encode(array_values($usiaCount)) !!}, 'Jumlah');
-                        makeBarChart('tenureChart', {!! json_encode(array_keys($masaKerjaCount)) !!}, {!! json_encode(array_values($masaKerjaCount)) !!}, 'Jumlah');
+                        makeBarChart('tenureChart', {!! json_encode(array_keys($masaKerjaCount)) !!}, {!! json_encode(array_values($masaKerjaCount)) !!}, 'Jumlah', {
+                            backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                            borderColor: 'rgba(255, 159, 64, 1)'
+                        });
                         // originChart removed - no decision-making value
 
                         // Dynamics
@@ -408,11 +414,19 @@
                         }
 
 
-                        makeBarChart('shiftChart', {!! json_encode(array_keys($shiftCount)) !!}, {!! json_encode(array_values($shiftCount)) !!}, 'Jumlah Karyawan', { indexAxis: 'y' });
+                        makeBarChart('shiftChart', {!! json_encode(array_keys($shiftCount)) !!}, {!! json_encode(array_values($shiftCount)) !!}, 'Jumlah Karyawan', {
+                            indexAxis: 'y',
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            borderColor: 'rgba(255, 99, 132, 1)'
+                        });
 
 
                         // Added Jabatan Chart
-                        makeBarChart('jabatanChart', {!! json_encode(array_keys($jabatanCount)) !!}, {!! json_encode(array_values($jabatanCount)) !!}, 'Jumlah Karyawan', { indexAxis: 'y' });
+                        makeBarChart('jabatanChart', {!! json_encode(array_keys($jabatanCount)) !!}, {!! json_encode(array_values($jabatanCount)) !!}, 'Jumlah Karyawan', {
+                            indexAxis: 'y',
+                            backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                            borderColor: 'rgba(153, 102, 255, 1)'
+                        });
 
                         // Added Departemen Chart (Vertical Bar for better readability with many depts)
                         makeBarChart('departemenChart', {!! json_encode(array_keys($departemenCount)) !!}, {!! json_encode(array_values($departemenCount)) !!}, 'Jumlah Karyawan', {
@@ -515,8 +529,8 @@
                             'Total Nilai (Rp)',
                             {
                                 indexAxis: 'y',
-                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                                borderColor: 'rgba(46, 204, 113, 1)',
                                 scales: { x: { ticks: { callback: value => 'Rp ' + (value / 1000000).toFixed(0) + ' Jt' } } }
                             }
                         );
@@ -539,8 +553,8 @@
                                     datasets: [{
                                         label: 'Total Nilai Kontrak',
                                         data: trendData,
-                                        borderColor: 'rgb(54, 162, 235)',
-                                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                        borderColor: 'rgb(44, 62, 80)',
+                                        backgroundColor: 'rgba(44, 62, 80, 0.5)',
                                         fill: true,
                                         tension: 0.1,
                                         barPercentage: 0.5 // For single bar width control

@@ -47,6 +47,10 @@
                 role="tab" aria-controls="mutasi" aria-selected="true">Mutasi & Promosi</button>
             </li>
             <li class="nav-item" role="presentation">
+              <button class="nav-link" id="baru-tab" data-bs-toggle="tab" data-bs-target="#baru" type="button" role="tab"
+                aria-controls="baru" aria-selected="false">Karyawan Baru</button>
+            </li>
+            <li class="nav-item" role="presentation">
               <button class="nav-link" id="pakaian-tab" data-bs-toggle="tab" data-bs-target="#pakaian" type="button"
                 role="tab" aria-controls="pakaian" aria-selected="false">Update Pakaian</button>
             </li>
@@ -73,6 +77,33 @@
                 </div>
                 <div class="text-end">
                   <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import Mutasi</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Tab Karyawan Baru -->
+            <div class="tab-pane fade" id="baru" role="tabpanel" aria-labelledby="baru-tab">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk mengimport data karyawan <strong>BARU</strong>
+                yang belum ada di sistem.
+                <br>Pastikan OSIS ID dan No KTP belum terdaftar.
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span>1. Download Template Karyawan Baru:</span>
+                <a href="{{ route('template.karyawan-baru') }}" class="btn btn-outline-success btn-sm">
+                  <i class="fas fa-download"></i> Download Template
+                </a>
+              </div>
+              <hr>
+              <form action="{{ url('/import-karyawan-baru') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-3">
+                  <label for="fileBaru" class="form-label">2. Upload File Karyawan Baru (Excel):</label>
+                  <input type="file" name="file" id="fileBaru" class="form-control" accept=".xlsx, .xls, .csv" required>
+                </div>
+                <div class="text-end">
+                  <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import Karyawan
+                    Baru</button>
                 </div>
               </form>
             </div>
@@ -392,7 +423,7 @@
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-      });
+          });
 
     $(document).on('click', '.btn-mutasi', function () {
       const nama = $(this).data('nama');

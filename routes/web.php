@@ -224,11 +224,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/import-mutasi', [ImportController::class, 'importMutasi']);
     Route::post('/import-pakaian', [ImportController::class, 'importPakaian']);
     Route::post('/import-template-baru', [ImportController::class, 'importTemplateBaru']);
+    Route::post('/import-karyawan-baru', [ImportController::class, 'importKaryawanBaru']);
 
     // Dynamic Template Downloads
     Route::get('/templates/mutasi-promosi', [App\Http\Controllers\TemplateController::class, 'downloadMutasi'])->name('template.mutasi');
     Route::get('/templates/pakaian', [App\Http\Controllers\TemplateController::class, 'downloadPakaian'])->name('template.pakaian');
     Route::get('/templates/perusahaan', [App\Http\Controllers\TemplateController::class, 'downloadPerusahaan'])->name('template.perusahaan');
+    Route::get('/templates/karyawan-baru', [App\Http\Controllers\TemplateController::class, 'downloadKaryawanBaru'])->name('template.karyawan-baru');
     Route::get('/templates/karyawan', [App\Http\Controllers\TemplateController::class, 'downloadKaryawan'])->name('template.karyawan');
     Route::get('/templates/paket', [App\Http\Controllers\TemplateController::class, 'downloadPaket'])->name('template.paket');
 
