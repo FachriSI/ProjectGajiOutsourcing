@@ -244,11 +244,7 @@
 
                             <td class="text-center">
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-success btn-add-employee text-white shadow-sm"
-                                        data-paket-id="{{ $item->paket_id }}" data-paket-nama="{{ $item->paket }}"
-                                        data-bs-toggle="tooltip" title="Tambah Karyawan">
-                                        <i class="fas fa-user-plus"></i>
-                                    </button>
+
                                     <a href="{{ url('/paket/' . $item->paket_id) }}"
                                         class="btn btn-sm btn-info text-white shadow-sm" data-bs-toggle="tooltip"
                                         title="Lihat Paket">
@@ -274,129 +270,70 @@
 
 
 
-    <!-- Modal Tambah Karyawan -->
-    <div class="modal fade" id="modalAddEmployee" tabindex="-1" aria-labelledby="modalAddEmployeeLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ url('/tambah-karyawan-paket') }}" method="POST">
-                    @csrf
-                    <div class="modal-header bg-success text-white">
-                        <h5 class="modal-title" id="modalAddEmployeeLabel">Tambah Karyawan ke Paket</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="paket_id_add" id="inputPaketId">
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Paket</label>
-                            <input type="text" class="form-control" id="displayPaketNama" readonly>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="selectKaryawan" class="form-label fw-bold">Pilih Karyawan</label>
-                            <small class="text-muted d-block mb-2">*Hanya karyawan yang belum memiliki paket</small>
-                            <select class="form-select" name="karyawan_id" id="selectKaryawan" required>
-                                <option value="" selected disabled>-- Pilih Karyawan --</option>
-                                @if(isset($availableKaryawan) && count($availableKaryawan) > 0)
-                                    @foreach($availableKaryawan as $karyawan)
-                                        <option value="{{ $karyawan->karyawan_id }}">{{ $karyawan->nama_tk }}
-                                            ({{ $karyawan->osis_id }})</option>
-                                    @endforeach
-                                @else
-                                    <option value="" disabled>Tidak ada karyawan tersedia</option>
-                                @endif
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-success">Simpan</button>
-                    </div>
-                </form>
-            </div>
+    var table = $('#datatablesSimple').DataTable({
+    "lengthChange": false,
+    "language": {
+    "decimal": "",
+    "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
+    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+    "infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+    "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+    "infoPostFix": "",
+    "thousands": ",",
+    "lengthMenu": "Tampilkan _MENU_ entri",
+    "loadingRecords": "Memuat...",
+    "processing": "Memproses...",
+    "search": "",
+    "searchPlaceholder": "Cari data...",
+    "zeroRecords": "Tidak ditemukan data yang sesuai",
+    "paginate": {
+    "first": "Pertama",
+    "last": "Terakhir",
+    "next": "Selanjutnya",
+    "previous": "Sebelumnya"
+    },
+    },
+    "autoWidth": false,
+    initComplete: function () {
+    const tableApi = this.api();
+    const container = $(tableApi.table().container());
+    const infoDiv = container.find('.dataTables_info');
+
+    // Create the checkbox HTML with separator
+    const switchId = 'showAllSwitch_paket';
+    const checkboxHtml = `
+    <div class="d-inline-block me-2" style="vertical-align: middle;">
+        <div class="form-check d-inline-block me-2">
+            <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+            <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan
+                semua</label>
         </div>
+        <span class="text-muted me-2">|</span>
     </div>
+    `;
 
-    <!-- Add jQuery DataTables Script to ensure controls appear and match Detail page styling -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Handle Add Employee Button Click
-            $('.btn-add-employee').on('click', function () {
-                var paketId = $(this).data('paket-id');
-                var paketNama = $(this).data('paket-nama');
+    // Create a wrapper for same-line alignment without affecting siblings (pagination)
+    const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
+    infoDiv.before(flexWrapper);
+    flexWrapper.append(checkboxHtml);
+    flexWrapper.append(infoDiv);
 
-                $('#inputPaketId').val(paketId);
-                $('#displayPaketNama').val(paketNama);
+    infoDiv.addClass('mb-0 ms-1');
+    infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
 
-                var modal = new bootstrap.Modal(document.getElementById('modalAddEmployee'));
-                modal.show();
-            });
-
-            var table = $('#datatablesSimple').DataTable({
-                "lengthChange": false,
-                "language": {
-                    "decimal": "",
-                    "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
-                    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-                    "infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
-                    "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "Tampilkan _MENU_ entri",
-                    "loadingRecords": "Memuat...",
-                    "processing": "Memproses...",
-                    "search": "",
-                    "searchPlaceholder": "Cari data...",
-                    "zeroRecords": "Tidak ditemukan data yang sesuai",
-                    "paginate": {
-                        "first": "Pertama",
-                        "last": "Terakhir",
-                        "next": "Selanjutnya",
-                        "previous": "Sebelumnya"
-                    },
-                },
-                "autoWidth": false,
-                initComplete: function () {
-                    const tableApi = this.api();
-                    const container = $(tableApi.table().container());
-                    const infoDiv = container.find('.dataTables_info');
-
-                    // Create the checkbox HTML with separator
-                    const switchId = 'showAllSwitch_paket';
-                    const checkboxHtml = `
-                                    <div class="d-inline-block me-2" style="vertical-align: middle;">
-                                        <div class="form-check d-inline-block me-2">
-                                            <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
-                                            <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
-                                        </div>
-                                        <span class="text-muted me-2">|</span>
-                                    </div>
-                                `;
-
-                    // Create a wrapper for same-line alignment without affecting siblings (pagination)
-                    const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
-                    infoDiv.before(flexWrapper);
-                    flexWrapper.append(checkboxHtml);
-                    flexWrapper.append(infoDiv);
-
-                    infoDiv.addClass('mb-0 ms-1');
-                    infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
-
-                    container.on('change', '.btn-show-all-switch', function () {
-                        if (this.checked) {
-                            tableApi.page.len(-1).draw();
-                        } else {
-                            tableApi.page.len(10).draw();
-                        }
-                    });
-                }
-            });
+    container.on('change', '.btn-show-all-switch', function () {
+    if (this.checked) {
+    tableApi.page.len(-1).draw();
+    } else {
+    tableApi.page.len(10).draw();
+    }
+    });
+    }
+    });
 
 
-        });
+    });
     </script>
 @endsection

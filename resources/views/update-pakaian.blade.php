@@ -12,10 +12,18 @@
                 </div>
                 <div class="mb-3"><label class="form-label">Nilai Jatah</label><input type="number" class="form-control"
                         name="nilai_jatah" value="{{ $dataP->nilai_jatah }}"></div>
-                <div class="mb-3"><label class="form-label">Ukuran Baju</label><input type="text" class="form-control"
-                        name="ukuran_baju" value="{{ $dataP->ukuran_baju }}"></div>
-                <div class="mb-3"><label class="form-label">Ukuran Celana</label><input type="text" class="form-control"
-                        name="ukuran_celana" value="{{ $dataP->ukuran_celana }}"></div>
+                <div class="mb-3"><label class="form-label">Ukuran Baju</label>
+                    <select class="form-select select2" name="ukuran_baju">
+                        <option value="">-- Pilih Ukuran --</option>
+                        @foreach ($masterUkuran as $m)
+                            <option value="{{ $m->nama_ukuran }}" {{ $dataP->ukuran_baju == $m->nama_ukuran ? 'selected' : '' }}>
+                                {{ $m->nama_ukuran }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-3"><label class="form-label">Ukuran Celana</label><input type="number" class="form-control"
+                        name="ukuran_celana" min="25" max="45" value="{{ $dataP->ukuran_celana }}"></div>
                 <div class="mb-3"><label class="form-label">Tanggal Mulai</label><input type="date" class="form-control"
                         name="beg_date" value="{{ $dataP->beg_date }}"></div>
                 <button type="submit" class="btn btn-primary">Update</button>

@@ -14,9 +14,6 @@
                         <i class="fas fa-trash-restore me-1"></i> Data Sampah
                     </a>
                 @endif
-                <a href="/gettambah-pakaian" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Pakaian
-                </a>
             </div>
         </div>
     </div>
@@ -52,7 +49,7 @@
                                         <div class="icon-circle bg-purple-light text-purple me-2">
                                             <i class="fas fa-user-tie"></i>
                                         </div>
-                                        <span class="fw-bold text-dark">{{ $item->nama }}</span>
+                                        <span class="fw-bold text-dark">{{ $item->nama_tk }}</span>
                                     </div>
                                 </td>
                                 <td class="text-end fw-bold text-success">

@@ -62,6 +62,7 @@ class PaketController extends Controller
         $resikoAll = Riwayat_resiko::with('resiko')->latest('beg_date')->get()->groupBy('karyawan_id');
         $lokasiAll = Riwayat_lokasi::with(['lokasi.ump' => fn($q) => $q->where('tahun', $currentYear)])->latest('beg_date')->get()->groupBy('karyawan_id');
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
+        $pakaianAll = \App\Models\Pakaian::latest('beg_date')->get()->unique('karyawan_id')->keyBy('karyawan_id');
 
         $allPakets = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
 
@@ -145,7 +146,8 @@ class PaketController extends Controller
 
                 $total_jml_fix_cost += $jml_fix;
 
-                $quota_jam = 2 * ($pk->kuota ?? 0); // using kuota from pivot
+                $kuota_jam_data = $kuotaJamAll[$id] ?? null;
+                $quota_jam = 2 * ($kuota_jam_data->kuota ?? 0);
                 $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
                 $nilai_lembur = round($tarif_lembur * $quota_jam);
                 $fee_lembur = round(0.025 * $nilai_lembur);
@@ -157,7 +159,8 @@ class PaketController extends Controller
                 $total_thr_bln += $thr_bln;
                 $total_thr_thn += ($thr_bln * 12);
 
-                $pakaian = 600000;
+                $pakaian_data = $pakaianAll[$id] ?? null;
+                $pakaian = $pakaian_data ? $pakaian_data->nilai_jatah : 0;
                 $fee_pakaian = round(0.05 * $pakaian);
                 $total_pakaian_all += ($pakaian + $fee_pakaian);
 
@@ -229,6 +232,7 @@ class PaketController extends Controller
             }
         ])->latest('beg_date')->get()->groupBy('karyawan_id');
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
+        $pakaianAll = \App\Models\Pakaian::latest('beg_date')->get()->unique('karyawan_id')->keyBy('karyawan_id');
         $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
 
         // Filter: Only for this package
@@ -286,8 +290,10 @@ class PaketController extends Controller
                 $fungsi = optional($fungsiAll[$id] ?? collect())->first();
                 $kuota_jam = $kuotaJamAll[$id] ?? null;
                 $masakerja = $masakerjaAll[$id] ?? null;
+                $pakaian_data = $pakaianAll[$id] ?? null;
 
                 $data[] = (object) array_merge(
+                    $pakaian_data?->toArray() ?? [], // Merge Pakaian fields (nilai_jatah)
                     $kuota_jam?->toArray() ?? [],
                     $karyawan->toArray(),
                     ['perusahaan' => $karyawan->perusahaan->perusahaan ?? null],
@@ -1044,34 +1050,34 @@ class PaketController extends Controller
         // Ideally `calculateBOQ` should accept `$periode`. 
         // Since I cannot easily change `calculateBOQ` signature without checking all usages (it might be used elsewhere), 
         // I will rely on `$nilaiKontrak` which IS calculated with correct period, and populate `$boqData` manually or correct it.
-        
+
         // Actually `calculateBOQ` calls `$calculatorService->calculateForPaket($paketId, $periode)` but `$periode` is `now()`.
         // So `calculateBOQ` returns data for CURRENT month. 
         // We want data for `$periode`.
-        
+
         // BEST FIX: Refactor `calculateBOQ` to accept optional `$periode`.
         // But to be safe and quick, let's just use the service directly here and construct the data structure expected by the view,
         // OR pass the correct data from `$nilaiKontrak`.
-        
+
         // breakdown_json in $nilaiKontrak has everything `calculateBOQ` returns except 'paket' object and 'vendor'.
-        
+
         $breakdown = $nilaiKontrak->breakdown_json;
         $pengawas = $breakdown['pengawas'];
         $pelaksana = $breakdown['pelaksana'];
         $karyawanData = $breakdown['karyawan'];
-        
+
         $paket = Paket::with(['paketKaryawan.karyawan.perusahaan', 'unitKerja'])->findOrFail($id);
-        
+
         $vendor = null;
         foreach ($paket->paketKaryawan as $pk) {
-             if ($pk->karyawan && $pk->karyawan->perusahaan) {
-                 $vendor = $pk->karyawan->perusahaan->perusahaan;
-                 break;
-             }
+            if ($pk->karyawan && $pk->karyawan->perusahaan) {
+                $vendor = $pk->karyawan->perusahaan->perusahaan;
+                break;
+            }
         }
 
         $totalBOQ = $pengawas['total'] + $pelaksana['total'];
-        
+
         $boqData = [
             'paket' => $paket,
             'vendor' => $vendor,

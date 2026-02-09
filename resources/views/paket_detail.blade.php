@@ -74,7 +74,7 @@
             $total_thr_thn += $thr_thn;
 
             // Pakaian
-            $pakaian = 600000;
+            $pakaian = $item->nilai_jatah ?? 0;
             $fee_pakaian = round(0.05 * $pakaian);
             $total_pakaian = $pakaian + $fee_pakaian;
             $total_pakaian_all += $total_pakaian;
@@ -303,7 +303,7 @@
                                     $thr_bln = $thr + $fee_thr;
                                     $thr_thn = $thr_bln * 12;
 
-                                    $pakaian = 600000;
+                                    $pakaian = $item->nilai_jatah ?? 0;
                                     $fee_pakaian = round(0.05 * $pakaian);
                                     $total_pakaian = $pakaian + $fee_pakaian;
 

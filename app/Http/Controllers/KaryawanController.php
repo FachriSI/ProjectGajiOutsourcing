@@ -400,7 +400,7 @@ class KaryawanController extends Controller
 
         DB::table('md_pakaian')->insert([
             'karyawan_id' => $request->karyawan_id,
-            'nilai_jatah' => 600000,
+            'nilai_jatah' => 690000,
             'ukuran_baju' => $request->ukuran_baju,
             'ukuran_celana' => $request->ukuran_celana,
             'beg_date' => $request->beg_date,
