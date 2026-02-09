@@ -23,6 +23,22 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class PaketController extends Controller
 {
 
+    public function storeKaryawan(Request $request)
+    {
+        $request->validate([
+            'paket_id_add' => 'required|exists:md_paket,paket_id',
+            'karyawan_id' => 'required|exists:md_karyawan,karyawan_id'
+        ]);
+
+        PaketKaryawan::create([
+            'paket_id' => $request->paket_id_add,
+            'karyawan_id' => $request->karyawan_id,
+            'beg_date' => now()
+        ]);
+
+        return redirect('/paket')->with('success', 'Karyawan berhasil ditambahkan ke paket');
+    }
+
     public function index()
     {
         // Calculate Global Totals for Summary Cards
@@ -46,6 +62,13 @@ class PaketController extends Controller
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
 
         $allPakets = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
+        
+        // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
+        $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();
+        $availableKaryawan = Karyawan::whereNotIn('karyawan_id', $assignedKaryawanIds)
+                                     ->where('status_aktif', 'Aktif') // Optional: Only Active employees
+                                     ->orderBy('nama_tk')
+                                     ->get();
 
         foreach ($allPakets as $paket) {
             $kuota = (int) $paket->kuota_paket;
@@ -149,7 +172,8 @@ class PaketController extends Controller
         return view('paket', compact(
             'data', 'hasDeleted', 
             'total_jml_fix_cost', 'total_seluruh_variabel', 'total_kontrak_all', 
-            'total_kontrak_tahunan_all', 'total_thr_bln', 'total_thr_thn', 'total_pakaian_all'
+            'total_kontrak_tahunan_all', 'total_thr_bln', 'total_thr_thn', 'total_pakaian_all',
+            'availableKaryawan'
         ));
     }
 
@@ -195,7 +219,7 @@ class PaketController extends Controller
 
             $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
 
-            $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
+            $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && ($item->karyawan->status_aktif === 'Aktif' || empty($item->karyawan->status_aktif)));
             $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
             $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
 
@@ -792,9 +816,20 @@ class PaketController extends Controller
             ->get();
         //  dd($data);
 
+        // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
+        $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();
+        $availableKaryawan = Karyawan::whereNotIn('karyawan_id', $assignedKaryawanIds)
+                                     ->where(function($q) {
+                                         $q->where('status_aktif', 'Aktif')
+                                           ->orWhereNull('status_aktif')
+                                           ->orWhere('status_aktif', '');
+                                     })
+                                     ->orderBy('nama_tk')
+                                     ->get();
+
         // $hasDeleted = Paket::where('is_deleted', 1)->exists();
         $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
-        return view('data_paket', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+        return view('data_paket', ['data' => $data, 'hasDeleted' => $hasDeleted, 'availableKaryawan' => $availableKaryawan]);
 
     }
 

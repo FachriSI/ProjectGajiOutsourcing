@@ -237,6 +237,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/datapaket', [PaketController::class, 'indexpaket']);
     Route::get('/gettambah-paket', [PaketController::class, 'getTambah']);
     Route::post('/tambah-paket', [PaketController::class, 'setTambah']);
+    Route::post('/tambah-karyawan-paket', [PaketController::class, 'storeKaryawan']); // New Route
     Route::get('/getupdate-paket/{id}', [PaketController::class, 'getUpdate']);
     Route::post('/update-paket/{id}', [PaketController::class, 'setUpdate']);
     Route::get('/delete-paket/{id}', [PaketController::class, 'destroy']);

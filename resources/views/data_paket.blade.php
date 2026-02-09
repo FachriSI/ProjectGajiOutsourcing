@@ -46,7 +46,17 @@
                                 <td>{{ $item->kuota_paket }}</td>
                                 <td>{{ $item->unit_kerja }}</td>
                                 <td class="text-center">
+
+                                        
                                     <div class="btn-group" role="group">
+                                        <!-- Button Add Employee -->
+                                        <button type="button" class="btn btn-sm btn-success btn-add-employee" 
+                                            data-paket-id="{{ $item->paket_id }}"
+                                            data-paket-nama="{{ $item->paket }}"
+                                            data-bs-toggle="tooltip" title="Tambah Karyawan">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+
                                         <a href="/getupdate-paket/{{ $item->paket_id }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -63,12 +73,66 @@
         </div>
     </div>
 
+    <!-- Modal Tambah Karyawan -->
+    <div class="modal fade" id="modalAddEmployee" tabindex="-1" aria-labelledby="modalAddEmployeeLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ url('/tambah-karyawan-paket') }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="modalAddEmployeeLabel">Tambah Karyawan ke Paket</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="paket_id_add" id="inputPaketId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Paket</label>
+                            <input type="text" class="form-control" id="displayPaketNama" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="selectKaryawan" class="form-label fw-bold">Pilih Karyawan</label>
+                            <small class="text-muted d-block mb-2">*Hanya karyawan yang belum memiliki paket</small>
+                            <select class="form-select" name="karyawan_id" id="selectKaryawan" required>
+                                <option value="" selected disabled>-- Pilih Karyawan --</option>
+                                @if(isset($availableKaryawan) && count($availableKaryawan) > 0)
+                                    @foreach($availableKaryawan as $karyawan)
+                                        <option value="{{ $karyawan->karyawan_id }}">{{ $karyawan->nama_tk }} ({{ $karyawan->osis_id }})</option>
+                                    @endforeach
+                                @else
+                                    <option value="" disabled>Tidak ada karyawan tersedia</option>
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function() {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
-            })
+            });
+
+             // Handle Add Employee Button Click
+             $('.btn-add-employee').on('click', function() {
+                var paketId = $(this).data('paket-id');
+                var paketNama = $(this).data('paket-nama');
+
+                $('#inputPaketId').val(paketId);
+                $('#displayPaketNama').val(paketNama);
+                
+                var modal = new bootstrap.Modal(document.getElementById('modalAddEmployee'));
+                modal.show();
+            });
         });
     </script>
 @endsection

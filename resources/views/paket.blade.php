@@ -202,6 +202,8 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
+
+
                                     <a href="/getupdate-paket/{{ $item->paket_id }}" class="btn btn-sm btn-warning"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
@@ -214,6 +216,8 @@
             </table>
         </div>
     </div>
+
+
 
     <!-- Add jQuery DataTables Script to ensure controls appear and match Detail page styling -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -235,6 +239,8 @@
                 },
                 "autoWidth": false
             });
+
+
         });
     </script>
 @endsection
