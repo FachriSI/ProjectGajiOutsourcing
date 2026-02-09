@@ -59,7 +59,7 @@ class MedicalCheckupController extends Controller
         $data = MedicalCheckup::findOrFail($id);
         $data->update([
             'is_deleted' => true,
-            'deleted_by' => auth()->user()->id ?? 'System', // Assuming auth is used or fallback
+            'deleted_by' => auth()->user()->name ?? 'System',
             'deleted_at' => now()
         ]);
 
