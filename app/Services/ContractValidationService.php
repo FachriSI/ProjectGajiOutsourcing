@@ -15,12 +15,16 @@ class ContractValidationService
      * @param NilaiKontrak $nilaiKontrak
      * @param int|null $userId
      * @param int|null $expiryDays
+     * @param array $additionalMetadata
      * @return ContractValidation
      */
-    public function createValidation(NilaiKontrak $nilaiKontrak, $userId = null, $expiryDays = null)
+    public function createValidation(NilaiKontrak $nilaiKontrak, $userId = null, $expiryDays = null, array $additionalMetadata = [])
     {
         $token = ContractValidation::generateToken();
         
+        $metadata = $this->buildMetadata($nilaiKontrak, $userId);
+        $metadata = array_merge($metadata, $additionalMetadata);
+
         $validationData = [
             'nilai_kontrak_id' => $nilaiKontrak->id,
             'validation_token' => $token,
@@ -29,7 +33,7 @@ class ContractValidationService
             'generated_at' => now(),
             'generated_by' => $userId,
             'expires_at' => $expiryDays ? now()->addDays($expiryDays) : null,
-            'metadata' => $this->buildMetadata($nilaiKontrak, $userId)
+            'metadata' => $metadata
         ];
 
         $validation = ContractValidation::create($validationData);

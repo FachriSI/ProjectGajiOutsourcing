@@ -131,7 +131,7 @@
                 <a href="{{ route('kalkulator.show', ['paket_id' => $boq['paket']->paket_id, 'periode' => \Carbon\Carbon::parse($boq['nilai_kontrak']->periode)->format('Y-m')]) }}" class="btn btn-secondary me-2">
                     <i class="fas fa-arrow-left me-1"></i> Kembali
                 </a>
-                <a href="#" class="btn btn-warning me-2">
+                <a href="{{ route('kalkulator.cetak-thr', ['paket_id' => $boq['paket']->paket_id, 'periode' => \Carbon\Carbon::parse($boq['nilai_kontrak']->periode)->format('Y-m')]) }}" class="btn btn-warning me-2" target="_blank">
                     <i class="fas fa-print me-1"></i> Cetak THR
                 </a>
                 <a href="{{ route('paket.pdf.download', $boq['paket']->paket_id) }}" class="btn btn-success">

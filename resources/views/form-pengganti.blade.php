@@ -7,13 +7,33 @@
 <h3 class="mt-4">Tambah Pengganti</h3>
 <form class="form-horizontal form-bordered" method="post" enctype="multipart/form-data" action="/simpan-pengganti/{{$dataM->karyawan_id}}">
 @csrf
+    <div class="card bg-light mb-4">
+        <div class="card-body">
+             <h5 class="card-title text-muted mb-3"><i class="fas fa-user-clock me-2"></i>Data Karyawan Sebelumnya</h5>
+             <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Nama Karyawan</label>
+                    <input type="text" class="form-control" value="{{ $dataM->nama_tk }}" readonly disabled>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">OSIS ID</label>
+                    <input type="text" class="form-control" value="{{ $dataM->osis_id }}" readonly disabled>
+                </div>
+             </div>
+        </div>
+    </div>
+
+    <input type="hidden" name="karyawan_sebelumnya_id" value="{{ $dataM->karyawan_id }}">
+
     <div class="mb-3">
-        <label for="osis_id" class="form-label">OSIS ID</label>
-        <input type="text" class="form-control" name="osis_id" id="osis_id">
+        <label for="osis_id" class="form-label">OSIS ID (Pengganti)</label>
+        <input type="text" class="form-control" name="osis_id" id="osis_id" maxlength="4" pattern="\d{4}" title="Harus 4 digit angka" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+        <div class="form-text">Wajib 4 digit angka.</div>
     </div>
     <div class="mb-3">
         <label for="ktp" class="form-label">Nomor KTP</label>
-        <input type="text" class="form-control" name="ktp" id="ktp">
+        <input type="text" class="form-control" name="ktp" id="ktp" maxlength="16" pattern="\d{16}" title="Harus 16 digit angka" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+        <div class="form-text">Wajib 16 digit angka.</div>
     </div>
     <div class="mb-3">
         <label for="nama" class="form-label">Nama Tenaga Kerja</label>

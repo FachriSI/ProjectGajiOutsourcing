@@ -575,6 +575,14 @@ class PenempatanController extends Controller
 
     public function simpanPengganti(Request $request, $id)
     {
+        $request->validate([
+            'osis_id' => 'required|numeric|digits:4',
+            'ktp' => 'required|numeric|digits:16',
+            'nama' => 'required',
+            'perusahaan_id' => 'required', // pastikan field ini ada di form
+            'tanggal_lahir' => 'required|date',
+        ]);
+
         DB::beginTransaction();
         // dd($request);
         try {
@@ -671,7 +679,17 @@ class PenempatanController extends Controller
                 'beg_date' => $request->tanggal_bekerja,
             ]);
 
-
+            // === SIMPAN KE HISTORY KARYAWAN ===
+            DB::table('history_karyawan')->insert([
+                'paket_id' => $request->paket,
+                'karyawan_id' => $newId, // ID Baru (Pengganti)
+                'karyawan_sebelumnya_id' => $id, // ID Lama (Yang digantikan)
+                'tanggal_diberhentikan' => $karyawanLama->tanggal_berhenti ?? now(),
+                'diberhentikan_oleh' => $karyawanLama->diberhentikan_oleh ?? auth()->id(),
+                'catatan' => $karyawanLama->catatan_berhenti,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // Update catatan pengganti pada karyawan lama (status sudah 'Berhenti' sebelumnya)
             DB::table('md_karyawan')
@@ -695,22 +713,34 @@ class PenempatanController extends Controller
 
         // Loop untuk mencari history ke belakang (limit 50 untuk mencegah infinite loop)
         for ($i = 0; $i < 50; $i++) {
-            // Ambil data karyawan saat ini
-            $karyawan = DB::table('md_karyawan')
+            $prevId = null;
+            $catatan = '-';
+            $tanggalBerhenti = '-';
+            $diberhentikanOleh = '-';
+
+            // 1. Cek di tabel history_karyawan (Fitur Baru)
+            $historyRecord = DB::table('history_karyawan')
                 ->where('karyawan_id', $currentId)
                 ->first();
 
-            if (!$karyawan)
-                break;
+            if ($historyRecord) {
+                $prevId = $historyRecord->karyawan_sebelumnya_id;
+            } else {
+                // 2. Cek Legacy (Regex dari catatan_pengganti)
+                $karyawan = DB::table('md_karyawan')
+                    ->where('karyawan_id', $currentId)
+                    ->first();
 
-            // Cek apakah ada catatan_pengganti yang menunjukkan ID sebelumnya
-            // Format: "Pengganti ID 123, Nama Lama, TMT ..."
-            if (preg_match('/Pengganti ID (\d+)/', $karyawan->catatan_pengganti, $matches)) {
-                $prevId = $matches[1];
+                // Regex lebih fleksibel: Case insensitive, spasi opsional, titik dua opsional
+                if ($karyawan && preg_match('/Pengganti\s+ID\s*:?\s*(\d+)/i', $karyawan->catatan_pengganti ?? '', $matches)) {
+                    $prevId = $matches[1];
+                }
+            }
 
+            if ($prevId) {
                 // Ambil data karyawan sebelumnya
                 $prevKaryawan = DB::table('md_karyawan')
-                    ->join('users', 'md_karyawan.diberhentikan_oleh', '=', 'users.id')
+                    ->leftJoin('users', 'md_karyawan.diberhentikan_oleh', '=', 'users.id')
                     ->where('karyawan_id', $prevId)
                     ->select('md_karyawan.*', 'users.name as deleted_by_name')
                     ->first();
@@ -719,9 +749,9 @@ class PenempatanController extends Controller
                     $history[] = [
                         'nama' => $prevKaryawan->nama_tk,
                         'osis_id' => $prevKaryawan->osis_id,
-                        'tanggal_berhenti' => $prevKaryawan->tanggal_berhenti,
-                        'diberhentikan_oleh' => $prevKaryawan->deleted_by_name,
-                        'catatan' => $prevKaryawan->catatan_berhenti
+                        'tanggal_berhenti' => $historyRecord ? $historyRecord->tanggal_diberhentikan : $prevKaryawan->tanggal_berhenti,
+                        'diberhentikan_oleh' => $prevKaryawan->deleted_by_name ?? '-',
+                        'catatan' => $historyRecord ? $historyRecord->catatan : $prevKaryawan->catatan_berhenti
                     ];
 
                     // Lanjut ke ID sebelumnya
@@ -730,14 +760,6 @@ class PenempatanController extends Controller
                     break;
                 }
             } else {
-                // Cek di riwayat_karyawan (jika ada update in-place/Snapshot)
-                // Logika: Cari riwayat yang tanggal berhentinya sebelum hari ini ATAU statusnya Berhenti
-                // Namun riwayat_karyawan mencatat state SEBELUM berubah.
-
-                // Implementasi sederhana: Cek apakah ada riwayat untuk ID ini yang statusnya 'Berhenti' ? 
-                // Tidak, riwayat di-create SAAT ganti.
-
-                // Jika tidak ada link ke ID lain, kita stop.
                 break;
             }
         }

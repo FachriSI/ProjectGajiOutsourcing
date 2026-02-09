@@ -50,5 +50,6 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Ump::observe(\App\Observers\GlobalActivityObserver::class);
         \App\Models\UnitKerja::observe(\App\Observers\GlobalActivityObserver::class);
         \App\Models\NilaiKontrak::observe(\App\Observers\GlobalActivityObserver::class);
+        \App\Models\Lebaran::observe(\App\Observers\GlobalActivityObserver::class);
     }
 }

@@ -249,9 +249,17 @@ class PaketController extends Controller
             $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
 
             // Ambil karyawan sesuai kuota
-            // MODIFIED: Show ALL employees, ignore kuota limit for display
-            // Ambil semua karyawan (Aktif, Berhenti, Diganti) tanpa dibatasi kuota
-            $terpilih = $aktif->concat($berhenti)->concat($diganti);
+            // REVERTED: Enforce quota limit to match Contract Calculation
+            $terpilih = collect();
+            if ($aktif->count() >= $kuota) {
+                $terpilih = $aktif->take($kuota);
+            } else {
+                $terpilih = $aktif;
+                $sisa = $kuota - $aktif->count();
+                $terpilih = $terpilih->concat($berhenti->take($sisa));
+                $sisa = $kuota - $terpilih->count();
+                $terpilih = $terpilih->concat($diganti->take($sisa));
+            }
 
             $totalActual += $terpilih->count();
 
@@ -1007,25 +1015,77 @@ class PaketController extends Controller
      * Lihat Tagihan - Preview BOQ sebelum download PDF
      * UPDATED: Menyimpan data ke nilai_kontrak untuk tracking
      */
-    public function lihatTagihan($id)
+    public function lihatTagihan(Request $request, $id)
     {
         // Calculate BOQ dan simpan ke nilai_kontrak
         $calculatorService = app(\App\Services\ContractCalculatorService::class);
 
-        // Get latest periode dari nilai_kontrak yang sudah ada, atau current jika belum ada
-        $latestNilai = \App\Models\NilaiKontrak::where('paket_id', $id)
-            ->orderBy('periode', 'desc')
-            ->first();
-        $periode = $latestNilai ? \Carbon\Carbon::parse($latestNilai->periode)->format('Y-m') : \Carbon\Carbon::now()->format('Y-m');
+        // Determine periode: 
+        // 1. From request 'periode' (e.g. "2026-02")
+        // 2. Or latest existing contract
+        // 3. Or current month
+        $periode = $request->periode;
 
-        // Calculate dan simpan
+        if (!$periode) {
+            $latestNilai = \App\Models\NilaiKontrak::where('paket_id', $id)
+                ->orderBy('periode', 'desc')
+                ->first();
+            $periode = $latestNilai ? \Carbon\Carbon::parse($latestNilai->periode)->format('Y-m') : \Carbon\Carbon::now()->format('Y-m');
+        }
+
+        // Calculate dan simpan (re-calculate to ensure fresh data)
         $nilaiKontrak = $calculatorService->calculateForPaket($id, $periode);
 
-        // Tetap gunakan calculateBOQ untuk compatibility dengan view yang ada
-        $boqData = $this->calculateBOQ($id);
+        // Tetap gunakan calculateBOQ untuk compatibility dengan view yang ada, 
+        // TAPI kita perlu adjust calculateBOQ agar bisa terima periode atau kita override datanya di sini.
+        // Masalahnya calculateBOQ() di controller ini hardcoded `now()->format('Y-m')` atau logic lain?
+        // Let's check calculateBOQ implementation again. 
+        // It uses `now()->format('Y-m')`. We should temporarily override logic or pass periode if we refactor `calculateBOQ`.
+        // Ideally `calculateBOQ` should accept `$periode`. 
+        // Since I cannot easily change `calculateBOQ` signature without checking all usages (it might be used elsewhere), 
+        // I will rely on `$nilaiKontrak` which IS calculated with correct period, and populate `$boqData` manually or correct it.
+        
+        // Actually `calculateBOQ` calls `$calculatorService->calculateForPaket($paketId, $periode)` but `$periode` is `now()`.
+        // So `calculateBOQ` returns data for CURRENT month. 
+        // We want data for `$periode`.
+        
+        // BEST FIX: Refactor `calculateBOQ` to accept optional `$periode`.
+        // But to be safe and quick, let's just use the service directly here and construct the data structure expected by the view,
+        // OR pass the correct data from `$nilaiKontrak`.
+        
+        // breakdown_json in $nilaiKontrak has everything `calculateBOQ` returns except 'paket' object and 'vendor'.
+        
+        $breakdown = $nilaiKontrak->breakdown_json;
+        $pengawas = $breakdown['pengawas'];
+        $pelaksana = $breakdown['pelaksana'];
+        $karyawanData = $breakdown['karyawan'];
+        
+        $paket = Paket::with(['paketKaryawan.karyawan.perusahaan', 'unitKerja'])->findOrFail($id);
+        
+        $vendor = null;
+        foreach ($paket->paketKaryawan as $pk) {
+             if ($pk->karyawan && $pk->karyawan->perusahaan) {
+                 $vendor = $pk->karyawan->perusahaan->perusahaan;
+                 break;
+             }
+        }
 
-        // Tambahkan data nilai_kontrak ke boqData
-        $boqData['nilai_kontrak'] = $nilaiKontrak;
+        $totalBOQ = $pengawas['total'] + $pelaksana['total'];
+        
+        $boqData = [
+            'paket' => $paket,
+            'vendor' => $vendor,
+            'jumlah_pekerja' => $pengawas['count'] + $pelaksana['count'],
+            'pengawas' => $pengawas,
+            'pelaksana' => $pelaksana,
+            'karyawan' => $karyawanData,
+            'total_bulanan' => $totalBOQ,
+            'total_tahunan' => $totalBOQ * 12,
+            'total_boq' => $totalBOQ,
+            'ump_sumbar' => $nilaiKontrak->ump_sumbar,
+            'tahun' => \Carbon\Carbon::parse($periode)->format('Y'),
+            'nilai_kontrak' => $nilaiKontrak // Important
+        ];
 
         return view('lihat-tagihan', [
             'boq' => $boqData

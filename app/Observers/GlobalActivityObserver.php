@@ -10,7 +10,7 @@ class GlobalActivityObserver
 {
     public function created(Model $model)
     {
-        $this->logActivity($model, 'Create', 'Created new ' . class_basename($model));
+        $this->logActivity($model, 'Create', 'Created new ' . class_basename($model) . ': ' . $this->getModelIdentifier($model));
     }
 
     public function updated(Model $model)
@@ -20,7 +20,24 @@ class GlobalActivityObserver
         unset($changes['updated_at']);
 
         if (!empty($changes)) {
-            $description = 'Updated ' . class_basename($model) . ' (ID: ' . $model->getKey() . ')';
+            $details = [];
+            $original = $model->getOriginal();
+            
+            foreach ($changes as $key => $newValue) {
+                // Skip long text fields to avoid cluttering logs
+                if (strlen($newValue) > 50) {
+                    $newValue = substr($newValue, 0, 50) . '...';
+                }
+                
+                $oldValue = $original[$key] ?? '-';
+                 if (is_scalar($oldValue) && strlen($oldValue) > 50) {
+                    $oldValue = substr($oldValue, 0, 50) . '...';
+                }
+
+                $details[] = "$key: '$oldValue' -> '$newValue'";
+            }
+
+            $description = 'Updated ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . '). Changes: ' . implode(', ', $details);
             $this->logActivity($model, 'Update', $description);
         }
     }
@@ -34,17 +51,31 @@ class GlobalActivityObserver
              $action = 'Delete';
         }
 
-        $this->logActivity($model, $action, 'Deleted ' . class_basename($model) . ' (ID: ' . $model->getKey() . ')');
+        $this->logActivity($model, $action, 'Deleted ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
     }
 
     public function restored(Model $model)
     {
-        $this->logActivity($model, 'Restore', 'Restored ' . class_basename($model) . ' (ID: ' . $model->getKey() . ')');
+        $this->logActivity($model, 'Restore', 'Restored ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
     }
 
     public function forceDeleted(Model $model)
     {
-        $this->logActivity($model, 'Force Delete', 'Permanently deleted ' . class_basename($model) . ' (ID: ' . $model->getKey() . ')');
+        $this->logActivity($model, 'Force Delete', 'Permanently deleted ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
+    }
+
+    protected function getModelIdentifier(Model $model)
+    {
+        // Try common name attributes
+        $candidates = ['name', 'nama', 'title', 'judul', 'description', 'keterangan', 'paket', 'unit_kerja', 'perusahaan'];
+        
+        foreach ($candidates as $attribute) {
+            if (!empty($model->$attribute) && is_scalar($model->$attribute)) {
+                return $model->$attribute . ' (ID: ' . $model->getKey() . ')';
+            }
+        }
+        
+        return 'ID: ' . $model->getKey();
     }
 
     protected function logActivity(Model $model, $action, $description)

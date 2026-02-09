@@ -11,6 +11,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Services\ContractValidationService;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class NilaiKontrakController extends Controller
 {
@@ -215,41 +217,118 @@ class NilaiKontrakController extends Controller
         return $nilaiKontrak;
     }
 
-    public function cetakThr($paket_id)
+    public function cetakThr(Request $request, $paket_id, ContractValidationService $validationService)
     {
-        $nilaiKontrak = NilaiKontrak::with(['paket.unitKerja'])
-            ->where('paket_id', $paket_id)
-            ->orderBy('periode', 'desc')
+        $query = NilaiKontrak::with(['paket.unitKerja', 'paket.paketKaryawan.karyawan.perusahaan'])
+            ->where('paket_id', $paket_id);
+
+        if ($request->has('periode')) {
+            $query->where('periode', $request->periode);
+        }
+
+        $nilaiKontrak = $query->orderBy('periode', 'desc')
             ->firstOrFail();
+
+        // 1. Get Lebaran Date
+        $lebaran = \App\Models\Lebaran::where('tahun', $nilaiKontrak->tahun)->where('is_deleted', 0)->first();
+        
+        if (!$lebaran) {
+            return back()->with('error', 'Tanggal Lebaran untuk tahun ' . $nilaiKontrak->tahun . ' belum diatur. Silakan atur di menu Data Lebaran.');
+        }
+
+        $tanggalLebaran = \Carbon\Carbon::parse($lebaran->tanggal);
+        // Eligibility Cutoff: 1st day of the Eid month
+        $cutoffDate = $tanggalLebaran->copy()->startOfMonth();
 
         $breakdown = $nilaiKontrak->breakdown_json ?? [];
         
         $totalBasicThr = 0;
+        $filteredKaryawanCount = 0;
+
         foreach (($breakdown['karyawan'] ?? []) as $karyawan) {
-            $upah = $karyawan['upah_pokok'] ?? 0;
-            $tjTetap = $karyawan['tj_tetap'] ?? 0;
-            $tjLokasi = $karyawan['tj_lokasi'] ?? 0;
-            // THR = 1 month salary (Upah + Tj Tetap + Tj Lokasi)
-            $totalBasicThr += ($upah + $tjTetap + $tjLokasi);
+            // Check eligibility against current DB status
+            $karyawanDb = \App\Models\Karyawan::find($karyawan['karyawan_id']);
+            
+            if (!$karyawanDb) continue;
+
+            $isEligible = false;
+
+            // Rule: Aktif OR (Resigned but worked until >= 1st of Eid Month)
+            if ($karyawanDb->status_aktif == 'Aktif') {
+                $isEligible = true;
+            } else {
+                if ($karyawanDb->tanggal_berhenti) {
+                    $tglBerhenti = \Carbon\Carbon::parse($karyawanDb->tanggal_berhenti);
+                    if ($tglBerhenti->gte($cutoffDate)) {
+                        $isEligible = true;
+                    }
+                }
+            }
+
+            if ($isEligible) {
+                $upah = $karyawan['upah_pokok'] ?? 0;
+                $tjTetap = $karyawan['tj_tetap'] ?? 0;
+                $tjLokasi = $karyawan['tj_lokasi'] ?? 0;
+                // THR = 1 month salary (Upah + Tj Tetap + Tj Lokasi)
+                $totalBasicThr += ($upah + $tjTetap + $tjLokasi);
+                $filteredKaryawanCount++;
+            }
         }
 
         // Fee THR 5%
         $feeThr = $totalBasicThr * 0.05;
         $totalNilaiThr = $totalBasicThr + $feeThr;
 
+        // QR Code Validation Logic
+        $validation = \App\Models\ContractValidation::where('nilai_kontrak_id', $nilaiKontrak->id)
+            ->where('metadata->type', 'THR')
+            ->where('metadata->tahun', $nilaiKontrak->tahun)
+            ->first();
+
+        if (!$validation) {
+            $validation = $validationService->createValidation($nilaiKontrak, auth()->id(), null, [
+                'type' => 'THR',
+                'tahun' => $nilaiKontrak->tahun,
+                'description' => 'Dokumen THR Tahun ' . $nilaiKontrak->tahun
+            ]);
+        }
+
+        $validationUrl = route('contract.validate', $validation->validation_token);
+        $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate($validationUrl));
+
+        // Find vendor details
+        $vendorName = '-';
+        $vendorLeader = '-';
+        $vendorPosition = '-';
+
+        // Iterate through paket employees to find the vendor (assuming consistent vendor per packet)
+        foreach ($nilaiKontrak->paket->paketKaryawan as $pk) {
+            if ($pk->karyawan && $pk->karyawan->perusahaan) {
+                $vendorName = $pk->karyawan->perusahaan->perusahaan;
+                $vendorLeader = $pk->karyawan->perusahaan->cp; // Contact Person
+                $vendorPosition = $pk->karyawan->perusahaan->cp_jab; // Contact Person Jabatan
+                break;
+            }
+        }
+
         $data = [
-            'nama_perusahaan' => 'PT Semen Padang', 
+            'nama_perusahaan' => $vendorName,
+            'pimpinan_vendor' => $vendorLeader,
+            'jabatan_vendor' => $vendorPosition,
             'paket' => $nilaiKontrak->paket->paket,
             'periode_tagihan' => 'THR Tahun ' . $nilaiKontrak->tahun,
-            'jumlah_pekerja' => $nilaiKontrak->jumlah_karyawan_total,
+            'jumlah_pekerja' => $filteredKaryawanCount,
             'unit_kerja' => $nilaiKontrak->paket->unitKerja->unit_kerja ?? '-',
-            'pekerjaan_pos' => '-', 
+            'pekerjaan_pos' => $nilaiKontrak->paket->paket, 
             'nilai_thr' => $totalBasicThr,
             'fee_thr' => $feeThr,
-            'total' => $totalNilaiThr
+            'total' => $totalNilaiThr,
+            'qr_code' => $qrCode,
+            'validation_url' => $validationUrl
         ];
 
         $pdf = \PDF::loadView('pdf.thr', compact('data', 'nilaiKontrak'));
+        $pdf->setPaper('A4', 'portrait');
         return $pdf->stream('THR_' . $nilaiKontrak->paket->paket . '_' . $nilaiKontrak->tahun . '.pdf');
     }
 

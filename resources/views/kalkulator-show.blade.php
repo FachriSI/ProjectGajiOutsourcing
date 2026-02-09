@@ -3,7 +3,12 @@
 @section('title', 'Detail Kontrak')
 
 @section('content')
-    <h3 class="mt-4">Detail Nilai Kontrak</h3>
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <h3>Detail Nilai Kontrak</h3>
+        <a href="{{ route('paket.tagihan', ['id' => $nilaiKontrak->paket_id, 'periode' => \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y-m')]) }}" class="btn btn-primary">
+            <i class="fas fa-file-invoice-dollar me-2"></i>Lihat Tagihan Lengkap
+        </a>
+    </div>
     <p class="text-muted">Rincian lengkap perhitungan nilai kontrak untuk paket {{ $nilaiKontrak->paket->paket }}</p>
 
     <div class="container-fluid px-0">

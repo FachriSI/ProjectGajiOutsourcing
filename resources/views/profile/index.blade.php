@@ -43,7 +43,7 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 <span class="small fw-bold text-muted">Role</span>
-                                <span class="badge bg-primary rounded-pill">Admin</span>
+                                <span class="badge bg-primary rounded-pill">{{ $user->role ?? 'User' }}</span>
                             </li>
                         </ul>
                     </div>
@@ -62,6 +62,9 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="ps-4">Time</th>
+                                        @if(auth()->user()->role === 'Admin')
+                                            <th>User</th>
+                                        @endif
                                         <th>Action</th>
                                         <th>Description</th>
                                         <th class="pe-4">IP Address</th>
@@ -73,6 +76,9 @@
                                         <td class="ps-4 text-nowrap small text-muted">
                                             <i class="far fa-clock me-1"></i> {{ $log->created_at->format('d M Y H:i') }}
                                         </td>
+                                        @if(auth()->user()->role === 'Admin')
+                                            <td class="small fw-bold">{{ $log->user->name ?? 'Unknown' }}</td>
+                                        @endif
                                         <td>
                                             @if($log->action == 'Login')
                                                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Login</span>
@@ -89,7 +95,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-4">
+                                        <td colspan="{{ auth()->user()->role === 'Admin' ? 5 : 4 }}" class="text-center py-4">
                                             <div class="d-flex flex-column align-items-center">
                                                 <i class="fas fa-search fa-2x text-muted mb-2"></i>
                                                 <p class="text-muted mb-0">No activity logs found.</p>

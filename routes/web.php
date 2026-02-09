@@ -278,6 +278,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/kota/{provinsi_id}', [WilayahController::class, 'getKota']);
 
+    // Routes for Lebaran
+    Route::get('/lebaran', [App\Http\Controllers\LebaranController::class, 'index']);
+    Route::get('/gettambah-lebaran', [App\Http\Controllers\LebaranController::class, 'getTambah']);
+    Route::post('/tambah-lebaran', [App\Http\Controllers\LebaranController::class, 'setTambah']);
+    Route::get('/lebaran/trash', [App\Http\Controllers\LebaranController::class, 'trash']);
+    Route::get('/getupdate-lebaran/{id}', [App\Http\Controllers\LebaranController::class, 'getUpdate']);
+    Route::post('/update-lebaran/{id}', [App\Http\Controllers\LebaranController::class, 'setUpdate']);
+    Route::get('/delete-lebaran/{id}', [App\Http\Controllers\LebaranController::class, 'destroy']);
+    Route::get('/restore-lebaran/{id}', [App\Http\Controllers\LebaranController::class, 'restore']);
+
     // Routes untuk Tagihan
     Route::get('/paket/{id}/tagihan', [PaketController::class, 'lihatTagihan'])->name('paket.tagihan');
     Route::get('/paket/{id}/pdf', [PaketController::class, 'generatePDF'])->name('paket.pdf.download');

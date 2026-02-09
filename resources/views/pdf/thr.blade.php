@@ -5,124 +5,164 @@
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
         }
         .header {
+            text-align: center;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         .title {
             font-size: 14px;
-            text-decoration: underline;
+            /* text-decoration: underline; */
+        }
+        .subtitle {
+            font-size: 12px;
         }
         .table-data {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .table-data td {
-            padding: 5px;
+            padding: 4px;
             border: 1px solid black;
         }
-        .table-data tr:nth-child(odd) {
-            background-color: #f2f2f2;
-        }
         .label-col {
-            width: 30%;
+            width: 35%;
             font-weight: bold;
         }
         .sep-col {
             width: 2%;
             text-align: center;
         }
+        .val-col {
+            width: 63%;
+        }
         .footer {
-            margin-top: 50px;
+            margin-top: 40px;
             width: 100%;
         }
-        .signature-box {
-            width: 30%;
-            float: right;
+        .signature-table {
+            width: 100%;
+            margin-top: 30px;
+        }
+        .signature-table td {
+            vertical-align: top;
             text-align: center;
         }
         .notes {
             font-size: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
+        }
+        .currency {
+            float: left;
+        }
+        .amount {
+            float: right;
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="title">Nilai Tunjangan Hari Raya Keagamaan (THR) Tahun {{ $nilaiKontrak->tahun }}</div>
-        <div>Kontrak Pekerjaan Jasa Penunjang Operasional PT Semen Padang</div>
+        <div class="title">Perhitungan Tagihan Tunjangan Hari Raya Keagamaan (THR) Tahun {{ $nilaiKontrak->tahun }}</div>
+        <div class="subtitle">Kontrak Pekerjaan Jasa Penunjang Operasional PT Semen Padang</div>
     </div>
 
-    <table class="table-data">
+    <table class="table-data" style="width: 80%;">
         <tr>
             <td class="label-col">Nama Perusahaan</td>
             <td class="sep-col">:</td>
-            <td>{{ $data['nama_perusahaan'] }}</td>
+            <td class="val-col">{{ $data['nama_perusahaan'] }}</td>
         </tr>
         <tr>
             <td class="label-col">Paket</td>
             <td class="sep-col">:</td>
-            <td>{{ $data['paket'] }}</td>
-        </tr>
-        <tr>
-            <td class="label-col">Periode Tagihan</td>
-            <td class="sep-col">:</td>
-            <td>{{ $data['periode_tagihan'] }}</td>
-        </tr>
-        <tr>
-            <td class="label-col">Jumlah Pekerja Alih Daya</td>
-            <td class="sep-col">:</td>
-            <td>{{ $data['jumlah_pekerja'] }} Orang</td>
+            <td class="val-col">{{ $data['paket'] }}</td>
         </tr>
         <tr>
             <td class="label-col">Unit Kerja</td>
             <td class="sep-col">:</td>
-            <td>{{ $data['unit_kerja'] }}</td>
+            <td class="val-col">{{ $data['unit_kerja'] }}</td>
         </tr>
         <tr>
-            <td class="label-col">Pekerjaan POS</td>
+            <td class="label-col">Tagihan</td>
             <td class="sep-col">:</td>
-            <td>{{ $data['pekerjaan_pos'] }}</td>
+            <td class="val-col">{{ $data['periode_tagihan'] }}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Jumlah Pekerja Alih Daya</td>
+            <td class="sep-col">:</td>
+            <td class="val-col">{{ $data['jumlah_pekerja'] }} orang</td>
         </tr>
         <tr>
             <td class="label-col">Nilai THR</td>
             <td class="sep-col">:</td>
-            <td>Rp {{ number_format($data['nilai_thr'], 0, ',', '.') }}</td>
+            <td class="val-col">
+                <span class="currency">Rp</span>
+                <span class="amount">{{ number_format($data['nilai_thr'], 0, ',', '.') }}</span>
+            </td>
         </tr>
         <tr>
-            <td class="label-col">Fee THR</td>
+            <td class="label-col">Fee Nilai THR</td>
             <td class="sep-col">:</td>
-            <td>Rp {{ number_format($data['fee_thr'], 0, ',', '.') }}</td>
+            <td class="val-col">
+                <span class="currency">Rp</span>
+                <span class="amount">{{ number_format($data['fee_thr'], 0, ',', '.') }}</span>
+            </td>
         </tr>
-        <tr style="font-weight: bold; background-color: #ddd;">
+        <tr style="font-weight: bold;">
             <td class="label-col">TOTAL NILAI THR</td>
             <td class="sep-col">:</td>
-            <td>Rp {{ number_format($data['total'], 0, ',', '.') }}</td>
+            <td class="val-col">
+                <span class="currency">Rp</span>
+                <span class="amount">{{ number_format($data['total'], 0, ',', '.') }}</span>
+            </td>
         </tr>
     </table>
 
-    <div class="notes">
+    <div class="notes" style="width: 80%; margin: 0 auto;">
         * Total nilai THR diatas sudah termasuk Fee Pengusaha (sesuai proposal yang disetujui Direksi PT Semen Padang)<br>
         * Permintaan Pembayaran harus ditambahkan PPh dan PPN<br>
         <br>
-        Catatan:<br>
+        Catatan :<br>
         - Pembayaran THR kepada tenaga kerja sesuai dengan peraturan perundang-undangan yang berlaku.<br>
-        - Bukti pembayaran THR kepada tenaga kerja wajib dilampirkan pada tagihan bulan ... {{ $nilaiKontrak->tahun }}.
+        - Bukti pembayaran THR kepada tenaga kerja wajib dilampirkan pada tagihan bulan Februari {{ $nilaiKontrak->tahun }} yang ditagih pada bulan Maret {{ $nilaiKontrak->tahun }}.
     </div>
 
-    <div class="footer">
-        <div class="signature-box">
-            <p>Padang, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-            <p>Unit Operasional HC</p>
-            <br><br><br>
-            <p style="text-decoration: underline; font-weight: bold;">Verdy Radinal Gusman</p>
-            <p>Kepala</p>
+    <table class="signature-table">
+        <tr>
+            <td width="33%">
+                Disetujui oleh,<br><br><br><br><br>
+                (Pimpinan Unit)<br>
+                Ka. Unit Kerja
+            </td>
+            <td width="33%"></td>
+            <td width="33%">
+                Padang, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+                {{ $data['nama_perusahaan'] }}<br><br><br><br>
+                ({{ $data['pimpinan_vendor'] }})<br>
+                {{ $data['jabatan_vendor'] }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align: center; padding-top: 30px;">
+                Mengetahui,<br><br><br><br><br>
+                (Verdy Radinal Gusman)<br>
+                Ka. Unit Operasional HC
+            </td>
+        </tr>
+    </table>
+
+    @if(isset($data['qr_code']))
+        <div style="position: absolute; bottom: 0; right: 0; text-align: center;">
+            <img src="data:image/svg+xml;base64,{{ $data['qr_code'] }}" alt="QR Code" width="60"><br>
+            <div style="font-size: 8px; margin-top: 5px;">Scan untuk validasi</div>
         </div>
-    </div>
+    @endif
 
 </body>
 </html>
