@@ -68,7 +68,11 @@ class PaketController extends Controller
         // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
         $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();
         $availableKaryawan = Karyawan::whereNotIn('karyawan_id', $assignedKaryawanIds)
-                                     ->where('status_aktif', 'Aktif') // Optional: Only Active employees
+                                     ->where(function($q) {
+                                         $q->where('status_aktif', 'Aktif')
+                                           ->orWhereNull('status_aktif')
+                                           ->orWhere('status_aktif', '');
+                                     })
                                      ->orderBy('nama_tk')
                                      ->get();
 
@@ -199,6 +203,7 @@ class PaketController extends Controller
         //$hasDeleted = Paket::where('is_deleted', 1)->exists();
         $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
 
+        return view('paket', compact(
             'data', 'hasDeleted', 
             'total_jml_fix_cost', 'total_seluruh_variabel', 'total_kontrak_all', 
             'total_kontrak_tahunan_all', 'total_thr_bln', 'total_thr_thn', 'total_pakaian_all',
@@ -841,25 +846,7 @@ class PaketController extends Controller
 //     }
 
 
-<<<<<<< HEAD
-        // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
-        $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();
-        $availableKaryawan = Karyawan::whereNotIn('karyawan_id', $assignedKaryawanIds)
-                                     ->where(function($q) {
-                                         $q->where('status_aktif', 'Aktif')
-                                           ->orWhereNull('status_aktif')
-                                           ->orWhere('status_aktif', '');
-                                     })
-                                     ->orderBy('nama_tk')
-                                     ->get();
 
-        // $hasDeleted = Paket::where('is_deleted', 1)->exists();
-        $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
-        return view('data_paket', ['data' => $data, 'hasDeleted' => $hasDeleted, 'availableKaryawan' => $availableKaryawan]);
-
-    }
-=======
->>>>>>> a87cf20d6d5a1f824899aa3fab0aef791ccb95ed
 
     public function getTambah()
     {
