@@ -20,39 +20,43 @@
 
     <!-- Modal Import Excel -->
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import
-                        Data
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import Data Karyawan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ url('/import-karyawan') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span>1. Download Template:</span>
-                            <a href="{{ route('template.karyawan') }}" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-download"></i> Download Template
-                            </a>
-                        </div>
-                        <hr>
+                <div class="modal-body">
+                    <!-- Info Box -->
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Gunakan fitur ini untuk menambah karyawan pengganti secara massal.
+                        <br><strong>Kolom Template:</strong> OSIS ID Lama, OSIS ID Baru, No KTP, Nama, Tanggal Lahir, dsb.
+                    </div>
+
+                    <!-- 1. Download Template -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold">1. Download Template Karyawan:</span>
+                        <a href="{{ route('template.karyawan') }}" class="btn btn-outline-success">
+                            <i class="fas fa-download me-1"></i> Download Template
+                        </a>
+                    </div>
+
+                    <!-- 2. Upload File -->
+                    <form action="{{ url('/import-karyawan') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
                         <div class="mb-3">
-                            <label for="file" class="form-label">2. Upload File Excel:</label>
-                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv"
-                                required>
-                            <div class="form-text">Format yang didukung: .xlsx, .xls, .csv</div>
+                            <span class="fw-bold">2. Upload File Karyawan (Excel):</span>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-upload"></i> Import
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    </div>
-                </form>
+                        <div class="mb-3">
+                            <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload me-1"></i> Import Karyawan
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -283,6 +287,7 @@
                                 </div>
                                 <span class="text-muted me-2">|</span>
                             </div>
+                        `;
                         // Create a wrapper for same-line alignment without affecting siblings (pagination)
                         const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
                         infoDiv.before(flexWrapper);

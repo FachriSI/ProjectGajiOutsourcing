@@ -15,7 +15,7 @@
                     </a>
                 @endif
                 <a href="/gettambah-jabatan" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah Tunjangan Jabatan
                 </a>
             </div>
         </div>

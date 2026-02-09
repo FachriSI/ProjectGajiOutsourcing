@@ -64,17 +64,17 @@ class PaketController extends Controller
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
 
         $allPakets = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
-        
+
         // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
         $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();
         $availableKaryawan = Karyawan::whereNotIn('karyawan_id', $assignedKaryawanIds)
-                                     ->where(function($q) {
-                                         $q->where('status_aktif', 'Aktif')
-                                           ->orWhereNull('status_aktif')
-                                           ->orWhere('status_aktif', '');
-                                     })
-                                     ->orderBy('nama_tk')
-                                     ->get();
+            ->where(function ($q) {
+                $q->where('status_aktif', 'Aktif')
+                    ->orWhereNull('status_aktif')
+                    ->orWhere('status_aktif', '');
+            })
+            ->orderBy('nama_tk')
+            ->get();
 
         foreach ($allPakets as $paket) {
             $kuota = (int) $paket->kuota_paket;
@@ -166,26 +166,10 @@ class PaketController extends Controller
         }
 
         // MCU Calculation
-        $mcu = \App\Models\MedicalCheckup::latest()->first();
+        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
         $mcu_cost = $mcu->biaya ?? 0;
 
-        // Count total active employees across all packages for MCU total
-        // We can reuse the loop or do a query. Reusing loop seems safer for consistency with other totals.
-        $total_active_employees_all = 0;
-        foreach ($allPakets as $paket) {
-            // ... (existing logic to get terpilih) ...
-            // Logic to count terpilih is already inside the loop, need to capture it.
-            // But existing loop iterates $terpilih to calculate costs.
-            // We can just add to count here.
-        }
-        // Wait, the loop above (lines 50-135) iterates through selected employees.
-        // I can just increment a counter there.
 
-        // OR, simpler:
-        // Just add $total_mcu_all variable.
-
-        // Let's modify the loop section instead of adding a new block here.
-        // I will use a different chunk for that.
 
         $total_mcu_all = $total_active_employees_all * $mcu_cost;
 
@@ -204,10 +188,17 @@ class PaketController extends Controller
         $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
 
         return view('paket', compact(
-            'data', 'hasDeleted', 
-            'total_jml_fix_cost', 'total_seluruh_variabel', 'total_kontrak_all', 
-            'total_kontrak_tahunan_all', 'total_thr_bln', 'total_thr_thn', 'total_pakaian_all',
-            'availableKaryawan', 'total_mcu_all'
+            'data',
+            'hasDeleted',
+            'total_jml_fix_cost',
+            'total_seluruh_variabel',
+            'total_kontrak_all',
+            'total_kontrak_tahunan_all',
+            'total_thr_bln',
+            'total_thr_thn',
+            'total_pakaian_all',
+            'availableKaryawan',
+            'total_mcu_all'
         ));
     }
 
@@ -238,7 +229,7 @@ class PaketController extends Controller
             }
         ])->latest('beg_date')->get()->groupBy('karyawan_id');
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
-        $mcu = \App\Models\MedicalCheckup::latest()->first();
+        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
 
         // Filter: Only for this package
         $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
@@ -326,7 +317,7 @@ class PaketController extends Controller
         $selectedPeriode = request('periode'); // Get period from request
 
         // MCU Calculation for this package
-        $mcu = \App\Models\MedicalCheckup::latest()->first();
+        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
         $mcu_cost = $mcu->biaya ?? 0;
         $total_mcu_paket = $totalActual * $mcu_cost; // $totalActual is calculated in the loop (count of $terpilih)
 

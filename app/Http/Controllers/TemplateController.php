@@ -109,4 +109,87 @@ class TemplateController extends Controller
 
         return Excel::download(new TemplateExport($headings, $data), 'template_import_karyawan.xlsx');
     }
+
+    public function downloadPaket()
+    {
+        // Headers based on Paket table structure
+        // Columns: Nama Paket, Kuota (Orang), Unit Kerja
+        $headings = [
+            'Nama Paket',
+            'Kuota (Orang)',
+            'Unit Kerja (Nama Unit)'
+        ];
+
+        $data = [
+            ['Paket 1212', '10', 'Unit Konsumsi'],
+            ['Paket 1313', '15', 'Unit Keamanan'],
+        ];
+
+        return Excel::download(new TemplateExport($headings, $data), 'template_import_paket.xlsx');
+    }
+
+    public function downloadLokasi()
+    {
+        // Headers based on Lokasi table structure
+        $headings = [
+            'Nama Lokasi',
+            'Jenis (Provinsi/Kabupaten/Kota)'
+        ];
+
+        $data = [
+            ['Padang', 'Kota'],
+            ['Bukittinggi', 'Kota'],
+            ['Pesisir Selatan', 'Kabupaten'],
+        ];
+
+        return Excel::download(new TemplateExport($headings, $data), 'template_import_lokasi.xlsx');
+    }
+
+    public function downloadDepartemen()
+    {
+        $headings = [
+            'Nama Departemen',
+            'Is SI (1=Ya, 0=Tidak)'
+        ];
+
+        $data = [
+            ['IT Department', 1],
+            ['HR Department', 0],
+            ['Finance Department', 0],
+        ];
+
+        return Excel::download(new TemplateExport($headings, $data), 'template_import_departemen.xlsx');
+    }
+
+    public function downloadFungsi()
+    {
+        $headings = [
+            'Nama Fungsi',
+            'Keterangan'
+        ];
+
+        $data = [
+            ['Admin', 'Administrasi kantor'],
+            ['Security', 'Keamanan gedung'],
+            ['Cleaning Service', 'Kebersihan gedung'],
+        ];
+
+        return Excel::download(new TemplateExport($headings, $data), 'template_import_fungsi.xlsx');
+    }
+
+    public function downloadUnitKerja()
+    {
+        $headings = [
+            'ID Unit',
+            'Nama Unit Kerja'
+        ];
+
+        $data = [
+            ['UK001', 'Unit Keamanan'],
+            ['UK002', 'Unit Kebersihan'],
+            ['UK003', 'Unit Operasional'],
+        ];
+
+        return Excel::download(new TemplateExport($headings, $data), 'template_import_unitkerja.xlsx');
+    }
 }

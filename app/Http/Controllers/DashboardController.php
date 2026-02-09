@@ -184,10 +184,16 @@ class DashboardController extends Controller
         // 8. Paket Analysis - Two separate visualizations
 
         // 8a. Top 10 Paket by Kuota Terbesar (informational)
+        // Fixed: Handle invalid beg_date values ('0000-00-00') by checking for valid dates OR invalid/null dates
         $topPaketKuota = Paket::select('paket_id', 'paket', 'kuota_paket')
             ->withCount([
                 'paketKaryawan as terisi' => function ($query) {
-                    $query->whereDate('beg_date', '<=', now())
+                    $query->where(function ($q) {
+                        // Include records with valid beg_date <= now OR invalid dates ('0000-00-00', NULL)
+                        $q->whereDate('beg_date', '<=', now())
+                            ->orWhere('beg_date', '0000-00-00')
+                            ->orWhereNull('beg_date');
+                    })
                         ->whereHas('karyawan', function ($q) {
                             $q->where('status_aktif', 'Aktif');
                         });
@@ -206,10 +212,16 @@ class DashboardController extends Controller
             });
 
         // 8b. Top 10 Paket by % Kuota Kosong Terbesar (actionable)
+        // Fixed: Handle invalid beg_date values ('0000-00-00') by checking for valid dates OR invalid/null dates
         $topPaketKosong = Paket::select('paket_id', 'paket', 'kuota_paket')
             ->withCount([
                 'paketKaryawan as terisi' => function ($query) {
-                    $query->whereDate('beg_date', '<=', now())
+                    $query->where(function ($q) {
+                        // Include records with valid beg_date <= now OR invalid dates ('0000-00-00', NULL)
+                        $q->whereDate('beg_date', '<=', now())
+                            ->orWhere('beg_date', '0000-00-00')
+                            ->orWhereNull('beg_date');
+                    })
                         ->whereHas('karyawan', function ($q) {
                             $q->where('status_aktif', 'Aktif');
                         });
@@ -237,10 +249,11 @@ class DashboardController extends Controller
 
 
         // 9. Cost Analysis (Unit Kerja Cost)
-        // Tables: nilai_kontrak -> md_paket -> md_unit_kerja
-        $unitKerjaCost = \App\Models\NilaiKontrak::join('md_paket', 'nilai_kontrak.paket_id', '=', 'md_paket.paket_id')
-            ->selectRaw('md_paket.paket, SUM(nilai_kontrak.total_nilai_kontrak) as total_biaya')
-            ->groupBy('md_paket.paket')
+        // Tables: md_paket -> nilai_kontrak (LEFT JOIN to show 0 if no contract)
+        $unitKerjaCost = \App\Models\Paket::leftJoin('nilai_kontrak', 'md_paket.paket_id', '=', 'nilai_kontrak.paket_id')
+            ->selectRaw('md_paket.paket, COALESCE(SUM(nilai_kontrak.total_nilai_kontrak), 0) as total_biaya')
+            ->where('md_paket.is_deleted', 0)
+            ->groupBy('md_paket.paket_id', 'md_paket.paket')
             ->orderByDesc('total_biaya')
             ->take(10)
             ->pluck('total_biaya', 'paket');

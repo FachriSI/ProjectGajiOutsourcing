@@ -230,6 +230,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/templates/pakaian', [App\Http\Controllers\TemplateController::class, 'downloadPakaian'])->name('template.pakaian');
     Route::get('/templates/perusahaan', [App\Http\Controllers\TemplateController::class, 'downloadPerusahaan'])->name('template.perusahaan');
     Route::get('/templates/karyawan', [App\Http\Controllers\TemplateController::class, 'downloadKaryawan'])->name('template.karyawan');
+    Route::get('/templates/paket', [App\Http\Controllers\TemplateController::class, 'downloadPaket'])->name('template.paket');
+
+    // Import Paket
+    Route::post('/import-paket', [ImportController::class, 'importPaket']);
+
+    // Template & Import Lokasi
+    Route::get('/templates/lokasi', [App\Http\Controllers\TemplateController::class, 'downloadLokasi'])->name('template.lokasi');
+    Route::post('/import-lokasi', [ImportController::class, 'importLokasi']);
+
+    // Template & Import Departemen
+    Route::get('/templates/departemen', [App\Http\Controllers\TemplateController::class, 'downloadDepartemen'])->name('template.departemen');
+    Route::post('/import-departemen', [ImportController::class, 'importDepartemen']);
+
+    // Template & Import Fungsi
+    Route::get('/templates/fungsi', [App\Http\Controllers\TemplateController::class, 'downloadFungsi'])->name('template.fungsi');
+    Route::post('/import-fungsi', [ImportController::class, 'importFungsi']);
+
+    // Template & Import Unit Kerja
+    Route::get('/templates/unitkerja', [App\Http\Controllers\TemplateController::class, 'downloadUnitKerja'])->name('template.unitkerja');
+    Route::post('/import-unitkerja', [ImportController::class, 'importUnitKerja']);
 
     Route::get('/paket', [PaketController::class, 'index'])->name('paket.index');
     Route::get('/paket/sampah', [PaketController::class, 'trash']);

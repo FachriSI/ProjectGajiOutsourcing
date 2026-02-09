@@ -15,7 +15,7 @@
                     </a>
                 @endif
                 <a href="/gettambah-kuotajam" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah Kuota Jam
                 </a>
             </div>
         </div>
@@ -63,7 +63,11 @@
                                 <td class="text-center">
                                     <div class="small text-dark">
                                         <i class="far fa-calendar-alt me-1"></i>
-                                        {{ \Carbon\Carbon::parse($item->beg_date)->translatedFormat('d F Y') }}
+                                        @if($item->beg_date && $item->beg_date != '0000-00-00')
+                                            {{ \Carbon\Carbon::parse($item->beg_date)->translatedFormat('d F Y') }}
+                                        @else
+                                            -
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="text-center">

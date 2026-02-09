@@ -6,7 +6,7 @@
         <div class="card-body">
             <form action="/tambah-masakerja" method="POST">@csrf
                 <div class="mb-3"><label class="form-label">Karyawan</label>
-                    <select class="form-select" name="karyawan_id" required>
+                    <select class="form-select select2" name="karyawan_id" required>
                         <option value="">-- Pilih Karyawan --</option>
                         @foreach ($karyawan as $k)<option value="{{ $k->karyawan_id }}">{{ $k->nama_tk }}</option>
                         @endforeach

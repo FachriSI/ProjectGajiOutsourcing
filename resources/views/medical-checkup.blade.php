@@ -16,7 +16,7 @@
                     </a>
                 @endif
                 <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah Medical Checkup
                 </button>
             </div>
         </div>

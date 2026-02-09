@@ -15,7 +15,7 @@
                     </a>
                 @endif
                 <a href="/gettambah-harianshift" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah Harian/Shift
                 </a>
             </div>
         </div>

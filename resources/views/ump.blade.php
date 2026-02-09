@@ -17,7 +17,7 @@
                     </a>
                 @endif
                 <a href="/gettambah-ump" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah UMP
                 </a>
             </div>
         </div>

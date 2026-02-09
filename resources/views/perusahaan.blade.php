@@ -35,42 +35,47 @@
     <!-- Modal Import Excel Template Baru -->
     <div class="modal fade" id="importTemplateBaruModal" tabindex="-1" aria-labelledby="importTemplateBaruModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-warning text-white">
-                    <h5 class="modal-title" id="importTemplateBaruModalLabel"><i class="fas fa-file-import me-2"></i>Import
-                        Perusahaan</h5>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="importTemplateBaruModalLabel"><i class="fas fa-file-excel me-2"></i>Template
+                        & Import Data Perusahaan</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <form action="{{ url('/import-template-baru') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk mengimport data perusahaan baru.
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span>1. Download Template Perusahaan:</span>
-                            <a href="{{ route('template.perusahaan') }}" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-download"></i> Download Template
-                            </a>
-                        </div>
-                        <hr>
+                <div class="modal-body">
+                    <!-- Info Box -->
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Gunakan fitur ini untuk menambah atau mengupdate data
+                        perusahaan secara massal.
+                        <br><strong>Kolom Template:</strong> No, Nama, Alamat, CP, CP Jabatan, CP Telp, CP Email, ID Mesin,
+                        Deleted, TKP, NPP
+                    </div>
+
+                    <!-- 1. Download Template -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold">1. Download Template Perusahaan:</span>
+                        <a href="{{ route('template.perusahaan') }}" class="btn btn-outline-success">
+                            <i class="fas fa-download me-1"></i> Download Template
+                        </a>
+                    </div>
+
+                    <!-- 2. Upload File -->
+                    <form action="{{ url('/import-template-baru') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
                         <div class="mb-3">
-                            <label for="file" class="form-label">2. Upload File Excel:</label>
-                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx, .xls, .csv"
-                                required>
-                            <div class="form-text">Pastikan format kolom: No, Nama, Alamat, CP, CPJAB, CPTelp, CPEmail,
-                                idMesin, Deleted, TKP, NPP</div>
+                            <span class="fw-bold">2. Upload File Perusahaan (Excel):</span>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-warning text-white">
-                            <i class="fas fa-upload"></i> Import Data
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    </div>
-                </form>
+                        <div class="mb-3">
+                            <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload me-1"></i> Import Perusahaan
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -168,14 +173,14 @@
                             // Create the checkbox HTML with separator
                             const switchId = 'showAllSwitch_perusahaan';
                             const checkboxHtml = `
-                                            <div class="d-inline-block me-2" style="vertical-align: middle;">
-                                                <div class="form-check d-inline-block me-2">
-                                                    <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
-                                                    <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
-                                                </div>
-                                                <span class="text-muted me-2">|</span>
-                                            </div>
-                                        `;
+                                                    <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                                        <div class="form-check d-inline-block me-2">
+                                                            <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                                            <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                                        </div>
+                                                        <span class="text-muted me-2">|</span>
+                                                    </div>
+                                                `;
 
                             // Create a wrapper for same-line alignment without affecting siblings (pagination)
                             const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');

@@ -16,9 +16,57 @@
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
+
+                <!-- Button Template & Import -->
+                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#templatePaketModal" title="Template & Import Data">
+                    <i class="fas fa-file-excel me-1"></i> Import / Template
+                </button>
+
                 <a href="/gettambah-paket" class="btn btn-primary shadow-sm">
                     <i class="fas fa-plus me-1"></i> Tambah Paket
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Template & Import Paket -->
+    <div class="modal fade" id="templatePaketModal" tabindex="-1" aria-labelledby="templatePaketModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="templatePaketModalLabel"><i class="fas fa-file-excel me-2"></i>Template &
+                        Import Data Paket</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk menambah atau mengupdate data paket
+                        secara massal.
+                        <br><strong>Kolom Template:</strong> Nama Paket, Kuota (Orang), Unit Kerja
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>1. Download Template Paket:</span>
+                        <a href="{{ route('template.paket') }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-download"></i> Download Template
+                        </a>
+                    </div>
+                    <hr>
+                    <form action="{{ url('/import-paket') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="filePaket" class="form-label">2. Upload File Paket (Excel):</label>
+                            <input type="file" name="file" id="filePaket" class="form-control" accept=".xlsx, .xls, .csv"
+                                required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import
+                                Paket</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -196,9 +244,8 @@
 
                             <td class="text-center">
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-success btn-add-employee text-white shadow-sm" 
-                                        data-paket-id="{{ $item->paket_id }}"
-                                        data-paket-nama="{{ $item->paket }}"
+                                    <button type="button" class="btn btn-sm btn-success btn-add-employee text-white shadow-sm"
+                                        data-paket-id="{{ $item->paket_id }}" data-paket-nama="{{ $item->paket }}"
                                         data-bs-toggle="tooltip" title="Tambah Karyawan">
                                         <i class="fas fa-user-plus"></i>
                                     </button>
@@ -235,11 +282,12 @@
                     @csrf
                     <div class="modal-header bg-success text-white">
                         <h5 class="modal-title" id="modalAddEmployeeLabel">Tambah Karyawan ke Paket</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="paket_id_add" id="inputPaketId">
-                        
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Paket</label>
                             <input type="text" class="form-control" id="displayPaketNama" readonly>
@@ -252,7 +300,8 @@
                                 <option value="" selected disabled>-- Pilih Karyawan --</option>
                                 @if(isset($availableKaryawan) && count($availableKaryawan) > 0)
                                     @foreach($availableKaryawan as $karyawan)
-                                        <option value="{{ $karyawan->karyawan_id }}">{{ $karyawan->nama_tk }} ({{ $karyawan->osis_id }})</option>
+                                        <option value="{{ $karyawan->karyawan_id }}">{{ $karyawan->nama_tk }}
+                                            ({{ $karyawan->osis_id }})</option>
                                     @endforeach
                                 @else
                                     <option value="" disabled>Tidak ada karyawan tersedia</option>
@@ -275,14 +324,14 @@
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function () {
-             // Handle Add Employee Button Click
-             $('.btn-add-employee').on('click', function() {
+            // Handle Add Employee Button Click
+            $('.btn-add-employee').on('click', function () {
                 var paketId = $(this).data('paket-id');
                 var paketNama = $(this).data('paket-nama');
 
                 $('#inputPaketId').val(paketId);
                 $('#displayPaketNama').val(paketNama);
-                
+
                 var modal = new bootstrap.Modal(document.getElementById('modalAddEmployee'));
                 modal.show();
             });
@@ -319,21 +368,21 @@
                     // Create the checkbox HTML with separator
                     const switchId = 'showAllSwitch_paket';
                     const checkboxHtml = `
-                                <div class="d-inline-block me-2" style="vertical-align: middle;">
-                                    <div class="form-check d-inline-block me-2">
-                                        <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
-                                        <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                    <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                        <div class="form-check d-inline-block me-2">
+                                            <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                            <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                        </div>
+                                        <span class="text-muted me-2">|</span>
                                     </div>
-                                    <span class="text-muted me-2">|</span>
-                                </div>
-                            `;
+                                `;
 
                     // Create a wrapper for same-line alignment without affecting siblings (pagination)
                     const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
                     infoDiv.before(flexWrapper);
                     flexWrapper.append(checkboxHtml);
                     flexWrapper.append(infoDiv);
-                    
+
                     infoDiv.addClass('mb-0 ms-1');
                     infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
 

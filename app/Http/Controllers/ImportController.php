@@ -160,4 +160,150 @@ class ImportController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
         }
     }
+
+    public function importPaket(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        $import = new \App\Imports\PaketImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            $total = $import->getTotal();
+            $gagal = $import->getGagal();
+            $berhasil = $total - $gagal;
+            $logs = $import->getLog();
+
+            if ($berhasil > 0) {
+                $msg = "$berhasil data paket berhasil diimport.";
+                if ($gagal > 0)
+                    $msg .= " $gagal gagal.";
+                return redirect()->back()->with('success', $msg);
+            } else {
+                return redirect()->back()->with('error', "Gagal memproses file. " . implode(', ', $logs));
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function importLokasi(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        $import = new \App\Imports\LokasiImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            $total = $import->getTotal();
+            $gagal = $import->getGagal();
+            $berhasil = $total - $gagal;
+
+            if ($berhasil > 0) {
+                $msg = "$berhasil data lokasi berhasil diimport.";
+                if ($gagal > 0)
+                    $msg .= " $gagal gagal.";
+                return redirect()->back()->with('success', $msg);
+            } else {
+                return redirect()->back()->with('error', "Gagal memproses file. Pastikan format sesuai template.");
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function importDepartemen(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        $import = new \App\Imports\DepartemenImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            $total = $import->getTotal();
+            $gagal = $import->getGagal();
+            $berhasil = $total - $gagal;
+
+            if ($berhasil > 0) {
+                $msg = "$berhasil data departemen berhasil diimport.";
+                if ($gagal > 0)
+                    $msg .= " $gagal gagal.";
+                return redirect()->back()->with('success', $msg);
+            } else {
+                return redirect()->back()->with('error', "Gagal memproses file. Pastikan format sesuai template.");
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function importFungsi(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        $import = new \App\Imports\FungsiImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            $total = $import->getTotal();
+            $gagal = $import->getGagal();
+            $berhasil = $total - $gagal;
+
+            if ($berhasil > 0) {
+                $msg = "$berhasil data fungsi berhasil diimport.";
+                if ($gagal > 0)
+                    $msg .= " $gagal gagal.";
+                return redirect()->back()->with('success', $msg);
+            } else {
+                return redirect()->back()->with('error', "Gagal memproses file. Pastikan format sesuai template.");
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function importUnitKerja(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        $import = new \App\Imports\UnitKerjaImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            $total = $import->getTotal();
+            $gagal = $import->getGagal();
+            $berhasil = $total - $gagal;
+
+            if ($berhasil > 0) {
+                $msg = "$berhasil data unit kerja berhasil diimport.";
+                if ($gagal > 0)
+                    $msg .= " $gagal gagal.";
+                return redirect()->back()->with('success', $msg);
+            } else {
+                return redirect()->back()->with('error', "Gagal memproses file. Pastikan format sesuai template.");
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
 }

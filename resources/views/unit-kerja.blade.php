@@ -15,9 +15,15 @@
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
-                <a href="/gettambah-unit" class="btn btn-primary shadow-sm"
-                    style="background-color: #6f42c1; border-color: #6f42c1;">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+
+                <!-- Button Template & Import -->
+                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal"
+                    title="Template & Import Data">
+                    <i class="fas fa-file-excel me-1"></i> Import / Template
+                </button>
+
+                <a href="/gettambah-unit" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-plus me-1"></i> Tambah Unit Kerja
                 </a>
             </div>
         </div>
@@ -26,6 +32,13 @@
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
@@ -67,6 +80,52 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import
+                        Data Unit Kerja</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Info Box -->
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Gunakan fitur ini untuk menambah atau mengupdate data unit
+                        kerja secara massal.
+                        <br><strong>Kolom Template:</strong> ID Unit, Nama Unit Kerja
+                    </div>
+
+                    <!-- 1. Download Template -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold">1. Download Template Unit Kerja:</span>
+                        <a href="{{ route('template.unitkerja') }}" class="btn btn-outline-success">
+                            <i class="fas fa-download me-1"></i> Download Template
+                        </a>
+                    </div>
+
+                    <!-- 2. Upload File -->
+                    <form action="/import-unitkerja" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <span class="fw-bold">2. Upload File Unit Kerja (Excel):</span>
+                        </div>
+                        <div class="mb-3">
+                            <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload me-1"></i> Import Unit Kerja
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

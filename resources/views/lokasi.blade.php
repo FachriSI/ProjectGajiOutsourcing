@@ -14,8 +14,12 @@
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
+                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#importModal">
+                    <i class="fas fa-file-excel me-1"></i> Import / Template
+                </button>
                 <a href="/gettambah-lokasi" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah Lokasi
                 </a>
             </div>
         </div>
@@ -77,4 +81,50 @@
             })
         });
     </script>
+
+    <!-- Import Modal -->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import
+                        Data Lokasi</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Info Box -->
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Gunakan fitur ini untuk menambah atau mengupdate data lokasi
+                        secara massal.
+                        <br><strong>Kolom Template:</strong> Nama Lokasi, Jenis (Provinsi/Kabupaten/Kota)
+                    </div>
+
+                    <!-- 1. Download Template -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold">1. Download Template Lokasi:</span>
+                        <a href="{{ route('template.lokasi') }}" class="btn btn-outline-success">
+                            <i class="fas fa-download me-1"></i> Download Template
+                        </a>
+                    </div>
+
+                    <!-- 2. Upload File -->
+                    <form action="/import-lokasi" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <span class="fw-bold">2. Upload File Lokasi (Excel):</span>
+                        </div>
+                        <div class="mb-3">
+                            <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload me-1"></i> Import Lokasi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection

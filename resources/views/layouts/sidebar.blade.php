@@ -42,11 +42,11 @@
                         </a>
                         <a class="nav-link {{ request()->is('penempatan*') ? 'active' : '' }}"
                             href="{{ url('/penempatan') }}">
-                            <i class="fas fa-map-pin"></i> Penempatan
+                            <i class="fas fa-map-marker-alt"></i> Penempatan
                         </a>
 
                         <a class="nav-link {{ request()->is('lokasi*') ? 'active' : '' }}" href="{{ url('/lokasi') }}">
-                            <i class="fas fa-map-pin"></i> Lokasi
+                            <i class="fas fa-user-tie"></i> Lokasi
                         </a>
                     </nav>
                 </div>

@@ -16,7 +16,7 @@
                     </a>
                 @endif
                 <a href="/gettambah-resiko" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah Tunjangan Risiko
                 </a>
             </div>
         </div>

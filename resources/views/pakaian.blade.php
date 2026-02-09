@@ -15,7 +15,7 @@
                     </a>
                 @endif
                 <a href="/gettambah-pakaian" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                    <i class="fas fa-plus me-1"></i> Tambah Pakaian
                 </a>
             </div>
         </div>
