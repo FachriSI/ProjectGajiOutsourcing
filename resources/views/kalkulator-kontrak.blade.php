@@ -8,7 +8,8 @@
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-file-contract me-2 text-primary"></i> Nilai Kontrak</h1>
-                <p class="text-muted small mb-0 mt-1">Hitung dan kelola nilai kontrak per paket berdasarkan UMP dan distribusi karyawan</p>
+                <p class="text-muted small mb-0 mt-1">Hitung dan kelola nilai kontrak per paket berdasarkan UMP dan
+                    distribusi karyawan</p>
             </div>
             <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#exportModal">
                 <i class="fas fa-file-excel me-1"></i> Export Laporan
@@ -42,7 +43,8 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="paket_id" class="form-label fw-bold small text-uppercase text-muted">Pilih Paket <span class="text-danger">*</span></label>
+                            <label for="paket_id" class="form-label fw-bold small text-uppercase text-muted">Pilih Paket
+                                <span class="text-danger">*</span></label>
                             <select name="paket_id" id="paket_id" class="form-select select2" required>
                                 <option value="">-- Cari Paket --</option>
                                 @foreach ($pakets as $paket)
@@ -54,7 +56,8 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="periode" class="form-label fw-bold small text-uppercase text-muted">Periode <span class="text-danger">*</span></label>
+                            <label for="periode" class="form-label fw-bold small text-uppercase text-muted">Periode <span
+                                    class="text-danger">*</span></label>
                             <input type="month" name="periode" id="periode" class="form-control"
                                 value="{{ $currentPeriode }}" required>
                         </div>
@@ -85,7 +88,8 @@
         <div class="col-md-7">
             <!-- Loading Spinner -->
             <div class="card shadow-sm border-0 h-100" id="loadingSpinner" style="display: none;">
-                 <div class="card-body d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center"
+                    style="min-height: 300px;">
                     <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                         <span class="visually-hidden">Memuat...</span>
                     </div>
@@ -94,14 +98,15 @@
             </div>
 
             <!-- Empty State (Information) -->
-             <div class="card shadow-sm border-0 h-100 bg-light" id="infoCard">
+            <div class="card shadow-sm border-0 h-100 bg-light" id="infoCard">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
                     <div class="mb-3 text-muted">
                         <i class="fas fa-info-circle fa-4x"></i>
                     </div>
                     <h5 class="text-muted">Informasi Perhitungan</h5>
                     <p class="small text-muted mb-0" style="max-width: 400px;">
-                        Pilih paket dan periode di sebelah kiri, lalu klik "Hitung" untuk melihat rincian nilai kontrak. Data dihitung berdasarkan UMP tahun berjalan dan distribusi karyawan.
+                        Pilih paket dan periode di sebelah kiri, lalu klik "Hitung" untuk melihat rincian nilai kontrak.
+                        Data dihitung berdasarkan UMP tahun berjalan dan distribusi karyawan.
                     </p>
                 </div>
             </div>
@@ -136,7 +141,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="p-3 border rounded bg-light h-100 position-relative overflow-hidden">
-                                     <div class="position-absolute end-0 top-0 p-3 opacity-25">
+                                    <div class="position-absolute end-0 top-0 p-3 opacity-25">
                                         <i class="fas fa-users fa-3x text-success"></i>
                                     </div>
                                     <strong class="text-success d-block mb-2">Pelaksana</strong>
@@ -149,16 +154,20 @@
                         <!-- Detail Grid -->
                         <div class="row small mb-4">
                             <div class="col-6 mb-2">
-                                <span class="text-muted">Karyawan Aktif:</span> <strong class="text-dark" id="karyawanAktif">0</strong>
+                                <span class="text-muted">Karyawan Aktif:</span> <strong class="text-dark"
+                                    id="karyawanAktif">0</strong>
                             </div>
                             <div class="col-6 mb-2">
-                                <span class="text-muted">Total Terdaftar:</span> <strong class="text-dark" id="karyawanTotal">0</strong>
+                                <span class="text-muted">Total Terdaftar:</span> <strong class="text-dark"
+                                    id="karyawanTotal">0</strong>
                             </div>
-                             <div class="col-6 mb-2">
-                                <span class="text-muted">Kuota Paket:</span> <strong class="text-dark" id="kuotaPaket">0</strong>
+                            <div class="col-6 mb-2">
+                                <span class="text-muted">Kuota Paket:</span> <strong class="text-dark"
+                                    id="kuotaPaket">0</strong>
                             </div>
-                             <div class="col-6 mb-2">
-                                <span class="text-muted">UMP Acuan:</span> <strong class="text-dark">Rp <span id="umpSumbar">0</span></strong>
+                            <div class="col-6 mb-2">
+                                <span class="text-muted">UMP Acuan:</span> <strong class="text-dark">Rp <span
+                                        id="umpSumbar">0</span></strong>
                             </div>
                         </div>
 
@@ -181,12 +190,13 @@
     <div class="row mt-4">
         <div class="col-md-12">
             <div class="card shadow">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-list"></i> Daftar Paket Kontrak</h5>
-                    
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-list me-2"></i> Daftar Paket Kontrak</h5>
+
                     <form action="{{ route('kalkulator.index') }}" method="GET" class="d-flex align-items-center">
-                        <label for="filter_periode" class="text-white me-2 small">Filter Periode:</label>
-                        <select name="filter_periode" id="filter_periode" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                        <label for="filter_periode" class="text-muted me-2 small fw-bold">Filter Periode:</label>
+                        <select name="filter_periode" id="filter_periode" class="form-select form-select-sm"
+                            onchange="this.form.submit()" style="width: auto;">
                             <option value="">-- Tampilkan Terbaru --</option>
                             @foreach($availablePeriods as $p)
                                 <option value="{{ $p }}" {{ $selectedPeriode == $p ? 'selected' : '' }}>
@@ -248,34 +258,34 @@
                                                     <i class="fas fa-calculator"></i>
                                                 </a>
                                                 @if($nilaiKontrak)
-                                                <a href="{{ route('paket.tagihan', $item->paket_id) }}"
-                                                    class="btn btn-sm btn-info" data-bs-toggle="tooltip"
-                                                    title="Lihat Tagihan BOQ">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ route('paket.pdf.download', $item->paket_id) }}"
-                                                    class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Unduh PDF"
-                                                    target="_blank">
-                                                    <i class="fas fa-download"></i>
-                                                </a>
-                                                <a href="{{ route('kalkulator.history', $item->paket_id) }}"
-                                                    class="btn btn-sm btn-secondary" data-bs-toggle="tooltip"
-                                                    title="Lihat Riwayat">
-                                                    <i class="fas fa-history"></i>
-                                                </a>
+                                                    <a href="{{ route('paket.tagihan', $item->paket_id) }}"
+                                                        class="btn btn-sm btn-info" data-bs-toggle="tooltip"
+                                                        title="Lihat Tagihan BOQ">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('paket.pdf.download', $item->paket_id) }}"
+                                                        class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Unduh PDF"
+                                                        target="_blank">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    <a href="{{ route('kalkulator.history', $item->paket_id) }}"
+                                                        class="btn btn-sm btn-secondary" data-bs-toggle="tooltip"
+                                                        title="Lihat Riwayat">
+                                                        <i class="fas fa-history"></i>
+                                                    </a>
                                                 @else
-                                                <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
-                                                    title="Hitung kontrak terlebih dahulu">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
-                                                    title="Hitung kontrak terlebih dahulu">
-                                                    <i class="fas fa-download"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
-                                                    title="Hitung kontrak terlebih dahulu">
-                                                    <i class="fas fa-history"></i>
-                                                </button>
+                                                    <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
+                                                        title="Hitung kontrak terlebih dahulu">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
+                                                        title="Hitung kontrak terlebih dahulu">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
+                                                        title="Hitung kontrak terlebih dahulu">
+                                                        <i class="fas fa-history"></i>
+                                                    </button>
                                                 @endif
                                             </div>
                                         </td>
@@ -313,7 +323,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="exportModalLabel"><i class="fas fa-file-excel"></i> Export Laporan Kontrak</h5>
+                    <h5 class="modal-title" id="exportModalLabel"><i class="fas fa-file-excel"></i> Export Laporan Kontrak
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('kalkulator.export') }}" method="POST">
@@ -322,20 +333,23 @@
                         <!-- Periode -->
                         <div class="mb-3">
                             <label for="exportPeriode" class="form-label">Periode</label>
-                            <input type="month" name="periode" id="exportPeriode" class="form-control" value="{{ $currentPeriode }}" required>
+                            <input type="month" name="periode" id="exportPeriode" class="form-control"
+                                value="{{ $currentPeriode }}" required>
                         </div>
 
                         <!-- Scope Selection -->
                         <div class="mb-3">
                             <label class="form-label">Lingkup Laporan</label>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="scope" id="scopeAll" value="all" checked onchange="togglePaketSelect(this.value)">
+                                <input class="form-check-input" type="radio" name="scope" id="scopeAll" value="all" checked
+                                    onchange="togglePaketSelect(this.value)">
                                 <label class="form-check-label" for="scopeAll">
                                     Semua Paket
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="scope" id="scopeSingle" value="single" onchange="togglePaketSelect(this.value)">
+                                <input class="form-check-input" type="radio" name="scope" id="scopeSingle" value="single"
+                                    onchange="togglePaketSelect(this.value)">
                                 <label class="form-check-label" for="scopeSingle">
                                     Per Paket
                                 </label>
@@ -361,45 +375,55 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="paket_nama" id="colPaket" checked>
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="paket_nama"
+                                            id="colPaket" checked>
                                         <label class="form-check-label" for="colPaket">Nama Paket</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="unit_kerja" id="colUnit" checked>
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="unit_kerja"
+                                            id="colUnit" checked>
                                         <label class="form-check-label" for="colUnit">Unit Kerja</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="periode" id="colPeriode" checked>
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="periode"
+                                            id="colPeriode" checked>
                                         <label class="form-check-label" for="colPeriode">Periode</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="total_nilai_kontrak" id="colTotal" checked>
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="total_nilai_kontrak" id="colTotal" checked>
                                         <label class="form-check-label" for="colTotal">Total Nilai</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="ump_sumbar" id="colUmp">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="ump_sumbar"
+                                            id="colUmp">
                                         <label class="form-check-label" for="colUmp">UMP</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_karyawan_total" id="colKaryawan" checked>
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="jumlah_karyawan_total" id="colKaryawan" checked>
                                         <label class="form-check-label" for="colKaryawan">Total Karyawan</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_pengawas" id="colJmlPengawas">
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="jumlah_pengawas" id="colJmlPengawas">
                                         <label class="form-check-label" for="colJmlPengawas">Jml Pengawas</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_pelaksana" id="colJmlPelaksana">
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="jumlah_pelaksana" id="colJmlPelaksana">
                                         <label class="form-check-label" for="colJmlPelaksana">Jml Pelaksana</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="total_pengawas" id="colBiayaPengawas">
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="total_pengawas" id="colBiayaPengawas">
                                         <label class="form-check-label" for="colBiayaPengawas">Biaya Pengawas</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="total_pelaksana" id="colBiayaPelaksana">
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="total_pelaksana" id="colBiayaPelaksana">
                                         <label class="form-check-label" for="colBiayaPelaksana">Biaya Pelaksana</label>
                                     </div>
                                 </div>
@@ -410,43 +434,52 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="upah_pokok" id="colUpah">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="upah_pokok"
+                                            id="colUpah">
                                         <label class="form-check-label small" for="colUpah">Upah Pokok</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tetap" id="colTjTetap">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tetap"
+                                            id="colTjTetap">
                                         <label class="form-check-label small" for="colTjTetap">Tj. Tetap</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tidak_tetap" id="colTjTidakTetap">
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="tj_tidak_tetap" id="colTjTidakTetap">
                                         <label class="form-check-label small" for="colTjTidakTetap">Tj. Tidak Tetap</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_lokasi" id="colTjLokasi">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_lokasi"
+                                            id="colTjLokasi">
                                         <label class="form-check-label small" for="colTjLokasi">Tj. Lokasi</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="bpjs_kesehatan" id="colBpjsKes">
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="bpjs_kesehatan" id="colBpjsKes">
                                         <label class="form-check-label small" for="colBpjsKes">BPJS Kese.</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="bpjs_ketenagakerjaan" id="colBpjsTk">
+                                        <input class="form-check-input" type="checkbox" name="columns[]"
+                                            value="bpjs_ketenagakerjaan" id="colBpjsTk">
                                         <label class="form-check-label small" for="colBpjsTk">BPJS TK</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="kompensasi" id="colKompen">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="kompensasi"
+                                            id="colKompen">
                                         <label class="form-check-label small" for="colKompen">Kompensasi</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="uang_jasa" id="colUangJasa">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="uang_jasa"
+                                            id="colUangJasa">
                                         <label class="form-check-label small" for="colUangJasa">Uang Jasa</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="lembur" id="colLembur">
+                                        <input class="form-check-input" type="checkbox" name="columns[]" value="lembur"
+                                            id="colLembur">
                                         <label class="form-check-label small" for="colLembur">Lembur</label>
                                     </div>
                                 </div>
@@ -455,7 +488,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-success"><i class="fas fa-file-export"></i> Export Excel</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-file-export"></i> Export
+                            Excel</button>
                     </div>
                 </form>
             </div>
@@ -480,6 +514,7 @@
             $('.datatable-paket').DataTable({
                 processing: true,
                 serverSide: false,
+                lengthChange: false,
                 pageLength: 10,
                 order: [[1, 'asc']], // Sort by paket name
                 language: {
@@ -491,9 +526,10 @@
                     "infoPostFix": "",
                     "thousands": ",",
                     "lengthMenu": "Tampilkan _MENU_ entri",
-                    "loadingRecords": "Sedang memuat...",
-                    "processing": "Sedang memproses...",
-                    "search": "Cari:",
+                    "loadingRecords": "Memuat...",
+                    "processing": "Memproses...",
+                    "search": "",
+                    "searchPlaceholder": "Cari data...",
                     "zeroRecords": "Tidak ditemukan data yang sesuai",
                     "paginate": {
                         "first": "Pertama",
@@ -505,6 +541,39 @@
                         "sortAscending": ": aktifkan untuk mengurutkan kolom ke atas",
                         "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
                     }
+                },
+                initComplete: function () {
+                    const tableApi = this.api();
+                    const container = $(tableApi.table().container());
+                    const infoDiv = container.find('.dataTables_info');
+
+                    // Create the checkbox HTML with separator
+                    const switchId = 'showAllSwitch_kalkulator';
+                    const checkboxHtml = `
+                                    <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                        <div class="form-check d-inline-block me-2">
+                                            <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                            <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                        </div>
+                                        <span class="text-muted me-2">|</span>
+                                    </div>
+                                `;
+
+                    // Create a wrapper for same-line alignment without affecting siblings (pagination)
+                    const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
+                    infoDiv.before(flexWrapper);
+                    flexWrapper.append(checkboxHtml).append(infoDiv);
+
+                    infoDiv.addClass('mb-0 ms-1');
+                    infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
+
+                    container.on('change', '.btn-show-all-switch', function () {
+                        if (this.checked) {
+                            tableApi.page.len(-1).draw();
+                        } else {
+                            tableApi.page.len(10).draw();
+                        }
+                    });
                 }
             });
 

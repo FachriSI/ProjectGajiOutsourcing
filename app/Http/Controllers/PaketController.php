@@ -48,7 +48,9 @@ class PaketController extends Controller
         $total_kontrak_tahunan_all = 0;
         $total_thr_bln = 0;
         $total_thr_thn = 0;
+        $total_thr_thn = 0;
         $total_pakaian_all = 0;
+        $total_active_employees_all = 0;
 
         $currentYear = date('Y');
         $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
@@ -73,21 +75,23 @@ class PaketController extends Controller
         foreach ($allPakets as $paket) {
             $kuota = (int) $paket->kuota_paket;
             $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
-            
+
             $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
             $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
             $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
 
-            $terpilih = $aktif->count() >= $kuota ? $aktif->take($kuota) : 
-                        $aktif->concat($berhenti->take($kuota - $aktif->count()))
-                              ->concat($diganti->take(max(0, $kuota - $aktif->count() - $berhenti->count())));
-            
+            $terpilih = $aktif->count() >= $kuota ? $aktif->take($kuota) :
+                $aktif->concat($berhenti->take($kuota - $aktif->count()))
+                    ->concat($diganti->take(max(0, $kuota - $aktif->count() - $berhenti->count())));
+
             // Limit strict to kuota
-            if ($terpilih->count() > $kuota) $terpilih = $terpilih->take($kuota);
+            if ($terpilih->count() > $kuota)
+                $terpilih = $terpilih->take($kuota);
 
             foreach ($terpilih as $pk) {
                 $karyawan = $pk->karyawan;
-                if (!$karyawan) continue;
+                if (!$karyawan)
+                    continue;
                 $id = $karyawan->karyawan_id;
 
                 $jabatan = optional($jabatanAll[$id] ?? collect())->first();
@@ -101,10 +105,10 @@ class PaketController extends Controller
                 $tj_umum = round($umpSumbar * 0.08);
                 $selisih_ump = round($ump - $umpSumbar);
                 $tj_lokasi = $lokasi?->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
-                
+
                 $tj_jabatan = round($jabatan?->jabatan?->tunjangan_jabatan ?? 0);
                 $tj_masakerja = round($masakerja?->tunjangan_masakerja ?? 0);
-                
+
                 // Assuming simpler calculation for summary or fetching specific fields if needed
                 // Replicating full logic briefly for accuracy:
                 $tj_suai = round($karyawan->tunjangan_penyesuaian ?? 0); // Karyawan model usually has this or from relation
@@ -116,7 +120,7 @@ class PaketController extends Controller
                 // Ah, $fungsi or $riwayat_unit? 
                 // Let's stick to what we know exists or use defaults to avoid crash. 
                 // Actually, let's use the simplest valid path. 
-                
+
                 $tj_harianshift = round($shift?->harianshift?->tunjangan_shift ?? 0);
                 $tj_resiko_val = ($resiko?->kode_resiko == 2) ? 0 : round($resiko?->resiko?->tunjangan_resiko ?? 0);
                 $tj_presensi = round($upah_pokok * 0.08);
@@ -124,17 +128,17 @@ class PaketController extends Controller
                 $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
                 $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
                 $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
-                
+
                 $bpjs_kes = round(0.04 * $komponen_gaji);
                 $bpjs_tk = round(0.0689 * $komponen_gaji);
-                
+
                 $uang_jasa = $karyawan->perusahaan_id == 38 ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12) : 0;
                 $kompensasi = round($komponen_gaji / 12);
-                
+
                 $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kes + $bpjs_tk + $uang_jasa + $kompensasi);
                 $fee_fix = round(0.10 * $fix_cost);
                 $jml_fix = round($fix_cost + $fee_fix);
-                
+
                 $total_jml_fix_cost += $jml_fix;
 
                 $quota_jam = 2 * ($pk->kuota ?? 0); // using kuota from pivot
@@ -152,8 +156,34 @@ class PaketController extends Controller
                 $pakaian = 600000;
                 $fee_pakaian = round(0.05 * $pakaian);
                 $total_pakaian_all += ($pakaian + $fee_pakaian);
+
+                $total_active_employees_all++;
             }
         }
+
+        // MCU Calculation
+        $mcu = \App\Models\MedicalCheckup::latest()->first();
+        $mcu_cost = $mcu->biaya ?? 0;
+
+        // Count total active employees across all packages for MCU total
+        // We can reuse the loop or do a query. Reusing loop seems safer for consistency with other totals.
+        $total_active_employees_all = 0;
+        foreach ($allPakets as $paket) {
+            // ... (existing logic to get terpilih) ...
+            // Logic to count terpilih is already inside the loop, need to capture it.
+            // But existing loop iterates $terpilih to calculate costs.
+            // We can just add to count here.
+        }
+        // Wait, the loop above (lines 50-135) iterates through selected employees.
+        // I can just increment a counter there.
+
+        // OR, simpler:
+        // Just add $total_mcu_all variable.
+
+        // Let's modify the loop section instead of adding a new block here.
+        // I will use a different chunk for that.
+
+        $total_mcu_all = $total_active_employees_all * $mcu_cost;
 
         $total_kontrak_all = $total_jml_fix_cost + $total_seluruh_variabel;
         $total_kontrak_tahunan_all = $total_kontrak_all * 12;
@@ -168,28 +198,27 @@ class PaketController extends Controller
 
         //$hasDeleted = Paket::where('is_deleted', 1)->exists();
         $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
-        
-        return view('paket', compact(
+
             'data', 'hasDeleted', 
             'total_jml_fix_cost', 'total_seluruh_variabel', 'total_kontrak_all', 
             'total_kontrak_tahunan_all', 'total_thr_bln', 'total_thr_thn', 'total_pakaian_all',
-            'availableKaryawan'
+            'availableKaryawan', 'total_mcu_all'
         ));
     }
 
     public function show($id)
     {
         // Old Index Logic: Detail for a specific package
-        $paketId = $id; 
+        $paketId = $id;
         $data = [];
         $errorLog = [];
         $totalExpected = 0;
         $totalActual = 0;
-        
+
         $selectedPeriode = request('periode');
         // Parse year from selected period, or default to current year
         $currentYear = $selectedPeriode ? \Carbon\Carbon::parse($selectedPeriode)->year : date('Y');
-        
+
         $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
 
         // Ambil semua data di awal untuk efisiensi
@@ -208,8 +237,8 @@ class PaketController extends Controller
 
         // Filter: Only for this package
         $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
-        
-        if($paketList->isEmpty()) {
+
+        if ($paketList->isEmpty()) {
             return redirect('/paket')->with('error', 'Paket tidak ditemukan');
         }
 
@@ -275,7 +304,7 @@ class PaketController extends Controller
                 );
             }
         }
-        
+
 
         // Data for Chart: Contract History
         $contractHistory = \App\Models\NilaiKontrak::where('paket_id', $paketId)
@@ -287,11 +316,16 @@ class PaketController extends Controller
                     'total' => $item->total_nilai_kontrak
                 ];
             });
-        
-        
+
+
         $selectedPeriode = request('periode'); // Get period from request
 
-        return view('paket_detail', compact('data', 'paketList', 'contractHistory', 'selectedPeriode'));  
+        // MCU Calculation for this package
+        $mcu = \App\Models\MedicalCheckup::latest()->first();
+        $mcu_cost = $mcu->biaya ?? 0;
+        $total_mcu_paket = $totalActual * $mcu_cost; // $totalActual is calculated in the loop (count of $terpilih)
+
+        return view('paket_detail', compact('data', 'paketList', 'contractHistory', 'selectedPeriode', 'total_mcu_paket'));
     }
 
     //chatgpt salah
@@ -806,16 +840,8 @@ class PaketController extends Controller
 //         return view('paket', compact('data'));
 //     }
 
-    public function indexpaket()
-    {
-        $data = DB::table('md_paket')
-            ->join('md_unit_kerja', 'md_unit_kerja.unit_id', '=', 'md_paket.unit_id')
-            ->select('md_paket.*', 'md_unit_kerja.*')
-            ->where('md_paket.is_deleted', 0)
-            ->orderBy('paket_id', 'asc')
-            ->get();
-        //  dd($data);
 
+<<<<<<< HEAD
         // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
         $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();
         $availableKaryawan = Karyawan::whereNotIn('karyawan_id', $assignedKaryawanIds)
@@ -832,30 +858,50 @@ class PaketController extends Controller
         return view('data_paket', ['data' => $data, 'hasDeleted' => $hasDeleted, 'availableKaryawan' => $availableKaryawan]);
 
     }
+=======
+>>>>>>> a87cf20d6d5a1f824899aa3fab0aef791ccb95ed
 
     public function getTambah()
     {
         $unit = DB::table('md_unit_kerja')
             ->select('md_unit_kerja.*')
             ->get();
-        return view('tambah-paket', ['unit' => $unit]);
+        // Get existing package names for client-side validation
+        $existingPakets = \App\Models\Paket::pluck('paket')->toArray();
+        return view('tambah-paket', ['unit' => $unit, 'existingPakets' => $existingPakets]);
     }
 
     public function setTambah(Request $request)
     {
+        // Handle paket naming with prefix
+        $paketName = $request->paket;
+        if ($request->has('paket_suffix')) {
+            $paketName = 'Paket ' . $request->paket_suffix;
+        }
+
+        // Merge the constructed name back into request for validation if needed, 
+        // or just validate manually. 
+        // We also need to ensure quota is > 0.
+
+        $request->merge(['full_paket_name' => $paketName]);
+
         $request->validate([
-            'paket' => 'required',
-            'kuota_paket' => 'required',
+            'paket_suffix' => 'required|integer|min:1',
+            'full_paket_name' => 'unique:md_paket,paket', // Check if "Paket X" exists
+            'kuota_paket' => 'required|integer|min:1',
             'unit_kerja' => 'required'
+        ], [
+            'full_paket_name.unique' => 'Nama paket sudah ada.',
+            'kuota_paket.min' => 'Kuota paket harus lebih dari 0.'
         ]);
 
-        Paket::create([
-            'paket' => $request->paket,
+        $paket = Paket::create([
+            'paket' => $paketName,
             'kuota_paket' => $request->kuota_paket,
             'unit_id' => $request->unit_kerja
         ]);
 
-        return redirect('/datapaket')->with('success', 'Data Berhasil Tersimpan');
+        return redirect('/paket/' . $paket->paket_id)->with('success', 'Data Berhasil Tersimpan');
     }
 
     public function getUpdate($id)
@@ -884,7 +930,7 @@ class PaketController extends Controller
                 'kuota_paket' => $request->kuota_paket
             ]);
 
-        return redirect('/datapaket')->with('success', 'Data Berhasil Tersimpan');
+        return redirect('/paket')->with('success', 'Data Berhasil Tersimpan');
     }
 
     public function destroy($id)
@@ -916,7 +962,7 @@ class PaketController extends Controller
         $data->deleted_at = null;
         $data->save();
 
-        return redirect('/datapaket')->with('success', 'Data berhasil dipulihkan!');
+        return redirect('/paket')->with('success', 'Data berhasil dipulihkan!');
     }
 
     /**
@@ -926,40 +972,40 @@ class PaketController extends Controller
     public function calculateBOQ($paketId)
     {
         $currentYear = date('Y');
-        
+
         // Use logic from ContractCalculatorService to ensure consistency
         $calculatorService = app(\App\Services\ContractCalculatorService::class);
         $periode = now()->format('Y-m');
-        
+
         // Calculate (will use updated logic from Service)
         $nilaiKontrak = $calculatorService->calculateForPaket($paketId, $periode);
-        
+
         // Extract breakdown data
         $breakdown = $nilaiKontrak->breakdown_json;
         $pengawas = $breakdown['pengawas'];
         $pelaksana = $breakdown['pelaksana'];
         $karyawanData = $breakdown['karyawan'];
-        
+
         $paket = Paket::with(['paketKaryawan.karyawan.perusahaan', 'unitKerja'])->findOrFail($paketId);
-        
+
         // Find vendor (first found among employees)
         $vendor = null;
         foreach ($karyawanData as $kd) {
-             // Note: karyawanData from service doesn't have perusahaan name directly, 
-             // but we can fetch it or just re-loop from packet if strictly needed.
-             // For safety/speed, let's just grab it from the packet relation we loaded above.
-             // Or better, iterate unique employees from packet to find vendor.
-             // Since service logic for "terpilih" matches fairly well, we can trust the counts.
+            // Note: karyawanData from service doesn't have perusahaan name directly, 
+            // but we can fetch it or just re-loop from packet if strictly needed.
+            // For safety/speed, let's just grab it from the packet relation we loaded above.
+            // Or better, iterate unique employees from packet to find vendor.
+            // Since service logic for "terpilih" matches fairly well, we can trust the counts.
         }
-        
+
         // Re-determine vendor from the packet employees for display consistency
         foreach ($paket->paketKaryawan as $pk) {
-             if ($pk->karyawan && $pk->karyawan->perusahaan) {
-                 $vendor = $pk->karyawan->perusahaan->perusahaan;
-                 break;
-             }
+            if ($pk->karyawan && $pk->karyawan->perusahaan) {
+                $vendor = $pk->karyawan->perusahaan->perusahaan;
+                break;
+            }
         }
-        
+
         $totalBOQ = $pengawas['total'] + $pelaksana['total'];
         $totalBulanan = $totalBOQ;
         $totalTahunan = $totalBOQ * 12;
@@ -987,19 +1033,19 @@ class PaketController extends Controller
     {
         // Calculate BOQ dan simpan ke nilai_kontrak
         $calculatorService = app(\App\Services\ContractCalculatorService::class);
-        
+
         // Get latest periode dari nilai_kontrak yang sudah ada, atau current jika belum ada
         $latestNilai = \App\Models\NilaiKontrak::where('paket_id', $id)
             ->orderBy('periode', 'desc')
             ->first();
         $periode = $latestNilai ? \Carbon\Carbon::parse($latestNilai->periode)->format('Y-m') : \Carbon\Carbon::now()->format('Y-m');
-        
+
         // Calculate dan simpan
         $nilaiKontrak = $calculatorService->calculateForPaket($id, $periode);
-        
+
         // Tetap gunakan calculateBOQ untuk compatibility dengan view yang ada
         $boqData = $this->calculateBOQ($id);
-        
+
         // Tambahkan data nilai_kontrak ke boqData
         $boqData['nilai_kontrak'] = $nilaiKontrak;
 
@@ -1025,18 +1071,18 @@ class PaketController extends Controller
             $latestNilai = \App\Models\NilaiKontrak::where('paket_id', $id)
                 ->orderBy('periode', 'desc')
                 ->first();
-            
+
             if (!$latestNilai) {
                 throw new \Exception('Data kontrak belum tersedia. Silakan hitung kontrak terlebih dahulu.');
             }
-            
+
             $calculatorService = app(\App\Services\ContractCalculatorService::class);
             $periode = \Carbon\Carbon::parse($latestNilai->periode)->format('Y-m');
             $nilaiKontrak = $calculatorService->calculateForPaket($id, $periode);
 
             // 2. Ambil data paket dari database (untuk compatibility)
             $boqData = $this->calculateBOQ($id);
-            
+
             // Tambahkan data nilai_kontrak ke boqData
             $boqData['nilai_kontrak'] = $nilaiKontrak;
 
@@ -1049,19 +1095,19 @@ class PaketController extends Controller
             // 5. Generate QR Code using QRServer.com API (more reliable than Google Charts)
             // QRServer.com is actively maintained and handles long URLs better
             $qrSize = 120;
-            
+
             // Use QRServer.com API instead of Google Charts (deprecated)
             $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?' . http_build_query([
                 'size' => $qrSize . 'x' . $qrSize,
                 'data' => $verifyUrl,
                 'format' => 'png'
             ]);
-            
+
             // Download QR image from Google API
             try {
                 // Log attempt
                 \Log::info('Attempting to download QR code from: ' . $qrApiUrl);
-                
+
                 // Use context to set proper headers
                 $context = stream_context_create([
                     'http' => [
@@ -1070,9 +1116,9 @@ class PaketController extends Controller
                         'timeout' => 10
                     ]
                 ]);
-                
+
                 $qrImageData = @file_get_contents($qrApiUrl, false, $context);
-                
+
                 if ($qrImageData !== false && strlen($qrImageData) > 0) {
                     // Convert to base64 for PDF embedding
                     $qrCodeBase64 = base64_encode($qrImageData);
@@ -1095,7 +1141,7 @@ class PaketController extends Controller
                     'openssl_loaded' => extension_loaded('openssl'),
                     'url' => $qrApiUrl
                 ], true));
-                
+
                 $qrCodeImg = '<div style="border:2px solid #000;padding:10px;width:120px;height:120px;text-align:center;font-size:7px;line-height:1.3;">
                     <strong>Verifikasi Online</strong><br/><br/>
                     Kunjungi:<br/>
@@ -1118,7 +1164,7 @@ class PaketController extends Controller
             // 6. Generate PDF dengan DomPDF
             // Extract year from contract period for signature
             $contractYear = \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y');
-            
+
             $pdf = Pdf::loadView('tagihan-pdf', [
                 'boq' => $boqData,
                 'qrCode' => $qrCodeImg,
@@ -1179,7 +1225,7 @@ class PaketController extends Controller
 
         // Calculate BOQ data
         $boqData = $this->calculateBOQ($tagihan->paket_id);
-        
+
         // Generate QR Code
         $verifyUrl = url('/verify-tagihan/' . $token);
         $qrSize = 120;
@@ -1188,7 +1234,7 @@ class PaketController extends Controller
             'data' => $verifyUrl,
             'format' => 'png'
         ]);
-        
+
         // Download and encode QR
         try {
             $context = stream_context_create([
@@ -1198,9 +1244,9 @@ class PaketController extends Controller
                     'timeout' => 10
                 ]
             ]);
-            
+
             $qrImageData = @file_get_contents($qrApiUrl, false, $context);
-            
+
             if ($qrImageData !== false && strlen($qrImageData) > 0) {
                 $qrCodeBase64 = base64_encode($qrImageData);
                 $qrCodeImg = '<img src="data:image/png;base64,' . $qrCodeBase64 . '" alt="QR Code" style="width:120px;height:120px;display:block;margin:0 auto;" />';
@@ -1213,7 +1259,7 @@ class PaketController extends Controller
 
         // Extract year from contract period
         $contractYear = \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y');
-        
+
         // Generate PDF and stream to browser (not download)
         $pdf = Pdf::loadView('tagihan-pdf', [
             'boq' => $boqData,
@@ -1225,7 +1271,7 @@ class PaketController extends Controller
         ]);
 
         $pdf->setPaper('A4', 'portrait');
-        
+
         // Stream PDF to browser (can view and print)
         return $pdf->stream('Tagihan_' . $tagihan->cetak_id . '.pdf');
     }

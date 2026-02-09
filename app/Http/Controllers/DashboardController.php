@@ -28,6 +28,7 @@ class DashboardController extends Controller
                     WHEN jenis_kelamin = 'P' THEN 'Perempuan' 
                     ELSE 'Lainnya' 
                 END as label, count(*) as total")
+            ->where('status_aktif', 'Aktif')
             ->groupBy('label')
             ->pluck('total', 'label')
             ->toArray();
@@ -44,11 +45,39 @@ class DashboardController extends Controller
             ->toArray();
         $statusAktifCount = array_merge(['Aktif' => 0, 'Tidak Aktif' => 0], $statusAktifCount);
 
+        // New: Strategic Global KPIs
+        // Total Karyawan
+        $totalKaryawan = \App\Models\Karyawan::count();
+
+        // Attrition Rate (Annual)
+        $activeEmployees = \App\Models\Karyawan::where('status_aktif', 'Aktif')->count();
+        $exitedThisYear = \App\Models\Karyawan::whereNotNull('tanggal_berhenti')
+            ->whereYear('tanggal_berhenti', $currentYear)
+            ->count();
+        $attritionRate = $activeEmployees > 0 ? round(($exitedThisYear / $activeEmployees) * 100, 1) : 0;
+
+        // Average Tenure (years)
+        // Total Paket
+        $totalPaket = \App\Models\Paket::count();
+
+        // Average Tenure (years) - DEPRECATED (Moved to replace with Total Paket)
+        $avgTenure = \App\Models\Karyawan::where('status_aktif', 'Aktif')
+            ->whereNotNull('tanggal_bekerja')
+            ->selectRaw('AVG(TIMESTAMPDIFF(YEAR, tanggal_bekerja, CURDATE())) as avg_years')
+            ->value('avg_years');
+        $avgTenure = round($avgTenure ?? 0, 1);
+
+        // UMP Compliance Rate (% of employees with salary >= UMP for their location)
+        // Note: This requires gaji field in md_karyawan and proper UMP mapping
+        // For now, using a placeholder calculation
+        $umpCompliance = 98.5; // Placeholder - needs actual implementation
+
         // 2. Age Distribution (SQL Calculation)
         $usiaRaw = \App\Models\Karyawan::selectRaw("timestampdiff(YEAR, tanggal_lahir, CURDATE()) as age")
             ->whereNotNull('tanggal_lahir')
+            ->where('status_aktif', 'Aktif')
             ->get();
-            
+
         $usiaCount = [
             '< 20' => $usiaRaw->where('age', '<', 20)->count(),
             '20-29' => $usiaRaw->whereBetween('age', [20, 29])->count(),
@@ -60,8 +89,9 @@ class DashboardController extends Controller
         // 3. Tenure Distribution (Masa Kerja)
         $masaKerjaRaw = \App\Models\Karyawan::selectRaw("timestampdiff(YEAR, tanggal_bekerja, CURDATE()) as tenure")
             ->whereNotNull('tanggal_bekerja')
+            ->where('status_aktif', 'Aktif')
             ->get();
-            
+
         $masaKerjaCount = [
             '< 1 Tahun' => $masaKerjaRaw->where('tenure', '<', 1)->count(),
             '1-3 Tahun' => $masaKerjaRaw->whereBetween('tenure', [1, 2])->count(),
@@ -70,15 +100,7 @@ class DashboardController extends Controller
             '> 10 Tahun' => $masaKerjaRaw->where('tenure', '>', 10)->count(),
         ];
 
-        // 4. Origin (Asal Kecamatan) - Top 10
-        $asalKecamatanCount = \App\Models\Karyawan::selectRaw("SUBSTRING_INDEX(asal, ',', -1) as kecamatan, count(*) as total")
-            ->whereNotNull('asal')
-            ->groupBy('kecamatan')
-            ->orderByDesc('total')
-            ->take(10)
-            ->pluck('total', 'kecamatan')
-            ->mapWithKeys(fn($item, $key) => [trim($key) => $item])
-            ->toArray();
+        // 4. Origin (Asal Kecamatan) - REMOVED (No decision-making value)
 
 
         // 5. Shift Distribution (Latest Active Shift)
@@ -87,13 +109,15 @@ class DashboardController extends Controller
         // PK: riwayat_shift.id
         $shiftCount = \DB::table('riwayat_shift')
             ->join('md_harianshift', 'riwayat_shift.kode_harianshift', '=', 'md_harianshift.kode_harianshift')
+            ->join('md_karyawan', 'riwayat_shift.karyawan_id', '=', 'md_karyawan.karyawan_id')
             ->select('md_harianshift.harianshift', \DB::raw('count(*) as total'))
-            ->whereIn('riwayat_shift.id', function($query) {
+            ->whereIn('riwayat_shift.id', function ($query) {
                 // Get Max ID per Karyawan to find latest
                 $query->select(\DB::raw('MAX(id)'))
-                      ->from('riwayat_shift')
-                      ->groupBy('karyawan_id');
+                    ->from('riwayat_shift')
+                    ->groupBy('karyawan_id');
             })
+            ->where('md_karyawan.status_aktif', 'Aktif')
             ->groupBy('md_harianshift.harianshift')
             ->pluck('total', 'harianshift')
             ->toArray();
@@ -105,10 +129,10 @@ class DashboardController extends Controller
         $resikoCount = \DB::table('riwayat_resiko')
             ->join('md_resiko', 'riwayat_resiko.kode_resiko', '=', 'md_resiko.kode_resiko')
             ->select('md_resiko.resiko', \DB::raw('count(*) as total'))
-            ->whereIn('riwayat_resiko.id', function($query) {
+            ->whereIn('riwayat_resiko.id', function ($query) {
                 $query->select(\DB::raw('MAX(id)'))
-                      ->from('riwayat_resiko')
-                      ->groupBy('karyawan_id');
+                    ->from('riwayat_resiko')
+                    ->groupBy('karyawan_id');
             })
             ->groupBy('md_resiko.resiko')
             ->pluck('total', 'resiko')
@@ -126,7 +150,7 @@ class DashboardController extends Controller
             'SI' => ['aktif' => 0, 'jumlah' => 0],
             'SP' => ['aktif' => 0, 'jumlah' => 0],
         ];
-        
+
         // This is still complex, let's keep it simple or approximate if performance is key.
         // Or use a raw query if needed. For now, let's try a simplified Eloquent approach.
         // To avoid heavy join, we can fetch Department stats.
@@ -137,8 +161,8 @@ class DashboardController extends Controller
             ->join('md_unit_kerja', 'md_paket.unit_id', '=', 'md_unit_kerja.unit_id')
             ->join('md_departemen', 'md_unit_kerja.departemen_id', '=', 'md_departemen.departemen_id')
             ->join('md_karyawan', 'paket_karyawan.karyawan_id', '=', 'md_karyawan.karyawan_id')
-            ->whereIn('paket_karyawan.paket_karyawan_id', function($q) {
-                 $q->select(\DB::raw('MAX(paket_karyawan_id)'))->from('paket_karyawan')->groupBy('karyawan_id');
+            ->whereIn('paket_karyawan.paket_karyawan_id', function ($q) {
+                $q->select(\DB::raw('MAX(paket_karyawan_id)'))->from('paket_karyawan')->groupBy('karyawan_id');
             })
             ->selectRaw('md_departemen.is_si, md_karyawan.status_aktif, count(*) as total')
             ->groupBy('md_departemen.is_si', 'md_karyawan.status_aktif')
@@ -148,51 +172,78 @@ class DashboardController extends Controller
             $key = $stat->is_si ? 'SI' : 'SP';
             $perusahaanCount[$key]['jumlah'] += $stat->total;
             if ($stat->status_aktif === 'Aktif') {
-                 $perusahaanCount[$key]['aktif'] += $stat->total;
+                $perusahaanCount[$key]['aktif'] += $stat->total;
             }
         }
         $perusahaanCount['Total'] = [
             'aktif' => $perusahaanCount['SI']['aktif'] + $perusahaanCount['SP']['aktif'],
-             'jumlah' => $perusahaanCount['SI']['jumlah'] + $perusahaanCount['SP']['jumlah']
+            'jumlah' => $perusahaanCount['SI']['jumlah'] + $perusahaanCount['SP']['jumlah']
         ];
 
 
-        // 8. Paket Analysis (Top 10 Quota & Realization)
-        // Use withCount for optimized counting of related active employees
-        $topPaketList = Paket::select('paket_id', 'paket', 'kuota_paket')
-            ->withCount(['paketKaryawan as terisi' => function ($query) {
-                // Count only currently active or valid assignments
-                // Removed end_date check as column does not exist
-                $query->whereDate('beg_date', '<=', now())
-                      ->whereHas('karyawan', function($q) {
-                          $q->where('status_aktif', 'Aktif');
-                      });
-            }])
-            ->orderByDesc('kuota_paket')
-            ->take(10)
-            ->get();
+        // 8. Paket Analysis - Two separate visualizations
 
-        $topPaket = $topPaketList->map(function($p) {
-            return [
-                'nama_paket' => $p->paket,
-                'kuota' => (int) $p->kuota_paket,
-                'terisi' => $p->terisi
-            ];
-        });
-        
-        // Ensure $paketStats matches logic if needed, or just reuse $topPaket
-        $paketStats = $topPaket; 
+        // 8a. Top 10 Paket by Kuota Terbesar (informational)
+        $topPaketKuota = Paket::select('paket_id', 'paket', 'kuota_paket')
+            ->withCount([
+                'paketKaryawan as terisi' => function ($query) {
+                    $query->whereDate('beg_date', '<=', now())
+                        ->whereHas('karyawan', function ($q) {
+                            $q->where('status_aktif', 'Aktif');
+                        });
+                }
+            ])
+            ->orderByDesc('terisi')
+            ->take(10)
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'nama_paket' => $p->paket,
+                    'kuota' => (int) $p->kuota_paket,
+                    'terisi' => $p->terisi,
+                    'kosong' => (int) $p->kuota_paket - $p->terisi
+                ];
+            });
+
+        // 8b. Top 10 Paket by % Kuota Kosong Terbesar (actionable)
+        $topPaketKosong = Paket::select('paket_id', 'paket', 'kuota_paket')
+            ->withCount([
+                'paketKaryawan as terisi' => function ($query) {
+                    $query->whereDate('beg_date', '<=', now())
+                        ->whereHas('karyawan', function ($q) {
+                            $q->where('status_aktif', 'Aktif');
+                        });
+                }
+            ])
+            ->where('kuota_paket', '>', 0) // Avoid division by zero
+            ->get()
+            ->map(function ($p) {
+                $kuota = (int) $p->kuota_paket;
+                $terisi = $p->terisi;
+                $kosong = $kuota - $terisi;
+                $persen_kosong = $kuota > 0 ? round(($kosong / $kuota) * 100, 1) : 0;
+
+                return [
+                    'nama_paket' => $p->paket,
+                    'kuota' => $kuota,
+                    'terisi' => $terisi,
+                    'kosong' => $kosong,
+                    'persen_kosong' => $persen_kosong
+                ];
+            })
+            ->sortByDesc('persen_kosong')
+            ->take(10)
+            ->values(); // Reset array keys 
 
 
         // 9. Cost Analysis (Unit Kerja Cost)
         // Tables: nilai_kontrak -> md_paket -> md_unit_kerja
         $unitKerjaCost = \App\Models\NilaiKontrak::join('md_paket', 'nilai_kontrak.paket_id', '=', 'md_paket.paket_id')
-            ->join('md_unit_kerja', 'md_paket.unit_id', '=', 'md_unit_kerja.unit_id')
-            ->selectRaw('md_unit_kerja.unit_kerja, SUM(nilai_kontrak.total_nilai_kontrak) as total_biaya')
-            ->groupBy('md_unit_kerja.unit_kerja')
+            ->selectRaw('md_paket.paket, SUM(nilai_kontrak.total_nilai_kontrak) as total_biaya')
+            ->groupBy('md_paket.paket')
             ->orderByDesc('total_biaya')
             ->take(10)
-            ->pluck('total_biaya', 'unit_kerja');
+            ->pluck('total_biaya', 'paket');
 
 
         // 10. Trends (Historical)
@@ -232,20 +283,41 @@ class DashboardController extends Controller
             ->pluck('jumlah', 'catatan_berhenti');
 
 
-        // 11. New Trend Metrics (Dynamics & UMP Growth)
-        $years = $trendData->pluck('tahun')->merge($attritionTrend->pluck('tahun'))->unique()->sort()->values();
+        // 11. New Trend Metrics (Employee Dynamics with ACTUAL population counts)
+        $years = $trendData->pluck('tahun')->merge($attritionTrend->pluck('tahun'))->push($currentYear)->unique()->sort()->values();
         $employeeDynamics = [];
-        $cumulativePopulation = 0;
-        
+
         foreach ($years as $year) {
             $in = $trendData->firstWhere('tahun', $year)->jumlah ?? 0;
             $out = $attritionTrend->firstWhere('tahun', $year)->jumlah ?? 0;
-            $cumulativePopulation += ($in - $out); 
+
+            // Calculate ACTUAL population at year-end by counting employees
+            // who were hired on/before this year AND (still active OR left after this year)
+            $populationAtYearEnd = \App\Models\Karyawan::where(function ($q) use ($year) {
+                // Hired on or before this year (or unknown hire date)
+                $q->whereYear('tanggal_bekerja', '<=', $year)
+                    ->orWhereNull('tanggal_bekerja');
+            })
+                ->where(function ($q) use ($year) {
+                    // STILL ACTIVE:
+                    // 1. Status is directly 'Aktif' (covers current active employees)
+                    // OR
+                    // 2. We allow them if they have a termination date AFTER this year (meaning they were active during this year)
+                    $q->where('status_aktif', 'Aktif')
+                        ->orWhere(function ($q2) use ($year) {
+                        $q2->whereNotNull('tanggal_berhenti')
+                            ->whereYear('tanggal_berhenti', '>', $year);
+                    });
+                    // REMOVED: orWhereNull('tanggal_berhenti') 
+                    // Reason: IF status is NOT 'Aktif' AND date is NULL, they are effectively inactive/unknown and should NOT be counted as active population.
+                })
+                ->count();
+
             $employeeDynamics[] = [
                 'tahun' => $year,
                 'masuk' => $in,
                 'keluar' => $out,
-                'populasi' => max(0, $cumulativePopulation)
+                'populasi' => $populationAtYearEnd // Actual count, not cumulative math
             ];
         }
         $employeeDynamics = collect($employeeDynamics);
@@ -262,7 +334,7 @@ class DashboardController extends Controller
             $previousUmp = $data->ump;
         }
         $umpGrowth = collect($umpGrowth);
-        
+
         // 12. Detailed UMP Matrix (Pivot: Location x Year)
         $umpRaw = \App\Models\Ump::join('md_lokasi', 'md_ump.kode_lokasi', '=', 'md_lokasi.kode_lokasi')
             ->where('md_ump.is_deleted', 0)
@@ -271,7 +343,7 @@ class DashboardController extends Controller
 
         // Extract unique years and sort them
         $umpYears = $umpRaw->pluck('tahun')->unique()->sort()->values();
-        
+
         // Build Matrix: [Location => [Year => Value]]
         $umpMatrix = [];
         foreach ($umpRaw as $row) {
@@ -284,13 +356,14 @@ class DashboardController extends Controller
         // Top 10 Job Titles (Jabatan)
         $jabatanCount = \DB::table('riwayat_jabatan')
             ->join('md_jabatan', 'riwayat_jabatan.kode_jabatan', '=', 'md_jabatan.kode_jabatan')
+            ->join('md_karyawan', 'riwayat_jabatan.karyawan_id', '=', 'md_karyawan.karyawan_id')
             ->select('md_jabatan.jabatan', \DB::raw('count(*) as total'))
-            ->whereIn('riwayat_jabatan.id', function($q) {
+            ->whereIn('riwayat_jabatan.id', function ($q) {
                 $q->select(\DB::raw('MAX(id)'))->from('riwayat_jabatan')->groupBy('karyawan_id');
             })
+            ->where('md_karyawan.status_aktif', 'Aktif')
             ->groupBy('md_jabatan.jabatan')
             ->orderByDesc('total')
-            ->take(10)
             ->pluck('total', 'jabatan')
             ->toArray();
 
@@ -299,9 +372,11 @@ class DashboardController extends Controller
             ->join('md_paket', 'paket_karyawan.paket_id', '=', 'md_paket.paket_id')
             ->join('md_unit_kerja', 'md_paket.unit_id', '=', 'md_unit_kerja.unit_id')
             ->join('md_departemen', 'md_unit_kerja.departemen_id', '=', 'md_departemen.departemen_id')
-            ->whereIn('paket_karyawan.paket_karyawan_id', function($q) {
-                 $q->select(\DB::raw('MAX(paket_karyawan_id)'))->from('paket_karyawan')->groupBy('karyawan_id');
+            ->join('md_karyawan', 'paket_karyawan.karyawan_id', '=', 'md_karyawan.karyawan_id')
+            ->whereIn('paket_karyawan.paket_karyawan_id', function ($q) {
+                $q->select(\DB::raw('MAX(paket_karyawan_id)'))->from('paket_karyawan')->groupBy('karyawan_id');
             })
+            ->where('md_karyawan.status_aktif', 'Aktif')
             ->select('md_departemen.departemen', \DB::raw('count(*) as total'))
             ->groupBy('md_departemen.departemen')
             ->orderByDesc('total')
@@ -310,12 +385,27 @@ class DashboardController extends Controller
 
 
         return view('dashboard', compact(
-            'genderCount', 'statusAktifCount', 'perusahaanCount', 'asalKecamatanCount',
-            'usiaCount', 'masaKerjaCount', 'shiftCount', 'resikoCount',
-            'topPaket', 'paketStats', 'unitKerjaCost',
-            'trendData', 'contractTrend', 'attritionTrend', 'exitReasons',
-            'umpTrend', 'umpPerLokasi', 'umpMatrix', 'umpYears',
-            'employeeDynamics', 'umpGrowth', 'jabatanCount', 'departemenCount'
+            'genderCount',
+            'statusAktifCount',
+            'totalKaryawan',
+            'avgTenure',
+            'usiaCount',
+            'masaKerjaCount',
+            'shiftCount',
+            'trendData',
+            'umpTrend',
+            'umpGrowth',
+            'umpPerLokasi',
+            'umpMatrix',
+            'umpYears',
+            'employeeDynamics',
+            'jabatanCount',
+            'departemenCount',
+            'topPaketKuota',
+            'topPaketKosong',
+            'unitKerjaCost',
+            'contractTrend',
+            'totalPaket'
         ));
     }
 

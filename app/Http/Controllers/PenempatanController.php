@@ -46,9 +46,16 @@ class PenempatanController extends Controller
                 $query->where('tahun', $currentYear);
             }
         ])->latest('beg_date')->get()->groupBy('karyawan_id');
+        $lokasiAll = Riwayat_lokasi::with([
+            'lokasi.ump' => function ($query) use ($currentYear) {
+                $query->where('tahun', $currentYear);
+            }
+        ])->latest('beg_date')->get()->groupBy('karyawan_id');
         $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
 
         $paketList = Paket::with(['unitKerja', 'paketKaryawan.karyawan.perusahaan'])->get();
+        // Get all unique package names for the filter dropdown
+        $allPaketNames = Paket::orderBy('paket')->pluck('paket')->unique();
 
 
         foreach ($paketList as $paket) {
@@ -124,7 +131,7 @@ class PenempatanController extends Controller
         logger()->info('Total Kuota: ' . $totalExpected);
         logger()->info('Total Terpilih: ' . $totalActual);
         logger()->info('Detail Paket yang Kurang:', $errorLog);
-        return view('penempatan', compact('data'));
+        return view('penempatan', compact('data', 'allPaketNames'));
     }
 
 
@@ -685,7 +692,7 @@ class PenempatanController extends Controller
     {
         $history = [];
         $currentId = $id;
-        
+
         // Loop untuk mencari history ke belakang (limit 50 untuk mencegah infinite loop)
         for ($i = 0; $i < 50; $i++) {
             // Ambil data karyawan saat ini
@@ -693,13 +700,14 @@ class PenempatanController extends Controller
                 ->where('karyawan_id', $currentId)
                 ->first();
 
-            if (!$karyawan) break;
+            if (!$karyawan)
+                break;
 
             // Cek apakah ada catatan_pengganti yang menunjukkan ID sebelumnya
             // Format: "Pengganti ID 123, Nama Lama, TMT ..."
             if (preg_match('/Pengganti ID (\d+)/', $karyawan->catatan_pengganti, $matches)) {
                 $prevId = $matches[1];
-                
+
                 // Ambil data karyawan sebelumnya
                 $prevKaryawan = DB::table('md_karyawan')
                     ->join('users', 'md_karyawan.diberhentikan_oleh', '=', 'users.id')
@@ -715,20 +723,20 @@ class PenempatanController extends Controller
                         'diberhentikan_oleh' => $prevKaryawan->deleted_by_name,
                         'catatan' => $prevKaryawan->catatan_berhenti
                     ];
-                    
+
                     // Lanjut ke ID sebelumnya
                     $currentId = $prevId;
                 } else {
-                    break; 
+                    break;
                 }
             } else {
                 // Cek di riwayat_karyawan (jika ada update in-place/Snapshot)
                 // Logika: Cari riwayat yang tanggal berhentinya sebelum hari ini ATAU statusnya Berhenti
                 // Namun riwayat_karyawan mencatat state SEBELUM berubah.
-                
+
                 // Implementasi sederhana: Cek apakah ada riwayat untuk ID ini yang statusnya 'Berhenti' ? 
                 // Tidak, riwayat di-create SAAT ganti.
-                
+
                 // Jika tidak ada link ke ID lain, kita stop.
                 break;
             }

@@ -5,7 +5,8 @@
     <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Tunjangan Risiko</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Tunjangan
+                    Risiko</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola data tunjangan berdasarkan tingkat risiko pekerjaan</p>
             </div>
             <div class="d-flex gap-2">
@@ -29,9 +30,7 @@
     @endif
 
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h6 class="m-0 fw-bold"><i class="fas fa-table me-2"></i>Daftar Risiko & Tunjangan</h6>
-        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-bordered datatable" id="dataTable" width="100%" cellspacing="0">
@@ -64,8 +63,10 @@
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{{ url('delete-resiko', $item->kode_resiko) }}" class="btn btn-sm btn-danger btn-delete"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete" onclick="return confirm('Hapus data risiko ini?')">
+                                        <a href="{{ url('delete-resiko', $item->kode_resiko) }}"
+                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" title="Delete"
+                                            onclick="return confirm('Hapus data risiko ini?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -88,13 +89,14 @@
             justify-content: center;
             font-size: 14px;
         }
+
         .bg-warning-light {
             background-color: rgba(246, 194, 62, 0.1);
         }
     </style>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)

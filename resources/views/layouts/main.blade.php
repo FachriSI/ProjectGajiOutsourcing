@@ -30,6 +30,32 @@
     <!-- Global Table Styles -->
     <link href="{{ asset('css/custom-tables.css') }}" rel="stylesheet">
 
+    <style>
+        /* Modern DataTables Search Bar */
+        .dataTables_filter {
+            margin-bottom: 1.5rem;
+        }
+
+        .dataTables_filter input {
+            border-radius: 20px !important;
+            padding: 0.4rem 1rem 0.4rem 2.5rem !important;
+            font-weight: 600 !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%236c757d' d='M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0s208 93.1 208 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: 0.8rem center !important;
+            background-size: 1rem !important;
+            border: 1px solid #ced4da !important;
+            transition: all 0.2s ease-in-out !important;
+            width: 250px !important;
+        }
+
+        .dataTables_filter input:focus {
+            border-color: #0d6efd !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+            outline: 0 !important;
+        }
+    </style>
+
 
     <!-- jQuery (harus paling atas sebelum plugin lain) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -90,6 +116,7 @@
             $('.datatable').each(function () {
                 if (!$.fn.DataTable.isDataTable(this)) {
                     $(this).DataTable({
+                        lengthChange: false,
                         language: {
                             "decimal": "",
                             "emptyTable": "Tidak ada data yang tersedia pada tabel ini",
@@ -99,9 +126,10 @@
                             "infoPostFix": "",
                             "thousands": ",",
                             "lengthMenu": "Tampilkan _MENU_ entri",
-                            "loadingRecords": "Sedang memuat...",
-                            "processing": "Sedang memproses...",
-                            "search": "Cari:",
+                            "loadingRecords": "Memuat...",
+                            "processing": "Memproses...",
+                            "search": "",
+                            "searchPlaceholder": "Cari data...",
                             "zeroRecords": "Tidak ditemukan data yang sesuai",
                             "paginate": {
                                 "first": "Pertama",
@@ -113,6 +141,40 @@
                                 "sortAscending": ": aktifkan untuk mengurutkan kolom ke atas",
                                 "sortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
                             }
+                        },
+                        initComplete: function () {
+                            const table = this.api();
+                            const container = $(table.table().container());
+                            const infoDiv = container.find('.dataTables_info');
+
+                            // Create the checkbox HTML with separator
+                            const switchId = 'showAllSwitch_' + Math.random().toString(36).substr(2, 9);
+                            const checkboxHtml = `
+                                <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                    <div class="form-check d-inline-block me-2">
+                                        <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                        <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                    </div>
+                                    <span class="text-muted me-2">|</span>
+                                </div>
+                            `;
+
+                            // Create a wrapper for same-line alignment without affecting siblings (pagination)
+                            const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');
+                            infoDiv.before(flexWrapper);
+                            flexWrapper.append(checkboxHtml);
+                            flexWrapper.append(infoDiv);
+
+                            infoDiv.addClass('mb-0 ms-1');
+                            infoDiv.css('padding-top', '0'); // Reset padding to align with checkbox
+
+                            container.on('change', '.btn-show-all-switch', function () {
+                                if (this.checked) {
+                                    table.page.len(-1).draw();
+                                } else {
+                                    table.page.len(10).draw();
+                                }
+                            });
                         }
                     });
                 }

@@ -5,7 +5,7 @@
 
                 <!-- Dashboard (Standalone) -->
                 <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
-                    <i class="fas fa-tachometer-alt"></i> Report
+                    <i class="fas fa-tachometer-alt"></i> Laporan
                 </a>
 
                 <!-- SDM & Vendor (Dropdown) -->
@@ -34,20 +34,17 @@
                     <i class="fas fa-box"></i> Paket & Penempatan
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('paket') || request()->is('penempatan*') || request()->is('datapaket*') || request()->is('lokasi*') ? 'show' : '' }}"
+                <div class="collapse {{ request()->is('paket') || request()->is('penempatan*') || request()->is('lokasi*') ? 'show' : '' }}"
                     id="collapsePaket" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ request()->is('paket') ? 'active' : '' }}" href="{{ url('/paket') }}">
-                            <i class="fas fa-chart-area"></i> Data Paket
+                            <i class="fas fa-box"></i> Paket
                         </a>
                         <a class="nav-link {{ request()->is('penempatan*') ? 'active' : '' }}"
                             href="{{ url('/penempatan') }}">
-                            <i class="fas fa-map-pin"></i> Data Penempatan
+                            <i class="fas fa-map-pin"></i> Penempatan
                         </a>
-                        <a class="nav-link {{ request()->is('datapaket*') ? 'active' : '' }}"
-                            href="{{ url('/datapaket') }}">
-                            <i class="fas fa-boxes"></i> Paket
-                        </a>
+
                         <a class="nav-link {{ request()->is('lokasi*') ? 'active' : '' }}" href="{{ url('/lokasi') }}">
                             <i class="fas fa-map-pin"></i> Lokasi
                         </a>
