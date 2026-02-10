@@ -272,7 +272,9 @@
 
 
 
-    var table = $('#datatablesSimple').DataTable({
+    <script>
+    $(document).ready(function() {
+        var table = $('#datatablesSimple').DataTable({
     "lengthChange": false,
     "language": {
     "decimal": "",

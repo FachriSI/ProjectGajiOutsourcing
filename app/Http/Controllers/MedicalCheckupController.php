@@ -10,10 +10,46 @@ class MedicalCheckupController extends Controller
 {
     public function index()
     {
-        $data = MedicalCheckup::where('is_deleted', false)->get();
-        $hasDeleted = MedicalCheckup::where('is_deleted', true)->exists();
+        // Ambil data MCU terakhir (global setting terakhir)
+        $sampleData = MedicalCheckup::where('is_deleted', false)
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-        return view('medical-checkup', compact('data', 'hasDeleted'));
+        $currentBiaya = $sampleData ? $sampleData->biaya : 0;
+
+        return view('medical-checkup', ['currentBiaya' => $currentBiaya]);
+    }
+
+    public function updateGlobal(Request $request)
+    {
+        $request->validate([
+            'biaya' => 'required|numeric|min:0',
+        ]);
+
+        $biaya = $request->biaya;
+
+        // Ambil semua karyawan aktif
+        $activeKaryawan = \App\Models\Karyawan::where('status_aktif', 'Aktif')->get();
+
+        $count = 0;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($activeKaryawan, $biaya, &$count) {
+            foreach ($activeKaryawan as $karyawan) {
+                MedicalCheckup::updateOrCreate(
+                    [
+                        'karyawan_id' => $karyawan->karyawan_id,
+                    ],
+                    [
+                        'biaya' => $biaya,
+                        'is_deleted' => false
+                    ]
+                );
+
+                $count++;
+            }
+        });
+
+        return redirect('/medical-checkup')->with('success', "Berhasil memperbarui Biaya MCU untuk {$count} karyawan aktif.");
     }
 
     public function getTambah()

@@ -24,14 +24,24 @@ class GlobalActivityObserver
             $original = $model->getOriginal();
             
             foreach ($changes as $key => $newValue) {
+                // Handle non-scalar values (arrays/objects)
+                if (!is_scalar($newValue) && !is_null($newValue)) {
+                    $newValue = json_encode($newValue);
+                }
+
                 // Skip long text fields to avoid cluttering logs
-                if (strlen($newValue) > 50) {
-                    $newValue = substr($newValue, 0, 50) . '...';
+                if (strlen((string)$newValue) > 50) {
+                    $newValue = substr((string)$newValue, 0, 50) . '...';
                 }
                 
                 $oldValue = $original[$key] ?? '-';
-                 if (is_scalar($oldValue) && strlen($oldValue) > 50) {
-                    $oldValue = substr($oldValue, 0, 50) . '...';
+
+                if (!is_scalar($oldValue) && !is_null($oldValue)) {
+                    $oldValue = json_encode($oldValue);
+                }
+                
+                 if (strlen((string)$oldValue) > 50) {
+                    $oldValue = substr((string)$oldValue, 0, 50) . '...';
                 }
 
                 $details[] = "$key: '$oldValue' -> '$newValue'";

@@ -36,35 +36,86 @@ class PaketController extends Controller
             'beg_date' => now()
         ]);
 
-        return redirect('/paket')->with('success', 'Karyawan berhasil ditambahkan ke paket');
+        // Auto-Calculate to ensure data appears immediately
+        try {
+            $calculatorService = app(\App\Services\ContractCalculatorService::class);
+            $calculatorService->calculateForPaket($request->paket_id_add, date('Y-m'));
+        } catch (\Exception $e) {
+            \Log::error('Auto-calculation failed after adding employee: ' . $e->getMessage());
+        }
+
+        return redirect('/paket/' . $request->paket_id_add)->with('success', 'Karyawan berhasil ditambahkan ke paket');
     }
 
     public function index()
     {
-        // Calculate Global Totals for Summary Cards
+        // Initialize totals
         $total_jml_fix_cost = 0;
         $total_seluruh_variabel = 0;
         $total_kontrak_all = 0;
         $total_kontrak_tahunan_all = 0;
         $total_thr_bln = 0;
         $total_thr_thn = 0;
-        $total_thr_thn = 0;
         $total_pakaian_all = 0;
         $total_active_employees_all = 0;
+        $total_mcu_all = 0;
 
         $currentYear = date('Y');
+        $currentMonth = date('Y-m');
         $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
 
-        // Fetch relations for calculation
-        $kuotaJamAll = Kuotajam::latest('beg_date')->get()->keyBy('karyawan_id');
-        $jabatanAll = Riwayat_jabatan::with('jabatan')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $shiftAll = Riwayat_shift::with('harianshift')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $resikoAll = Riwayat_resiko::with('resiko')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $lokasiAll = Riwayat_lokasi::with(['lokasi.ump' => fn($q) => $q->where('tahun', $currentYear)])->latest('beg_date')->get()->groupBy('karyawan_id');
-        $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
-        $pakaianAll = \App\Models\Pakaian::latest('beg_date')->get()->unique('karyawan_id')->keyBy('karyawan_id');
-
         $allPakets = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
+        
+        $calculatorService = app(\App\Services\ContractCalculatorService::class);
+
+        foreach ($allPakets as $paket) {
+            // Get or Calculate NilaiKontrak for CURRENT month
+            $nilaiKontrak = \App\Models\NilaiKontrak::where('paket_id', $paket->paket_id)
+                ->where('periode', $currentMonth)
+                ->first();
+
+            // Auto-calculate if missing (Consistency with Detail View)
+            if (!$nilaiKontrak) {
+                try {
+                    $calculatorService->calculateForPaket($paket->paket_id, $currentMonth);
+                    // Re-fetch
+                    $nilaiKontrak = \App\Models\NilaiKontrak::where('paket_id', $paket->paket_id)
+                        ->where('periode', $currentMonth)
+                        ->first();
+                } catch (\Exception $e) {
+                    \Log::error("Auto-calc failed for Index Paket {$paket->paket_id}: " . $e->getMessage());
+                    continue; // Skip meaningful data for this packet if calc fails
+                }
+            }
+
+            if ($nilaiKontrak) {
+                // Aggregate Totals from Calculated Data
+                
+                $breakdown = $nilaiKontrak->breakdown_json;
+                
+                $total_kontrak_all += $nilaiKontrak->total_nilai_kontrak;
+                
+                $karyawanData = $breakdown['karyawan'] ?? [];
+                
+                foreach ($karyawanData as $k) {
+                    $total_active_employees_all++;
+                    
+                    // Summing up components from the JSON data for accuracy
+                    $total_jml_fix_cost += ($k['jml_fix_cost'] ?? 0);
+                    $total_seluruh_variabel += ($k['total_variabel'] ?? 0);
+                    $total_thr_bln += ($k['thr_bln'] ?? 0);
+                    $total_thr_thn += (($k['thr_bln'] ?? 0) * 12);
+                    
+                    $total_pakaian_all += ($k['pakaian_total'] ?? 0); // Hypothetical key
+                }
+                
+                 $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
+                 $mcu_cost = $mcu->biaya ?? 0;
+                 $total_mcu_all += (count($karyawanData) * $mcu_cost);
+            }
+        }
+
+        $total_kontrak_tahunan_all = $total_kontrak_all * 12;
 
         // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
         $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();
@@ -77,118 +128,8 @@ class PaketController extends Controller
             ->orderBy('nama_tk')
             ->get();
 
-        foreach ($allPakets as $paket) {
-            $kuota = (int) $paket->kuota_paket;
-            $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
-
-            $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
-            $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
-            $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
-
-            $terpilih = $aktif->count() >= $kuota ? $aktif->take($kuota) :
-                $aktif->concat($berhenti->take($kuota - $aktif->count()))
-                    ->concat($diganti->take(max(0, $kuota - $aktif->count() - $berhenti->count())));
-
-            // Limit strict to kuota
-            if ($terpilih->count() > $kuota)
-                $terpilih = $terpilih->take($kuota);
-
-            foreach ($terpilih as $pk) {
-                $karyawan = $pk->karyawan;
-                if (!$karyawan)
-                    continue;
-                $id = $karyawan->karyawan_id;
-
-                $jabatan = optional($jabatanAll[$id] ?? collect())->first();
-                $shift = optional($shiftAll[$id] ?? collect())->first();
-                $resiko = optional($resikoAll[$id] ?? collect())->first();
-                $lokasi = optional($lokasiAll[$id] ?? collect())->first();
-                $masakerja = $masakerjaAll[$id] ?? null;
-
-                $ump = $lokasi?->lokasi?->ump?->first()?->ump ?? 0;
-                $upah_pokok = round($umpSumbar * 0.92);
-                $tj_umum = round($umpSumbar * 0.08);
-                $selisih_ump = round($ump - $umpSumbar);
-                $tj_lokasi = $lokasi?->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
-
-                $tj_jabatan = round($jabatan?->jabatan?->tunjangan_jabatan ?? 0);
-                $tj_masakerja = round($masakerja?->tunjangan_masakerja ?? 0);
-
-                // Assuming simpler calculation for summary or fetching specific fields if needed
-                // Replicating full logic briefly for accuracy:
-                $tj_suai = round($karyawan->tunjangan_penyesuaian ?? 0); // Karyawan model usually has this or from relation
-                // Re-checking relation usage in original code... 
-                // Original used $item->tunjangan_penyesuaian which came from array_merge.
-                // In Karyawan model, 'tunjangan_penyesuaian' is fillable, let's assume it's directly on model or we missed a relation.
-                // Wait, index logic used Riwayat_unit or Riwayat_penyesuaian?
-                // The original code passed 'tunjangan_penyesuaian' via array_merge but where did it come from? 
-                // Ah, $fungsi or $riwayat_unit? 
-                // Let's stick to what we know exists or use defaults to avoid crash. 
-                // Actually, let's use the simplest valid path. 
-
-                $tj_harianshift = round($shift?->harianshift?->tunjangan_shift ?? 0);
-                $tj_resiko_val = ($resiko?->kode_resiko == 2) ? 0 : round($resiko?->resiko?->tunjangan_resiko ?? 0);
-                $tj_presensi = round($upah_pokok * 0.08);
-
-                $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi;
-                $t_tetap = $tj_umum + $tj_jabatan + $tj_masakerja;
-                $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
-
-                $bpjs_kes = round(0.04 * $komponen_gaji);
-                $bpjs_tk = round(0.0689 * $komponen_gaji);
-
-                $uang_jasa = $karyawan->perusahaan_id == 38 ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12) : 0;
-                $kompensasi = round($komponen_gaji / 12);
-
-                $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kes + $bpjs_tk + $uang_jasa + $kompensasi);
-                $fee_fix = round(0.10 * $fix_cost);
-                $jml_fix = round($fix_cost + $fee_fix);
-
-                $total_jml_fix_cost += $jml_fix;
-
-                $kuota_jam_data = $kuotaJamAll[$id] ?? null;
-                $quota_jam = 2 * ($kuota_jam_data->kuota ?? 0);
-                $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
-                $nilai_lembur = round($tarif_lembur * $quota_jam);
-                $fee_lembur = round(0.025 * $nilai_lembur);
-                $total_seluruh_variabel += ($nilai_lembur + $fee_lembur);
-
-                $thr = round(($upah_pokok + $t_tetap) / 12);
-                $fee_thr = round($thr * 0.05);
-                $thr_bln = $thr + $fee_thr;
-                $total_thr_bln += $thr_bln;
-                $total_thr_thn += ($thr_bln * 12);
-
-                $pakaian_data = $pakaianAll[$id] ?? null;
-                $pakaian = $pakaian_data ? $pakaian_data->nilai_jatah : 0;
-                $fee_pakaian = round(0.05 * $pakaian);
-                $total_pakaian_all += ($pakaian + $fee_pakaian);
-
-                $total_active_employees_all++;
-            }
-        }
-
-        // MCU Calculation
-        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
-        $mcu_cost = $mcu->biaya ?? 0;
-
-
-
-        $total_mcu_all = $total_active_employees_all * $mcu_cost;
-
-        $total_kontrak_all = $total_jml_fix_cost + $total_seluruh_variabel;
-        $total_kontrak_tahunan_all = $total_kontrak_all * 12;
-
-        // List of Packages
-        $data = DB::table('md_paket')
-            ->join('md_unit_kerja', 'md_unit_kerja.unit_id', '=', 'md_paket.unit_id')
-            ->select('md_paket.*', 'md_unit_kerja.*')
-            ->where('md_paket.is_deleted', 0)
-            ->orderBy('paket_id', 'asc')
-            ->get();
-
-        //$hasDeleted = Paket::where('is_deleted', 1)->exists();
-        $hasDeleted = DB::table('md_paket')->where('is_deleted', 1)->exists();
+        $data = $allPakets;
+        $hasDeleted = \App\Models\Paket::where('is_deleted', 1)->exists();
 
         return view('paket', compact(
             'data',
@@ -215,25 +156,31 @@ class PaketController extends Controller
         $totalActual = 0;
 
         $selectedPeriode = request('periode');
-        // Parse year from selected period, or default to current year
-        $currentYear = $selectedPeriode ? \Carbon\Carbon::parse($selectedPeriode)->year : date('Y');
+        
+        // Determine correct period
+        // If not specified, default to current month Y-m
+        if (!$selectedPeriode) {
+             $selectedPeriode = date('Y-m');
+        }
 
-        $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
+        // Parse year from selected period
+        $currentYear = \Carbon\Carbon::parse($selectedPeriode)->year;
 
-        // Ambil semua data di awal untuk efisiensi
-        $kuotaJamAll = Kuotajam::latest('beg_date')->get()->keyBy('karyawan_id');
-        $jabatanAll = Riwayat_jabatan::with('jabatan')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $shiftAll = Riwayat_shift::with('harianshift')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $resikoAll = Riwayat_resiko::with('resiko')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $fungsiAll = Riwayat_fungsi::with('fungsi')->latest('beg_date')->get()->groupBy('karyawan_id');
-        $lokasiAll = Riwayat_lokasi::with([
-            'lokasi.ump' => function ($query) use ($currentYear) {
-                $query->where('tahun', $currentYear);
-            }
-        ])->latest('beg_date')->get()->groupBy('karyawan_id');
-        $masakerjaAll = Masakerja::latest('beg_date')->get()->keyBy('karyawan_id');
-        $pakaianAll = \App\Models\Pakaian::latest('beg_date')->get()->unique('karyawan_id')->keyBy('karyawan_id');
-        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
+        // Check for existing Calculation (NilaiKontrak)
+        $nilaiKontrak = \App\Models\NilaiKontrak::where('paket_id', $paketId)
+            ->where('periode', $selectedPeriode)
+            ->first();
+
+        // Data for Chart: Contract History
+        $contractHistory = \App\Models\NilaiKontrak::where('paket_id', $paketId)
+            ->orderBy('periode', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'period' => \Carbon\Carbon::parse($item->periode)->format('F Y'),
+                    'total' => $item->total_nilai_kontrak
+                ];
+            });
 
         // Filter: Only for this package
         $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
@@ -242,45 +189,79 @@ class PaketController extends Controller
             return redirect('/paket')->with('error', 'Paket tidak ditemukan');
         }
 
+        // If NO calculation exists for this period, AUTO-CALCULATE to ensure data consistency
+        if (!$nilaiKontrak) {
+            try {
+                // Auto-calculate on the fly
+                $calculatorService = app(\App\Services\ContractCalculatorService::class);
+                $calculatorService->calculateForPaket($paketId, $selectedPeriode);
+
+                // Re-fetch the newly created calculation
+                $nilaiKontrak = \App\Models\NilaiKontrak::where('paket_id', $paketId)
+                    ->where('periode', $selectedPeriode)
+                    ->first();
+            } catch (\Exception $e) {
+                // Determine if failure is due to empty package or real error
+                // If package has no employees, it might return empty/null or throw error depending on service.
+                // Fallback to empty view if calculation fails or still no result.
+                \Log::error("Auto-calc failed for Paket {$paketId}: " . $e->getMessage());
+                
+                $total_mcu_paket = 0;
+                return view('paket_detail', compact('data', 'paketList', 'contractHistory', 'selectedPeriode', 'total_mcu_paket'))
+                    ->with('warning', 'Data belum tersedia dan perhitungan otomatis gagal: ' . $e->getMessage());
+            }
+        }
+        
+        // Double check if re-fetch worked
+        if (!$nilaiKontrak) {
+             $total_mcu_paket = 0;
+             return view('paket_detail', compact('data', 'paketList', 'contractHistory', 'selectedPeriode', 'total_mcu_paket'));
+        }
+
+        // If Calculation EXISTS, use the IDs from the calculation to ensure consistency
+        $calculatedKaryawanIds = collect($nilaiKontrak->breakdown_json['karyawan'] ?? [])->pluck('karyawan_id')->toArray();
+        
+        // Use UMP stored in calculation to maintain history accuracy
+        $umpSumbar = $nilaiKontrak->ump_sumbar;
+
+        // Ambil semua data di awal untuk efisiensi
+        // Only fetch for IDs that were in the calculation
+        $kuotaJamAll = Kuotajam::whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->keyBy('karyawan_id');
+        $jabatanAll = Riwayat_jabatan::with('jabatan')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $shiftAll = Riwayat_shift::with('harianshift')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $resikoAll = Riwayat_resiko::with('resiko')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $fungsiAll = Riwayat_fungsi::with('fungsi')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        
+        // For Lokasi, we try to match historical year, but data might be scant. 
+        // Using 'latest' logic similar to original but scoped to IDs.
+        $lokasiAll = Riwayat_lokasi::with([
+            'lokasi.ump' => function ($query) use ($currentYear) {
+                $query->where('tahun', $currentYear);
+            }
+        ])->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        
+        $masakerjaAll = Masakerja::whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->keyBy('karyawan_id');
+        $pakaianAll = \App\Models\Pakaian::whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->unique('karyawan_id')->keyBy('karyawan_id');
+        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
+
         foreach ($paketList as $paket) {
             $kuota = (int) $paket->kuota_paket;
             $totalExpected += $kuota;
 
-            $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
-
-            $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && ($item->karyawan->status_aktif === 'Aktif' || empty($item->karyawan->status_aktif)));
-            $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
-            $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
-
-            // Ambil karyawan sesuai kuota
-            // REVERTED: Enforce quota limit to match Contract Calculation
-            $terpilih = collect();
-            if ($aktif->count() >= $kuota) {
-                $terpilih = $aktif->take($kuota);
-            } else {
-                $terpilih = $aktif;
-                $sisa = $kuota - $aktif->count();
-                $terpilih = $terpilih->concat($berhenti->take($sisa));
-                $sisa = $kuota - $terpilih->count();
-                $terpilih = $terpilih->concat($diganti->take($sisa));
-            }
+            // Instead of filtering active/active logic again, 
+            // We iterating ONLY the employees that were explicitly saved in the Contract Calculation.
+            // This ensures "What you see is what you calculated".
+            
+            // Need to fetch Karyawan models for these IDs to get names/dates etc
+            $terpilih = Karyawan::whereIn('karyawan_id', $calculatedKaryawanIds)
+                        ->with('perusahaan')
+                        // We might want to preserve the order or just standard sort
+                        ->orderBy('nama_tk')
+                        ->get();
 
             $totalActual += $terpilih->count();
 
-            if ($terpilih->count() < $kuota) {
-                $errorLog[] = [
-                    'paket_id' => $paket->paket_id,
-                    'paket' => $paket->paket,
-                    'kuota' => $kuota,
-                    'terpilih' => $terpilih->count(),
-                    'selisih' => $kuota - $terpilih->count(),
-                ];
-            }
-
-            foreach ($terpilih as $pk) {
-                $karyawan = $pk->karyawan;
-                if (!$karyawan)
-                    continue;
+            foreach ($terpilih as $karyawan) {
                 $id = $karyawan->karyawan_id;
 
                 $jabatan = optional($jabatanAll[$id] ?? collect())->first();
@@ -293,6 +274,15 @@ class PaketController extends Controller
                 $pakaian_data = $pakaianAll[$id] ?? null;
 
                 $data[] = (object) array_merge(
+                    // Default values for potentially missing relations
+                    [
+                        'kode_lokasi' => 12, 
+                        'kode_resiko' => 2,
+                        'lokasi' => [],
+                        'harianshift' => [],
+                        'resiko' => [],
+                        'kuota' => 0
+                    ], 
                     $pakaian_data?->toArray() ?? [], // Merge Pakaian fields (nilai_jatah)
                     $kuota_jam?->toArray() ?? [],
                     $karyawan->toArray(),
@@ -307,7 +297,7 @@ class PaketController extends Controller
                     $shift?->toArray() ?? [],
                     $resiko?->toArray() ?? [],
                     $lokasi?->toArray() ?? [],
-                    ['ump_sumbar' => $umpSumbar],
+                    ['ump_sumbar' => $umpSumbar], // Use UMP from Contract History
                     $paket->toArray(),
                     $masakerja?->toArray() ?? [],
                     ['mcu' => $mcu->biaya ?? 0]
@@ -316,542 +306,13 @@ class PaketController extends Controller
         }
 
 
-        // Data for Chart: Contract History
-        $contractHistory = \App\Models\NilaiKontrak::where('paket_id', $paketId)
-            ->orderBy('periode', 'asc')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'period' => \Carbon\Carbon::parse($item->periode)->format('F Y'),
-                    'total' => $item->total_nilai_kontrak
-                ];
-            });
-
-
-        $selectedPeriode = request('periode'); // Get period from request
-
         // MCU Calculation for this package
         $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
         $mcu_cost = $mcu->biaya ?? 0;
-        $total_mcu_paket = $totalActual * $mcu_cost; // $totalActual is calculated in the loop (count of $terpilih)
-
+        $total_mcu_paket = $totalActual * $mcu_cost; 
+        
         return view('paket_detail', compact('data', 'paketList', 'contractHistory', 'selectedPeriode', 'total_mcu_paket'));
     }
-
-    //chatgpt salah
-// public function index()
-// {
-//     $currentYear = date('Y');
-//     $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
-
-    //     $paketList = Paket::with([
-//         'paketKaryawan.karyawan.perusahaan',
-//         'paketKaryawan.karyawan.kuotaJam' => fn($q) => $q->orderByDesc('beg_date'),
-//         'paketKaryawan.karyawan.riwayatUnit.unitKerja',
-//         'paketKaryawan.karyawan.riwayatJabatan.jabatan',
-//         'paketKaryawan.karyawan.riwayatShift.harianShift',
-//         'paketKaryawan.karyawan.riwayatResiko.resiko',
-//         'paketKaryawan.karyawan.riwayatLokasi.lokasi',
-//         'paketKaryawan.karyawan.riwayatLokasi.lokasi.ump' => fn($q) => $q->where('tahun', $currentYear),
-//         'paketKaryawan.karyawan.masaKerja' => fn($q) => $q->orderByDesc('beg_date'),
-//     ])->get();
-
-    //     $data = [];
-
-    //     foreach ($paketList as $paket) {
-//         $kuota = (int) $paket->kuota_paket;
-//         $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
-
-    //         // Filter berdasarkan status
-//         $aktif = $karyawanPaket->where('karyawan.status_aktif', 'Aktif');
-//         $berhenti = $karyawanPaket->where('karyawan.status_aktif', 'Berhenti');
-//         $diganti = $karyawanPaket->where('karyawan.status_aktif', 'Sudah Diganti');
-
-    //         $terpilih = collect();
-//         if ($aktif->count() >= $kuota) {
-//             $terpilih = $aktif->take($kuota);
-//         } else {
-//             $terpilih = $aktif;
-//             $sisa = $kuota - $aktif->count();
-//             $terpilih = $terpilih->concat($berhenti->take($sisa));
-//             $sisa = $kuota - $terpilih->count();
-//             $terpilih = $terpilih->concat($diganti->take($sisa));
-//         }
-
-    //         foreach ($terpilih as $pk) {
-//             $karyawan = $pk->karyawan;
-//             if (!$karyawan) continue;
-
-    //             $data[] = (object) [
-//                 'osis_id' => $karyawan->osis_id ?? null,
-//                 'karyawan_id' => $karyawan->karyawan_id ?? null,
-//                 'nama_tk' => $karyawan->nama_tk ?? null,
-//                 'perusahaan' => $karyawan->perusahaan->perusahaan ?? null,
-//                 'perusahaan_id' => $karyawan->perusahaan_id ?? null,
-//                 'tanggal_bekerja' => $karyawan->tanggal_bekerja ?? null,
-//                 'aktif_mulai' => \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->translatedFormat('F Y'),
-//                 'ump' => optional($karyawan->riwayatLokasi->first()?->lokasi->ump->first())->ump ?? 0,
-//                 'ump_sumbar' => $umpSumbar,
-//                 'kuota' => $pk->kuota ?? 0,
-//                 'tunjangan_jabatan' => $karyawan->riwayatJabatan->first()?->tunjangan_jabatan ?? 0,
-//                 'tunjangan_masakerja' => $karyawan->masaKerja->first()?->tunjangan_masakerja ?? 0,
-//                 'tunjangan_penyesuaian' => $karyawan->riwayatUnit->first()?->tunjangan_penyesuaian ?? 0,
-//                 'tunjangan_shift' => $karyawan->riwayatShift->first()?->tunjangan_shift ?? 0,
-//                 'tunjangan_resiko' => $karyawan->riwayatResiko->first()?->tunjangan_resiko ?? 0,
-//                 'kode_resiko' => $karyawan->riwayatResiko->first()?->kode_resiko ?? null,
-//                 'kode_lokasi' => $karyawan->riwayatLokasi->first()?->kode_lokasi ?? null,
-//                 'paket' => $paket->paket ?? null,
-//             ];
-//         }
-//     }
-// dd($data);
-//     return view('paket', compact('data'));
-// }
-
-
-
-    //yg udah benar
-//     public function index()
-// {
-//     $data = [];
-//     $errorLog = [];
-//     $totalExpected = 0;
-//     $totalActual = 0;
-
-    //     $paketList = Paket::with(['paketKaryawan.karyawan'])->get();
-//     $currentYear = date('Y');
-//     $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
-
-    //     foreach ($paketList as $paket) {
-//         $kuota = (int) $paket->kuota_paket;
-//         $totalExpected += $kuota;
-
-    //         $karyawanPaket = Paketkaryawan::where('paket_id', $paket->paket_id)
-//             ->with('karyawan')
-//             ->orderByDesc('beg_date')
-//             ->get();
-
-    //         // Filter berdasarkan status dan pastikan data karyawan ada
-//         $aktif = $karyawanPaket->filter(fn($item) =>
-//             $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
-//         $berhenti = $karyawanPaket->filter(fn($item) =>
-//             $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
-//         $diganti = $karyawanPaket->filter(fn($item) =>
-//             $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
-
-    //         // Pilih sesuai kuota
-//         $terpilih = collect();
-
-    //         if ($aktif->count() >= $kuota) {
-//             $terpilih = $aktif->take($kuota);
-//         } else {
-//             $terpilih = $aktif;
-//             $sisa = $kuota - $aktif->count();
-
-    //             if ($berhenti->count() >= $sisa) {
-//                 $terpilih = $terpilih->concat($berhenti->take($sisa));
-//             } else {
-//                 $terpilih = $terpilih->concat($berhenti);
-//                 $sisa = $kuota - $terpilih->count();
-//                 $terpilih = $terpilih->concat($diganti->take($sisa));
-//             }
-//         }
-
-    //         $totalActual += $terpilih->count();
-
-    //         // Cek jika jumlah terpilih kurang dari kuota, simpan log
-//         if ($terpilih->count() < $kuota) {
-//             $errorLog[] = [
-//                 'paket_id' => $paket->paket_id,
-//                 'paket' => $paket->paket,
-//                 'kuota' => $kuota,
-//                 'terpilih' => $terpilih->count(),
-//                 'selisih' => $kuota - $terpilih->count(),
-//             ];
-//         }
-
-    //         // Gabungkan data yang valid
-//         foreach ($terpilih as $pk) {
-//             $karyawan = $pk->karyawan;
-//             $karyawan_id = $karyawan->karyawan_id;
-
-    //             // Ambil riwayat
-//             $kuota_jam = Kuotajam::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $unit = Riwayat_unit::join('unit_kerja', 'unit_kerja.unit_id', '=', 'riwayat_unit.unit_id')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $jabatan = Riwayat_jabatan::join('jabatan', 'jabatan.kode_jabatan', '=', 'riwayat_jabatan.kode_jabatan')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $shift = Riwayat_shift::join('harianshift', 'harianshift.kode_harianshift', '=', 'riwayat_shift.kode_harianshift')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $resiko = Riwayat_resiko::join('resiko', 'resiko.kode_resiko', '=', 'riwayat_resiko.kode_resiko')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $lokasi = Riwayat_lokasi::join('lokasi', 'lokasi.kode_lokasi', '=', 'riwayat_lokasi.kode_lokasi')
-//                 ->join('ump', function ($join) use ($currentYear) {
-//                     $join->on('ump.kode_lokasi', '=', 'lokasi.kode_lokasi')
-//                         ->where('ump.tahun', $currentYear);
-//                 })
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $masakerja = Masakerja::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-
-    //             $data[] = (object) array_merge(
-//                 $kuota_jam?->toArray() ?? [],
-//                 $karyawan->toArray(),
-//                 ['perusahaan' => $karyawan->perusahaan->perusahaan ?? null],
-//                 ['aktif_mulai' => \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->translatedFormat('F Y')],
-//                 $unit?->toArray() ?? [],
-//                 $jabatan?->toArray() ?? [],
-//                 $shift?->toArray() ?? [],
-//                 $resiko?->toArray() ?? [],
-//                 $lokasi?->toArray() ?? [],
-//                 ['ump_sumbar' => $umpSumbar],
-//                 $paket->toArray(),
-//                 $masakerja?->toArray() ?? []
-//             );
-//         }
-//     }
-//     // dd($data);
-
-    //     // Dump hasil log
-//     logger()->info('Total Kuota: ' . $totalExpected);
-//     logger()->info('Total Terpilih: ' . $totalActual);
-//     logger()->info('Detail Paket yang Kurang:', $errorLog);
-
-    //     return view('paket', compact('data'));
-// }
-
-
-
-    //     public function index()
-// {
-//     $data = [];
-
-    //     $paketList = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
-//     $currentYear = date('Y');
-//     $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
-
-    //     foreach ($paketList as $paket) {
-//         $kuota = (int) $paket->kuota_paket;
-//         $karyawanPaket = Paketkaryawan::where('paket_id', $paket->paket_id)
-//             ->with('karyawan')
-//             ->orderByDesc('beg_date')
-//             ->get();
-
-    //         // Gabungkan status dengan prioritas: Aktif -> Berhenti -> Sudah Diganti
-//         $terurut = $karyawanPaket->filter(fn($item) => $item->karyawan !== null)
-//             ->sortBy(function ($item) {
-//                 return match ($item->karyawan->status_aktif) {
-//                     'Aktif' => 1,
-//                     'Berhenti' => 2,
-//                     'Sudah Diganti' => 3,
-//                     default => 4,
-//                 };
-//             })
-//             ->values();
-
-    //         $terpilih = $terurut->take($kuota);
-
-    //         // Loop data yang terpilih
-//         foreach ($terpilih as $pk) {
-//             $karyawan = $pk->karyawan;
-//             $karyawan_id = $karyawan->karyawan_id;
-
-    //             // Relasi terkait
-//             $kuota_jam = Kuotajam::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $unit = Riwayat_unit::join('unit_kerja', 'unit_kerja.unit_id', '=', 'riwayat_unit.unit_id')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $jabatan = Riwayat_jabatan::join('jabatan', 'jabatan.kode_jabatan', '=', 'riwayat_jabatan.kode_jabatan')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $shift = Riwayat_shift::join('harianshift', 'harianshift.kode_harianshift', '=', 'riwayat_shift.kode_harianshift')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $resiko = Riwayat_resiko::join('resiko', 'resiko.kode_resiko', '=', 'riwayat_resiko.kode_resiko')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $lokasi = Riwayat_lokasi::join('lokasi', 'lokasi.kode_lokasi', '=', 'riwayat_lokasi.kode_lokasi')
-//                 ->join('ump', function ($join) use ($currentYear) {
-//                     $join->on('ump.kode_lokasi', '=', 'lokasi.kode_lokasi')
-//                         ->where('ump.tahun', $currentYear);
-//                 })
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $masakerja = Masakerja::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-
-    //             $data[] = (object) array_merge(
-//                 $kuota_jam?->toArray() ?? [],
-//                 $karyawan->toArray(),
-//                 ['perusahaan' => $karyawan->perusahaan->perusahaan ?? null],
-//                 ['aktif_mulai' => \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->translatedFormat('F Y')],
-//                 $unit?->toArray() ?? [],
-//                 $jabatan?->toArray() ?? [],
-//                 $shift?->toArray() ?? [],
-//                 $resiko?->toArray() ?? [],
-//                 $lokasi?->toArray() ?? [],
-//                 ['ump_sumbar' => $umpSumbar],
-//                 $paket->toArray(),
-//                 $masakerja?->toArray() ?? []
-//             );
-//         }
-
-    //         // Jika data kurang dari kuota, tambahkan placeholder kosong
-//         // $kurang = $kuota - $terpilih->count();
-//         // for ($i = 0; $i < $kurang; $i++) {
-//         //     $data[] = (object) [
-//         //         'karyawan_id' => null,
-//         //         'nama_lengkap' => 'Belum tersedia',
-//         //         'perusahaan' => $paket->paket ?? null,
-//         //         'ump_sumbar' => $umpSumbar,
-//         //         'paket_id' => $paket->paket_id,
-//         //         'paket' => $paket->paket,
-//         //         'aktif_mulai' => null,
-//         //         // Tambahkan field default lainnya jika perlu
-//         //     ];
-//         // }
-//     }
-
-    //     return view('paket', compact('data'));
-// }
-
-
-    // public function index()
-    // {
-    //     $data = [];
-
-    //     // Ambil semua paket dengan relasi perusahaan
-    //     $paketList = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
-
-    //     foreach ($paketList as $paket) {
-    //         $kuota = $paket->kuota_paket;
-
-    //         // Ambil semua karyawan yang terkait dengan paket
-    //         $karyawanPaket = Paketkaryawan::where('paket_id', $paket->paket_id)
-    //             ->with('karyawan')
-    //             ->orderByDesc('beg_date')
-    //             ->get();
-
-    //         // Filter berdasarkan status
-    //         $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan->status_aktif === 'Aktif');
-    //         $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan->status_aktif === 'Berhenti');
-    //         $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan->status_aktif === 'Sudah Diganti');
-
-    //         // Ambil sebanyak kuota dari urutan prioritas
-    //         $terpilih = collect();
-
-    //         if ($aktif->count() >= $kuota) {
-    //             $terpilih = $aktif->take($kuota);
-    //         } else {
-    //             $terpilih = $aktif;
-    //             $sisa = $kuota - $terpilih->count();
-
-    //             if ($berhenti->count() >= $sisa) {
-    //                 $terpilih = $terpilih->concat($berhenti->take($sisa));
-    //             } else {
-    //                 $terpilih = $terpilih->concat($berhenti);
-    //                 $sisa = $kuota - $terpilih->count();
-    //                 $terpilih = $terpilih->concat($diganti->take($sisa));
-    //             }
-    //         }
-
-    //         // Gabungkan data terpilih
-    //         foreach ($terpilih as $pk) {
-    //             $karyawan = $pk->karyawan;
-    //             $karyawan_id = $karyawan->karyawan_id;
-
-    //             $kuota_jam = Kuotajam::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-    //             $unit = Riwayat_unit::join('unit_kerja', 'unit_kerja.unit_id', '=', 'riwayat_unit.unit_id')
-    //                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-    //             $jabatan = Riwayat_jabatan::join('jabatan', 'jabatan.kode_jabatan', '=', 'riwayat_jabatan.kode_jabatan')
-    //                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-    //             $shift = Riwayat_shift::join('harianshift', 'harianshift.kode_harianshift', '=', 'riwayat_shift.kode_harianshift')
-    //                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-    //             $resiko = Riwayat_resiko::join('resiko', 'resiko.kode_resiko', '=', 'riwayat_resiko.kode_resiko')
-    //                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-    //             $lokasi = Riwayat_lokasi::join('lokasi', 'lokasi.kode_lokasi', '=', 'riwayat_lokasi.kode_lokasi')
-    //                 ->join('ump', function ($join) {
-    //                     $join->on('ump.kode_lokasi', '=', 'lokasi.kode_lokasi')
-    //                         ->where('ump.tahun', date('Y'));
-    //                 })
-    //                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-
-    //             $ump_sumbar = Ump::where('kode_lokasi', '12')->where('tahun', date('Y'))->value('ump');
-    //             $masakerja = Masakerja::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-
-    //             // Gabungkan semua info menjadi satu objek
-    //             $data[] = (object) array_merge(
-    //                 $kuota_jam?->toArray() ?? [],
-    //                 $karyawan->toArray(),
-    //                 ['perusahaan' => $karyawan->perusahaan->perusahaan ?? null],
-    //                 ['aktif_mulai' => \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->translatedFormat('F Y')],
-    //                 $unit?->toArray() ?? [],
-    //                 $jabatan?->toArray() ?? [],
-    //                 $shift?->toArray() ?? [],
-    //                 $resiko?->toArray() ?? [],
-    //                 $lokasi?->toArray() ?? [],
-    //                 ['ump_sumbar' => $ump_sumbar],
-    //                 $paket->toArray(),
-    //                 $masakerja?->toArray() ?? []
-    //             );
-    //         }
-    //     }
-
-    //     return view('paket', compact('data'));
-    // }
-
-
-    //     public function index()
-// {
-//     $data = [];
-
-    //     // Ambil semua paket
-//     $paketList = Paket::with(['paketKaryawan.karyawan.perusahaan:perusahaan_id,perusahaan'])->get();
-
-    //     foreach ($paketList as $paket) {
-//         $kuota = $paket->kuota_paket;
-
-    //         // Ambil semua karyawan terkait paket ini
-//         $karyawanPaket = Paketkaryawan::where('paket_id', $paket->paket_id)
-//             ->orderByDesc('beg_date')
-//             ->with('karyawan') // eager load biar efisien
-//             ->get();
-
-    //         // Pisahkan berdasarkan status aktif karyawan
-//         $aktif = $karyawanPaket->filter(function ($item) {
-//             return $item->karyawan->status_aktif === 'Aktif';
-//         });
-
-    //         $nonaktif = $karyawanPaket->reject(function ($item) {
-//             return $item->karyawan->status_aktif === 'Aktif';
-//         });
-
-    //         // Ambil sebanyak kuota
-//         $terpilih = $aktif->take($kuota);
-
-    //         if ($terpilih->count() < $kuota) {
-//             $sisa = $kuota - $terpilih->count();
-//             $terpilih = $terpilih->concat($nonaktif->take($sisa));
-//         }
-
-    //         // Gabungkan data
-//         foreach ($terpilih as $pk) {
-//             $karyawan = $pk->karyawan;
-//             $karyawan_id = $karyawan->karyawan_id;
-
-    //             $kuota_jam = Kuotajam::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $unit = Riwayat_unit::join('unit_kerja', 'unit_kerja.unit_id', '=', 'riwayat_unit.unit_id')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $jabatan = Riwayat_jabatan::join('jabatan', 'jabatan.kode_jabatan', '=', 'riwayat_jabatan.kode_jabatan')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $shift = Riwayat_shift::join('harianshift', 'harianshift.kode_harianshift', '=', 'riwayat_shift.kode_harianshift')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $resiko = Riwayat_resiko::join('resiko', 'resiko.kode_resiko', '=', 'riwayat_resiko.kode_resiko')
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-//             $lokasi = Riwayat_lokasi::join('lokasi', 'lokasi.kode_lokasi', '=', 'riwayat_lokasi.kode_lokasi')
-//                 ->join('ump', function ($join) {
-//                     $join->on('ump.kode_lokasi', '=', 'lokasi.kode_lokasi')
-//                          ->where('ump.tahun', date('Y'));
-//                 })
-//                 ->where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-
-    //             $ump_sumbar = Ump::where('kode_lokasi', '12')->where('tahun', date('Y'))->value('ump');
-//             $masakerja = Masakerja::where('karyawan_id', $karyawan_id)->orderByDesc('beg_date')->first();
-
-    //             // Gabung semua info ke satu objek
-//             $data[] = (object) array_merge(
-//                 $kuota_jam?->toArray() ?? [],
-//                 $karyawan->toArray(),
-//                 [
-//                     'perusahaan' => $karyawan->perusahaan->perusahaan ?? '-',
-//                     'aktif_mulai' => \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->translatedFormat('F Y')
-//                 ],
-//                 $unit?->toArray() ?? [],
-//                 $jabatan?->toArray() ?? [],
-//                 $shift?->toArray() ?? [],
-//                 $resiko?->toArray() ?? [],
-//                 $lokasi?->toArray() ?? [],
-//                 ['ump_sumbar' => $ump_sumbar],
-//                 $paket->toArray(),
-//                 $masakerja?->toArray() ?? []
-//             );
-//         }
-//     }
-
-    //     return view('paket', compact('data'));
-// }
-
-    //     public function index()
-//     {
-//         // Ambil semua karyawan beserta nama perusahaan
-//         $karyawanList = Karyawan::join('perusahaan', 'perusahaan.perusahaan_id', '=', 'karyawan.perusahaan_id')
-//             ->select('karyawan.*', 'perusahaan.perusahaan') // ambil nama perusahaan atau semua kolom jika perlu
-//             ->get();
-
-    //         $data = [];
-
-    //         foreach ($karyawanList as $karyawan) {
-//             $karyawan_id = $karyawan->karyawan_id;
-
-    //             // Ambil riwayat masing-masing entitas
-//             $kuota_jam = Kuotajam::where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             $unit = Riwayat_unit::join('unit_kerja', 'unit_kerja.unit_id', '=', 'riwayat_unit.unit_id')
-//                 ->where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             $jabatan = Riwayat_jabatan::join('jabatan', 'jabatan.kode_jabatan', '=', 'riwayat_jabatan.kode_jabatan')
-//                 ->where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             $shift = Riwayat_shift::join('harianshift', 'harianshift.kode_harianshift', '=', 'riwayat_shift.kode_harianshift')
-//                 ->where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             $resiko = Riwayat_resiko::join('resiko', 'resiko.kode_resiko', '=', 'riwayat_resiko.kode_resiko')
-//                 ->where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             $lokasi = Riwayat_lokasi::join('lokasi', 'lokasi.kode_lokasi', '=', 'riwayat_lokasi.kode_lokasi')
-//                 ->join('ump', 'ump.kode_lokasi','=','lokasi.kode_lokasi')
-//                 ->where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             $ump_sumbar = Ump::where('kode_lokasi', '12')
-//                 ->where('tahun', date('Y')) // atau tahun aktif
-//                 ->value('ump');
-
-    //             $paket = PaketKaryawan::join('paket', 'paket.paket_id', '=', 'paket_karyawan.paket_id')
-//                 ->where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             $masakerja = Masakerja::where('karyawan_id', $karyawan_id)
-//                 ->orderByDesc('beg_date')
-//                 ->first();
-
-    //             // Gabungkan data
-//             $data[] = (object) array_merge(
-//                 $kuota_jam->toArray(),
-//                 $karyawan->toArray()?? [],
-//                 ['aktif_mulai' => \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->translatedFormat('F Y')],
-//                 $unit?->toArray() ?? [],
-//                 $jabatan?->toArray() ?? [],
-//                 $shift?->toArray() ?? [],
-//                 $resiko?->toArray() ?? [],
-//                 $lokasi?->toArray() ?? [],
-//                 ['ump_sumbar' => $ump_sumbar],
-//                 $paket?->toArray() ?? [],
-//                 $masakerja?->toArray() ?? [],
-
-    //             );
-//         }
-//   //dd($data);
-//         return view('paket', compact('data'));
-//     }
-
-
-
 
     public function getTambah()
     {
@@ -1337,5 +798,21 @@ class PaketController extends Controller
         return redirect()->route('paket.pdf.download', $tagihan->paket_id);
     }
 
-}
+    /**
+     * Hitung Ulang Nilai Kontrak Manual
+     */
+    public function hitung(Request $request, $id)
+    {
+        $calculatorService = app(\App\Services\ContractCalculatorService::class);
+        
+        $periode = $request->periode ?: date('Y-m');
+        
+        try {
+            $calculatorService->calculateForPaket($id, $periode);
+            return redirect()->back()->with('success', 'Perhitungan kontrak periode ' . \Carbon\Carbon::parse($periode)->format('F Y') . ' berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghitung kontrak: ' . $e->getMessage());
+        }
+    }
 
+}

@@ -267,6 +267,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update-paket/{id}', [PaketController::class, 'setUpdate']);
     Route::get('/delete-paket/{id}', [PaketController::class, 'destroy']);
     Route::get('/restore-paket/{id}', [PaketController::class, 'restore']);
+    Route::post('/paket/{id}/hitung', [PaketController::class, 'hitung'])->name('paket.hitung');
 
     Route::get('/ump', [UmpController::class, 'index']);
     Route::get('/gettambah-ump-tahunan', [UmpController::class, 'getTambah']);

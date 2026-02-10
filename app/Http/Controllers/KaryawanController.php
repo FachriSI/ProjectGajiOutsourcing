@@ -244,6 +244,14 @@ class KaryawanController extends Controller
             'beg_date' => now()->format('Y-m-d'), // Start date in package
         ]);
 
+        // Auto-Calculate to ensure data appears immediately in Paket Detail
+        try {
+            $calculatorService = app(\App\Services\ContractCalculatorService::class);
+            $calculatorService->calculateForPaket($request->paket_id, date('Y-m'));
+        } catch (\Exception $e) {
+            \Log::error('Auto-calculation failed after creating employee: ' . $e->getMessage());
+        }
+
         return redirect('/karyawan')->with('success', 'Data Berhasil Tersimpan');
     }
 
@@ -327,6 +335,17 @@ class KaryawanController extends Controller
             'paket_id' => $request->paket_id,
             'beg_date' => $request->beg_date,
         ]);
+
+        // Auto-Calculate for the NEW Paket
+        try {
+            $calculatorService = app(\App\Services\ContractCalculatorService::class);
+            $calculatorService->calculateForPaket($request->paket_id, date('Y-m'));
+            
+            // Optional: Calculate for OLD paket too if we knew what it was, but that requires extra query.
+            // For now, ensuring the destination package has data is the priority.
+        } catch (\Exception $e) {
+            \Log::error('Auto-calculation failed after mutation: ' . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Mutasi paket berhasil disimpan.');
     }

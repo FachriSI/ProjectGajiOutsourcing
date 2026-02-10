@@ -91,6 +91,14 @@
 
             </form>
 
+            <form action="{{ route('paket.hitung', $paketList->first()->paket_id) }}" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="periode" value="{{ $selectedPeriode }}">
+                <button type="submit" class="btn btn-primary shadow-sm me-2">
+                    <i class="fas fa-calculator me-1"></i> Hitung / Refresh
+                </button>
+            </form>
+
 
             <a href="/gettambah-karyawan?paket_id={{ $paketList->first()->paket_id ?? '' }}" class="btn btn-success shadow-sm">
                 <i class="fas fa-user-plus me-1"></i> Tambah Karyawan
@@ -300,6 +308,11 @@
 
                                     $thr = round(($upah_pokok + $t_tetap) / 12);
                                     $fee_thr = round($thr * 0.05);
+
+                                    // Yearly THR Components
+                                    $thr_base_thn = $thr * 12;
+                                    $fee_thr_thn = $fee_thr * 12;
+
                                     $thr_bln = $thr + $fee_thr;
                                     $thr_thn = $thr_bln * 12;
 
@@ -327,9 +340,8 @@
             data-total-variabel="{{ number_format($total_variabel, 0, ',', '.') }}"
             data-total-kontrak-bln="{{ number_format($total_kontrak, 0, ',', '.') }}"
             data-total-kontrak-thn="{{ number_format($total_kontrak_tahunan, 0, ',', '.') }}"
-            data-thr="{{ number_format($thr, 0, ',', '.') }}"
-            data-fee-thr="{{ number_format($fee_thr, 0, ',', '.') }}"
-            data-thr-bln="{{ number_format($thr_bln, 0, ',', '.') }}"
+            data-thr-base-thn="{{ number_format($thr_base_thn, 0, ',', '.') }}"
+            data-fee-thr-thn="{{ number_format($fee_thr_thn, 0, ',', '.') }}"
             data-thr-thn="{{ number_format($thr_thn, 0, ',', '.') }}"
             data-total-pakaian="{{ number_format($total_pakaian, 0, ',', '.') }}">
             
@@ -378,6 +390,7 @@
                 <h5 class="mb-3"><i class="fas fa-info-circle"></i> Detail Breakdown Komponen</h5>
                 
                 <div class="row">
+                    <!-- Left Column: Tunjangan -->
                     <div class="col-md-6">
                         <h6 class="text-primary"><i class="fas fa-money-bill-wave"></i> Breakdown Tunjangan Tetap & Tidak Tetap</h6>
                         <table class="table table-sm table-bordered">
@@ -391,6 +404,7 @@
                         </table>
                     </div>
                     
+                    <!-- Right Column: Cost & Fee -->
                     <div class="col-md-6">
                         <h6 class="text-primary"><i class="fas fa-calculator"></i> Breakdown Cost & Fee</h6>
                         <table class="table table-sm table-bordered">
@@ -410,6 +424,7 @@
                     </div>
                 </div>
                 
+                <!-- Bottom Row: Total & THR -->
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <h6 class="text-success"><i class="fas fa-file-invoice-dollar"></i> Total Kontrak & Benefit</h6>
@@ -422,10 +437,9 @@
                                 <td><strong>Total Kontrak/Tahun</strong></td>
                                 <td class="text-right"><strong>Rp${data.totalKontrakThn}</strong></td>
                             </tr>
-                            <tr><td><strong>THR (Base)</strong></td><td class="text-right">Rp${data.thr}</td></tr>
-                            <tr><td><strong>Fee THR (5%)</strong></td><td class="text-right">Rp${data.feeThr}</td></tr>
-                            <tr><td><strong>THR/Bulan</strong></td><td class="text-right">Rp${data.thrBln}</td></tr>
-                            <tr><td><strong>THR/Tahun</strong></td><td class="text-right">Rp${data.thrThn}</td></tr>
+                            <tr><td><strong>THR Base / Tahun</strong></td><td class="text-right">Rp${data.thrBaseThn}</td></tr>
+                            <tr><td><strong>Fee THR (5%) / Tahun</strong></td><td class="text-right">Rp${data.feeThrThn}</td></tr>
+                            <tr><td><strong>Total THR/Tahun</strong></td><td class="text-right">Rp${data.thrThn}</td></tr>
                             <tr><td><strong>Total Pakaian/Tahun</strong></td><td class="text-right">Rp${data.totalPakaian}</td></tr>
                         </table>
                     </div>
@@ -530,9 +544,8 @@
                     totalVariabel: tr.attr('data-total-variabel'),
                     totalKontrakBln: tr.attr('data-total-kontrak-bln'),
                     totalKontrakThn: tr.attr('data-total-kontrak-thn'),
-                    thr: tr.attr('data-thr'),
-                    feeThr: tr.attr('data-fee-thr'),
-                    thrBln: tr.attr('data-thr-bln'),
+                    thrBaseThn: tr.attr('data-thr-base-thn'),
+                    feeThrThn: tr.attr('data-fee-thr-thn'),
                     thrThn: tr.attr('data-thr-thn'),
                     totalPakaian: tr.attr('data-total-pakaian')
                 };

@@ -14,6 +14,7 @@ class MedicalCheckup extends Model
     
     // Allow mass assignment
     protected $fillable = [
+        'karyawan_id',
         'biaya',
         'is_deleted', 
         'deleted_by', 
