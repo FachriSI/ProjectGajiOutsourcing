@@ -6,14 +6,7 @@
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-tshirt me-2" style="color: #6f42c1;"></i> Pakaian</h1>
-                <p class="text-muted small mb-0 mt-1">Kelola data jatah pakaian dinas karyawan</p>
-            </div>
-            <div class="d-flex gap-2">
-                @if($hasDeleted)
-                    <a href="/pakaian/sampah" class="btn btn-secondary shadow-sm">
-                        <i class="fas fa-trash-restore me-1"></i> Data Sampah
-                    </a>
-                @endif
+                <p class="text-muted small mb-0 mt-1">Kelola data jatah pakaian dinas (Global)</p>
             </div>
         </div>
     </div>
@@ -25,90 +18,43 @@
         </div>
     @endif
 
-    <div class="card shadow border-0 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Atur Nilai Jatah Pakaian</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Pengaturan ini akan memperbarui nilai jatah pakaian untuk <strong>semua karyawan aktif</strong>.
+                    </div>
 
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered datatable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="table-light">
-                        <tr>
-                            <th width="5%" class="text-center">No.</th>
-                            <th>Karyawan</th>
-                            <th class="text-end">Nilai Jatah</th>
-                            <th class="text-center">Ukuran Baju</th>
-                            <th class="text-center">Ukuran Celana</th>
-                            <th width="15%" class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($data as $item)
-                            <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-circle bg-purple-light text-purple me-2">
-                                            <i class="fas fa-user-tie"></i>
-                                        </div>
-                                        <span class="fw-bold text-dark">{{ $item->nama_tk }}</span>
-                                    </div>
-                                </td>
-                                <td class="text-end fw-bold text-success">
-                                    Rp {{ number_format($item->nilai_jatah, 0, ',', '.') }}
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-light text-dark border">{{ $item->ukuran_baju }}</span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-light text-dark border">{{ $item->ukuran_celana }}</span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="/getupdate-pakaian/{{ $item->pakaian_id }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-pakaian', $item->pakaian_id) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Delete"
-                                            onclick="return confirm('Hapus data pakaian ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    <form action="{{ url('/pakaian/update-global') }}" method="POST">
+                        @csrf
+
+                        <div class="mb-4 text-center">
+                            <label class="text-muted mb-1">Nilai Jatah Saat Ini</label>
+                            <h2 class="font-weight-bold text-success">Rp {{ number_format($currentNilai, 0, ',', '.') }}
+                            </h2>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nilai_jatah" class="form-label">Nilai Jatah Baru (Rp)</label>
+                            <input type="number" class="form-control" id="nilai_jatah" name="nilai_jatah"
+                                value="{{ $currentNilai }}" required min="0">
+                        </div>
+
+
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-save me-2"></i> Simpan Perubahan Global
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-
-    <style>
-        .icon-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        .text-purple {
-            color: #6f42c1 !important;
-        }
-
-        .bg-purple-light {
-            background-color: rgba(111, 66, 193, 0.1);
-        }
-    </style>
-
-    <script>
-        $(document).ready(function () {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            })
-        });
-    </script>
 @endsection

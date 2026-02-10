@@ -154,13 +154,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/restore-masakerja/{id}', [MasakerjaController::class, 'restore']);
 
     Route::get('/pakaian', [PakaianController::class, 'index']);
-    Route::get('/gettambah-pakaian', [PakaianController::class, 'getTambah']);
-    Route::post('/tambah-pakaian', [PakaianController::class, 'setTambah']);
-    Route::get('/pakaian/sampah', [PakaianController::class, 'trash']);
-    Route::get('/getupdate-pakaian/{id}', [PakaianController::class, 'getUpdate']);
-    Route::get('/update-pakaian/{id}', [PakaianController::class, 'setUpdate']);
-    Route::get('/delete-pakaian/{id}', [PakaianController::class, 'destroy']);
-    Route::get('/restore-pakaian/{id}', [PakaianController::class, 'restore']);
+    Route::post('/pakaian/update-global', [PakaianController::class, 'updateGlobal']);
+    // Route::get('/gettambah-pakaian', [PakaianController::class, 'getTambah']);
+    // Route::post('/tambah-pakaian', [PakaianController::class, 'setTambah']);
+    // Route::get('/pakaian/sampah', [PakaianController::class, 'trash']);
+    // Route::get('/getupdate-pakaian/{id}', [PakaianController::class, 'getUpdate']);
+    // Route::post('/update-pakaian/{id}', [PakaianController::class, 'setUpdate']);
+    // Route::get('/delete-pakaian/{id}', [PakaianController::class, 'destroy']);
+    // Route::get('/restore-pakaian/{id}', [PakaianController::class, 'restore']);
 
     Route::get('/penyesuaian', [PenyesuaianController::class, 'index']);
     Route::get('/gettambah-penyesuaian', [PenyesuaianController::class, 'getTambah']);

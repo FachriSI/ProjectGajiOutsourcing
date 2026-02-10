@@ -10,121 +10,71 @@ class PakaianController extends Controller
 {
     public function index()
     {
-        // 1. Sync: Ensure all active employees have a Pakaian record
+        // Ambil satu contoh data pakaian terakhir dari karyawan aktif untuk menampilkan nilai jatah saat ini
+        // Asumsi: Semua karyawan aktif memiliki nilai jatah yang sama setelah update global
+        // Ambil satu contoh data pakaian terakhir (global setting terakhir)
+        // Kita ambil record yang paling baru dibuat/berlaku
+        // Ambil satu contoh data pakaian terakhir (global setting terakhir)
+        // Kita ambil record yang paling baru DI-INPUT (created_at), bukan berdasarkan tanggal berlaku (beg_date)
+        // Ini agar user melihat angka yang baru saja dia input, meskipun tanggal berlakunya mundur/maju.
+        $sampleData = \App\Models\Pakaian::where('is_deleted', 0)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        $currentNilai = $sampleData ? $sampleData->nilai_jatah : 0;
+
+        // Use a simple history if needed, or just the current value.
+        // For now, passing the current value.
+
+        return view('pakaian', ['currentNilai' => $currentNilai]);
+    }
+
+    public function updateGlobal(Request $request)
+    {
+        $request->validate([
+            'nilai_jatah' => 'required|numeric|min:0',
+        ]);
+
+        $nilaiJatah = $request->nilai_jatah;
+        // Gunakan tanggal hari ini secara otomatis
+        $begDate = now()->format('Y-m-d');
+
+        // Ambil semua karyawan aktif
         $activeKaryawan = \App\Models\Karyawan::where('status_aktif', 'Aktif')->get();
 
-        foreach ($activeKaryawan as $k) {
-            $exists = Pakaian::where('karyawan_id', $k->karyawan_id)
-                ->where('is_deleted', 0)
-                ->exists();
+        $count = 0;
 
-            if (!$exists) {
-                Pakaian::create([
-                    'karyawan_id' => $k->karyawan_id,
-                    'nilai_jatah' => 690000, // Default requested by user
-                    'ukuran_baju' => '0',
-                    'ukuran_celana' => '0',
-                    'beg_date' => now()->format('Y-m-d'),
-                ]);
+        DB::transaction(function () use ($activeKaryawan, $nilaiJatah, $begDate, &$count) {
+            foreach ($activeKaryawan as $karyawan) {
+                // Ambil data pakaian terakhir untuk mendapatkan ukuran baju/celana
+                $lastPakaian = Pakaian::where('karyawan_id', $karyawan->karyawan_id)
+                    ->where('is_deleted', 0)
+                    ->orderBy('beg_date', 'desc')
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                $ukuranBaju = $lastPakaian ? $lastPakaian->ukuran_baju : '0';
+                $ukuranCelana = $lastPakaian ? $lastPakaian->ukuran_celana : '0';
+
+                // Buat record baru atau update jika tanggal sama
+                Pakaian::updateOrCreate(
+                    [
+                        'karyawan_id' => $karyawan->karyawan_id,
+                        'beg_date' => $begDate
+                    ],
+                    [
+                        'nilai_jatah' => $nilaiJatah,
+                        'ukuran_baju' => $ukuranBaju,
+                        'ukuran_celana' => $ukuranCelana,
+                        'is_deleted' => 0
+                    ]
+                );
+
+                $count++;
             }
-        }
+        });
 
-        // 2. Fetch Data for View
-        // Join with subquery to get ONLY the latest Pakaian record by ID (most recent entry)
-        $latestPakaian = DB::table('md_pakaian')
-            ->select(DB::raw('MAX(pakaian_id) as max_id'))
-            ->where('is_deleted', 0)
-            ->groupBy('karyawan_id');
-
-        $data = DB::table('md_karyawan')
-            ->join('md_pakaian', function ($join) {
-                $join->on('md_karyawan.karyawan_id', '=', 'md_pakaian.karyawan_id');
-            })
-            ->joinSub($latestPakaian, 'latest_pakaian', function ($join) {
-                $join->on('md_pakaian.pakaian_id', '=', 'latest_pakaian.max_id');
-            })
-            ->where('md_karyawan.status_aktif', 'Aktif')
-            ->where('md_pakaian.is_deleted', 0)
-            ->select(
-                'md_karyawan.nama_tk',
-                'md_karyawan.karyawan_id',
-                'md_pakaian.pakaian_id',
-                'md_pakaian.nilai_jatah',
-                'md_pakaian.ukuran_baju',
-                'md_pakaian.ukuran_celana'
-            )
-            ->get();
-
-        $hasDeleted = Pakaian::where('is_deleted', 1)->exists();
-        return view('pakaian', ['data' => $data, 'hasDeleted' => $hasDeleted]);
+        return redirect('/pakaian')->with('success', "Berhasil memperbarui Nilai Jatah untuk {$count} karyawan aktif.");
     }
 
-    public function trash()
-    {
-        $data = Pakaian::where('is_deleted', 1)->get();
-        return view('pakaian-sampah', ['data' => $data]);
-    }
-
-    public function getTambah()
-    {
-        $karyawan = DB::table('md_karyawan')->get();
-        $masterUkuran = \App\Models\MasterUkuran::all();
-        return view('tambah-pakaian', ['karyawan' => $karyawan, 'masterUkuran' => $masterUkuran]);
-    }
-
-    public function setTambah(Request $request)
-    {
-        $request->validate(['karyawan_id' => 'required']);
-
-        Pakaian::create([
-            'karyawan_id' => $request->karyawan_id,
-            'nilai_jatah' => $request->nilai_jatah ?? 0,
-            'ukuran_baju' => $request->ukuran_baju ?? 0,
-            'ukuran_celana' => $request->ukuran_celana ?? 0,
-            'beg_date' => $request->beg_date ?? now(),
-        ]);
-
-        return redirect('/pakaian')->with('success', 'Data Berhasil Tersimpan');
-    }
-
-    public function getUpdate($id)
-    {
-        $dataP = DB::table('md_pakaian')->where('pakaian_id', '=', $id)->first();
-        $karyawan = DB::table('md_karyawan')->get();
-        $masterUkuran = \App\Models\MasterUkuran::all();
-        return view('update-pakaian', ['dataP' => $dataP, 'karyawan' => $karyawan, 'masterUkuran' => $masterUkuran]);
-    }
-
-    public function setUpdate(Request $request, $id)
-    {
-        Pakaian::where('pakaian_id', $id)->update([
-            'karyawan_id' => $request->karyawan_id,
-            'nilai_jatah' => $request->nilai_jatah ?? 0,
-            'ukuran_baju' => $request->ukuran_baju ?? 0,
-            'ukuran_celana' => $request->ukuran_celana ?? 0,
-            'beg_date' => $request->beg_date,
-        ]);
-
-        return redirect('/pakaian')->with('success', 'Data Berhasil Diupdate');
-    }
-
-    public function destroy($id)
-    {
-        Pakaian::where('pakaian_id', $id)->update([
-            'is_deleted' => 1,
-            'deleted_by' => auth()->user() ? auth()->user()->username : 'System',
-            'deleted_at' => now()
-        ]);
-        return back()->with('success', 'Data berhasil dihapus!');
-    }
-
-    public function restore($id)
-    {
-        Pakaian::where('pakaian_id', $id)->update([
-            'is_deleted' => 0,
-            'deleted_by' => null,
-            'deleted_at' => null
-        ]);
-        return back()->with('success', 'Data berhasil dipulihkan!');
-    }
 }

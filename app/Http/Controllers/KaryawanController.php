@@ -397,10 +397,15 @@ class KaryawanController extends Controller
             'beg_date' => 'required',
         ]);
 
+        // Ambil nilai jatah global saat ini (dari data terakhir yang diinput)
+        $currentNilai = \App\Models\Pakaian::where('is_deleted', 0)
+            ->orderBy('beg_date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->value('nilai_jatah') ?? 0;
 
         DB::table('md_pakaian')->insert([
             'karyawan_id' => $request->karyawan_id,
-            'nilai_jatah' => 690000,
+            'nilai_jatah' => $currentNilai,
             'ukuran_baju' => $request->ukuran_baju,
             'ukuran_celana' => $request->ukuran_celana,
             'beg_date' => $request->beg_date,
