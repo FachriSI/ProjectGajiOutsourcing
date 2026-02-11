@@ -68,6 +68,9 @@ class PaketController extends Controller
         
         $calculatorService = app(\App\Services\ContractCalculatorService::class);
 
+        // Collection to store all active employee IDs found in contracts (for bulk querying Pakaian)
+        $activeEmployeeIds = collect();
+
         foreach ($allPakets as $paket) {
             // Get or Calculate NilaiKontrak for CURRENT month
             $nilaiKontrak = \App\Models\NilaiKontrak::where('paket_id', $paket->paket_id)
@@ -90,9 +93,9 @@ class PaketController extends Controller
 
             if ($nilaiKontrak) {
                 // Aggregate Totals from Calculated Data
-                
                 $breakdown = $nilaiKontrak->breakdown_json;
                 
+                // Total Kontrak (Monthly) - Directly from stored value
                 $total_kontrak_all += $nilaiKontrak->total_nilai_kontrak;
                 
                 $karyawanData = $breakdown['karyawan'] ?? [];
@@ -100,22 +103,46 @@ class PaketController extends Controller
                 foreach ($karyawanData as $k) {
                     $total_active_employees_all++;
                     
-                    // Summing up components from the JSON data for accuracy
-                    $total_jml_fix_cost += ($k['jml_fix_cost'] ?? 0);
-                    $total_seluruh_variabel += ($k['total_variabel'] ?? 0);
-                    $total_thr_bln += ($k['thr_bln'] ?? 0);
-                    $total_thr_thn += (($k['thr_bln'] ?? 0) * 12);
+                    // Collect ID for Pakaian query
+                    if (isset($k['karyawan_id'])) {
+                        $activeEmployeeIds->push($k['karyawan_id']);
+                    }
                     
-                    $total_pakaian_all += ($k['pakaian_total'] ?? 0); // Hypothetical key
+                    // Fix Cost: 'fix_cost' key from service
+                    $total_jml_fix_cost += ($k['fix_cost'] ?? 0);
+                    
+                    // Variable Cost: 'lembur' key from service (which represents Total Variabel)
+                    $total_seluruh_variabel += ($k['lembur'] ?? 0);
+                    
+                    // THR Calculation: Upah Pokok + Tunjangan Tetap + Tunjangan Lokasi
+                    // Note: 'tj_tetap' includes Jabatan + Masa Kerja
+                    $upah = $k['upah_pokok'] ?? 0;
+                    $tjTetap = $k['tj_tetap'] ?? 0;
+                    $tjLokasi = $k['tj_lokasi'] ?? 0;
+                    
+                    $thr_amount = $upah + $tjTetap + $tjLokasi;
+                    $total_thr_thn += $thr_amount;
                 }
-                
-                 $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
-                 $mcu_cost = $mcu->biaya ?? 0;
-                 $total_mcu_all += (count($karyawanData) * $mcu_cost);
             }
         }
 
-        $total_kontrak_tahunan_all = $total_kontrak_all * 12;
+        // Yearly Totals based on Monthly Sums
+        $total_kontrak_tahunan_all = $total_kontrak_all * 12; // Total Contract/Year
+        
+        // THR Monthly Average
+        $total_thr_bln = $total_thr_thn / 12;
+
+        // Pakaian Calculation: Sum 'nilai_jatah' for all unique active employees found
+        if ($activeEmployeeIds->isNotEmpty()) {
+            $total_pakaian_all = \App\Models\Pakaian::whereIn('karyawan_id', $activeEmployeeIds->unique())
+                ->where('is_deleted', 0)
+                ->sum('nilai_jatah');
+        }
+
+        // MCU Calculation: Cost * Number of Active Employees
+        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
+        $mcu_cost = $mcu->biaya ?? 0;
+        $total_mcu_all = $total_active_employees_all * $mcu_cost;
 
         // Filter Karyawan: Only those who are NOT in any PaketKaryawan record (Strictly 'Free')
         $assignedKaryawanIds = PaketKaryawan::pluck('karyawan_id')->unique();

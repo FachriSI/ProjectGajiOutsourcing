@@ -117,6 +117,10 @@
                             href="{{ url('/medical-checkup') }}">
                             <i class="fas fa-notes-medical"></i> Medical Checkup
                         </a>
+                        <a class="nav-link {{ request()->is('lebaran*') ? 'active' : '' }}"
+                            href="{{ url('/lebaran') }}">
+                            <i class="fas fa-calendar-alt"></i> Data Lebaran
+                        </a>
                     </nav>
                 </div>
 

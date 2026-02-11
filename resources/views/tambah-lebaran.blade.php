@@ -3,54 +3,44 @@
 @section('title', 'Tambah Data Lebaran')
 
 @section('content')
-
-<div class="row justify-content-center mt-4">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Tambah Data Lebaran</h5>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4"><i class="fas fa-calendar-plus me-2"></i>Tambah Data Lebaran</h1>
+        
+        <div class="card mb-4 shadow-sm border-0 mt-3">
+            <div class="card-header">
+                <i class="fas fa-edit me-1"></i>
+                Form Tambah Lebaran
             </div>
             <div class="card-body">
-                <form method="post" action="{{ url('tambah-lebaran') }}">
+                <form action="/tambah-lebaran" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label for="tahun" class="form-label">Tahun</label>
-                        <select class="form-select" name="tahun" id="tahun" required>
-                            @php
-                                $currentYear = date('Y');
-                                $startYear = $currentYear - 2;
-                                $endYear = $currentYear + 5;
-                            @endphp
-                            @for ($i = $startYear; $i <= $endYear; $i++)
-                                <option value="{{ $i }}" {{ $i == $currentYear ? 'selected' : '' }}>{{ $i }}</option>
-                            @endfor
-                        </select>
+                        <label for="tahun" class="form-label">Tahun (Masehi)</label>
+                        <input type="number" class="form-control @error('tahun') is-invalid @enderror" id="tahun" name="tahun" value="{{ old('tahun', date('Y')) }}" required>
                         @error('tahun')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="tanggal" class="form-label">Tanggal Lebaran (Idul Fitri)</label>
+                        <input type="date" class="form-control @error('tanggal') is-invalid @enderror" id="tanggal" name="tanggal" value="{{ old('tanggal') }}" required>
+                        @error('tanggal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="tahun_hijriyah" class="form-label">Tahun Hijriyah (Opsional)</label>
+                        <input type="text" class="form-control" id="tahun_hijriyah" name="tahun_hijriyah" placeholder="Contoh: 1447 H" value="{{ old('tahun_hijriyah') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="keterangan" class="form-label">Keterangan (Opsional)</label>
+                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3">{{ old('keterangan') }}</textarea>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="tanggal" class="form-label">Tanggal Idul Fitri</label>
-                        <input type="date" class="form-control" name="tanggal" id="tanggal" required>
-                        @error('tanggal')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="keterangan" class="form-label">Keterangan (Optional)</label>
-                        <textarea class="form-control" name="keterangan" id="keterangan" rows="3"></textarea>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url('lebaran') }}" class="btn btn-secondary">Kembali</a>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Simpan</button>
+                    <a href="/lebaran" class="btn btn-secondary">Batal</a>
                 </form>
             </div>
         </div>
     </div>
-</div>
-
 @endsection

@@ -130,7 +130,7 @@
         <br>
         Catatan :<br>
         - Pembayaran THR kepada tenaga kerja sesuai dengan peraturan perundang-undangan yang berlaku.<br>
-        - Bukti pembayaran THR kepada tenaga kerja wajib dilampirkan pada tagihan bulan Februari {{ $nilaiKontrak->tahun }} yang ditagih pada bulan Maret {{ $nilaiKontrak->tahun }}.
+        - Bukti pembayaran THR kepada tenaga kerja wajib dilampirkan pada tagihan bulan {{ \Carbon\Carbon::parse($data['tanggal_lebaran'])->subMonth()->translatedFormat('F Y') }} yang ditagih pada bulan {{ \Carbon\Carbon::parse($data['tanggal_lebaran'])->translatedFormat('F Y') }}.
     </div>
 
     <table class="signature-table">

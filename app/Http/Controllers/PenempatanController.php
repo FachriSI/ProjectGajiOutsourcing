@@ -710,15 +710,15 @@ class PenempatanController extends Controller
     {
         $history = [];
         $currentId = $id;
+        $visitedIds = [$id]; // Prevent infinite loops
 
         // Loop untuk mencari history ke belakang (limit 50 untuk mencegah infinite loop)
         for ($i = 0; $i < 50; $i++) {
             $prevId = null;
-            $catatan = '-';
-            $tanggalBerhenti = '-';
-            $diberhentikanOleh = '-';
+            $historyRecord = null;
 
-            // 1. Cek di tabel history_karyawan (Fitur Baru)
+            // 1. Cek di tabel history_karyawan (Fitur Baru - Direct Link)
+            // Logic: Current ID is the 'New' employee, so we look for where karyawan_id happens to be $currentId
             $historyRecord = DB::table('history_karyawan')
                 ->where('karyawan_id', $currentId)
                 ->first();
@@ -726,18 +726,33 @@ class PenempatanController extends Controller
             if ($historyRecord) {
                 $prevId = $historyRecord->karyawan_sebelumnya_id;
             } else {
-                // 2. Cek Legacy (Regex dari catatan_pengganti)
+                // 2. Cek Legacy (Regex dari catatan_pengganti pada Current Employee)
+                // "Saya adalah pengganti ID X"
                 $karyawan = DB::table('md_karyawan')
                     ->where('karyawan_id', $currentId)
                     ->first();
 
-                // Regex lebih fleksibel: Case insensitive, spasi opsional, titik dua opsional
                 if ($karyawan && preg_match('/Pengganti\s+ID\s*:?\s*(\d+)/i', $karyawan->catatan_pengganti ?? '', $matches)) {
                     $prevId = $matches[1];
                 }
+                
+                // 3. Cek Reverse Legacy (Cari Karyawan Lama yang dicatat 'Digantikan oleh ID Current')
+                // "ID X berkata: Saya digantikan oleh CurrentID"
+                if (!$prevId) {
+                    $prevKaryawanCandidate = DB::table('md_karyawan')
+                        ->where('catatan_pengganti', 'like', '%Digantikan oleh ID ' . $currentId . '%')
+                        ->orWhere('catatan_pengganti', 'like', '%Digantikan oleh ' . $currentId . '%') // Flexible match
+                        ->first();
+                    
+                    if ($prevKaryawanCandidate) {
+                        $prevId = $prevKaryawanCandidate->karyawan_id;
+                    }
+                }
             }
 
-            if ($prevId) {
+            if ($prevId && !in_array($prevId, $visitedIds)) {
+                $visitedIds[] = $prevId;
+
                 // Ambil data karyawan sebelumnya
                 $prevKaryawan = DB::table('md_karyawan')
                     ->leftJoin('users', 'md_karyawan.diberhentikan_oleh', '=', 'users.id')

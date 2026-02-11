@@ -31,21 +31,137 @@
         </div>
     @endif
 
-    <div class="row">
-        <!-- Form Kalkulator -->
-        <div class="col-md-5">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-bottom fw-bold text-primary py-3">
-                    <i class="fas fa-calculator me-1"></i> Form Perhitungan
+    <!-- Daftar Semua Paket (Moved to Top) -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card shadow border-primary border-top border-3">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-list me-2"></i> Daftar Paket Kontrak</h5>
+
+                    <form action="{{ route('kalkulator.index') }}" method="GET" class="d-flex align-items-center">
+                        <label for="filter_periode" class="text-muted me-2 small fw-bold">Filter Periode:</label>
+                        <select name="filter_periode" id="filter_periode" class="form-select form-select-sm"
+                            onchange="this.form.submit()" style="width: auto;">
+                            <option value="">-- Tampilkan Terbaru --</option>
+                            @foreach($availablePeriods as $p)
+                                <option value="{{ $p }}" {{ $selectedPeriode == $p ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::parse($p)->translatedFormat('F Y') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
                 </div>
                 <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped datatable-paket">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Paket</th>
+                                    <th>Unit Kerja</th>
+                                    <th>Kuota</th>
+                                    <th>Nilai Kontrak Per Bulan</th>
+                                    <th>Periode</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($pakets as $item)
+                                    @php
+                                        $nilaiKontrak = $nilaiKontrakData[$item->paket_id] ?? null;
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $item->paket }}</td>
+                                        <td>{{ $item->unitKerja->unit_kerja ?? '-' }}</td>
+                                        <td class="text-center">{{ $item->kuota_paket }} orang</td>
+                                        <td class="text-end">
+                                            @if($nilaiKontrak)
+                                                <strong class="text-success">
+                                                    Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}
+                                                </strong>
+                                            @else
+                                                <span class="text-muted">Belum dihitung</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($nilaiKontrak)
+                                                <small>{{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('M Y') }}</small>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        @php
+                                            // Use actual contract periode if available, otherwise use current periode
+                                            $routePeriode = $nilaiKontrak ? \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y-m') : $currentPeriode;
+                                        @endphp
+                                        <td>
+                                            <div class="d-flex justify-content-center gap-1">
+                                                <a href="{{ route('kalkulator.show', ['paket_id' => $item->paket_id, 'periode' => $routePeriode]) }}"
+                                                    class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                                                    title="Hitung & Lihat Detail">
+                                                    <i class="fas fa-calculator"></i>
+                                                </a>
+
+
+
+
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th colspan="4" class="text-end">TOTAL KONTRAK SEMUA PAKET PER BULAN:</th>
+                                    <th class="text-end">
+                                        @php
+                                            $grandTotal = 0;
+                                            foreach ($nilaiKontrakData as $nk) {
+                                                if ($nk) {
+                                                    $grandTotal += $nk->total_nilai_kontrak;
+                                                }
+                                            }
+                                        @endphp
+                                        <strong class="text-primary">
+                                            Rp {{ number_format($grandTotal, 0, ',', '.') }}
+                                        </strong>
+                                    </th>
+                                    <th colspan="2"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Divider Section -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h5 class="text-gray-800 border-bottom pb-2">
+                <i class="fas fa-calculator me-2"></i> Kalkulator Manual
+            </h5>
+            <p class="text-muted small">Gunakan formulir ini untuk simulasi perhitungan pada periode yang berbeda atau jika terdapat perubahan UMP.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Form Kalkulator -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom fw-bold text-primary py-2 small">
+                    <i class="fas fa-calculator me-1"></i> Form Perhitungan
+                </div>
+                <div class="card-body p-3">
                     <form action="{{ route('kalkulator.calculate') }}" method="POST" id="formKalkulator">
                         @csrf
 
-                        <div class="mb-3">
-                            <label for="paket_id" class="form-label fw-bold small text-uppercase text-muted">Pilih Paket
-                                <span class="text-danger">*</span></label>
-                            <select name="paket_id" id="paket_id" class="form-select select2" required>
+                        <div class="mb-2">
+                            <label for="paket_id" class="form-label fw-bold small text-uppercase text-muted" style="font-size: 0.75rem;">Pilih Paket <span class="text-danger">*</span></label>
+                            <select name="paket_id" id="paket_id" class="form-select form-select-sm select2" required>
                                 <option value="">-- Cari Paket --</option>
                                 @foreach ($pakets as $paket)
                                     <option value="{{ $paket->paket_id }}">
@@ -55,28 +171,26 @@
                             </select>
                         </div>
 
-                        <div class="mb-4">
-                            <label for="periode" class="form-label fw-bold small text-uppercase text-muted">Periode <span
-                                    class="text-danger">*</span></label>
-                            <input type="month" name="periode" id="periode" class="form-control"
+                        <div class="mb-3">
+                            <label for="periode" class="form-label fw-bold small text-uppercase text-muted" style="font-size: 0.75rem;">Periode <span class="text-danger">*</span></label>
+                            <input type="month" name="periode" id="periode" class="form-control form-control-sm"
                                 value="{{ $currentPeriode }}" required>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary py-2 shadow-sm">
-                                <i class="fas fa-calculator me-2"></i> Hitung Nilai Kontrak
+                            <button type="submit" class="btn btn-primary btn-sm py-2 shadow-sm">
+                                <i class="fas fa-calculator me-2"></i> Hitung
                             </button>
                         </div>
                     </form>
 
-                    <div class="mt-4 pt-4 border-top text-center">
-                        <small class="text-muted d-block mb-3">Opsi Lanjutan</small>
+                    <div class="mt-3 pt-3 border-top text-center">
                         <form action="{{ route('kalkulator.recalculate') }}" method="POST"
                             onsubmit="return confirm('Hitung ulang semua paket? Proses ini bisa memakan waktu.')">
                             @csrf
                             <input type="hidden" name="periode" value="{{ $currentPeriode }}">
-                            <button type="submit" class="btn btn-outline-warning btn-sm w-100">
-                                <i class="fas fa-sync me-1"></i> Hitung Ulang Semua Paket
+                            <button type="submit" class="btn btn-link btn-sm text-warning text-decoration-none small p-0" style="font-size: 0.8rem;">
+                                <i class="fas fa-sync me-1"></i> Hitung Ulang Semua
                             </button>
                         </form>
                     </div>
@@ -85,36 +199,35 @@
         </div>
 
         <!-- Result Display (AJAX) -->
-        <div class="col-md-7">
+        <div class="col-md-8">
             <!-- Loading Spinner -->
             <div class="card shadow-sm border-0 h-100" id="loadingSpinner" style="display: none;">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center"
-                    style="min-height: 300px;">
-                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    style="min-height: 200px;">
+                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
                         <span class="visually-hidden">Memuat...</span>
                     </div>
-                    <p class="mt-3 text-muted">Sedang menghitung nilai kontrak...</p>
+                    <p class="mt-2 small text-muted">Menghitung...</p>
                 </div>
             </div>
 
             <!-- Empty State (Information) -->
             <div class="card shadow-sm border-0 h-100 bg-light" id="infoCard">
-                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
-                    <div class="mb-3 text-muted">
-                        <i class="fas fa-info-circle fa-4x"></i>
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-3">
+                    <div class="mb-2 text-muted">
+                        <i class="fas fa-info-circle fa-3x"></i>
                     </div>
-                    <h5 class="text-muted">Informasi Perhitungan</h5>
+                    <h6 class="text-muted">Informasi Perhitungan</h6>
                     <p class="small text-muted mb-0" style="max-width: 400px;">
-                        Pilih paket dan periode di sebelah kiri, lalu klik "Hitung" untuk melihat rincian nilai kontrak.
-                        Data dihitung berdasarkan UMP tahun berjalan dan distribusi karyawan.
+                        Pilih paket dan periode, lalu klik "Hitung".
                     </p>
                 </div>
             </div>
 
             <!-- Result Card -->
             <div class="card shadow-sm border-primary h-100" id="resultCard" style="display: none;">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i> Hasil Perhitungan</h5>
+                <div class="card-header bg-primary text-white py-2">
+                    <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i> Hasil Perhitungan</h6>
                 </div>
                 <div class="card-body">
                     <div id="resultContent">
@@ -180,138 +293,6 @@
                                 <i class="fas fa-history me-1"></i> Riwayat
                             </a>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Daftar Semua Paket -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-list me-2"></i> Daftar Paket Kontrak</h5>
-
-                    <form action="{{ route('kalkulator.index') }}" method="GET" class="d-flex align-items-center">
-                        <label for="filter_periode" class="text-muted me-2 small fw-bold">Filter Periode:</label>
-                        <select name="filter_periode" id="filter_periode" class="form-select form-select-sm"
-                            onchange="this.form.submit()" style="width: auto;">
-                            <option value="">-- Tampilkan Terbaru --</option>
-                            @foreach($availablePeriods as $p)
-                                <option value="{{ $p }}" {{ $selectedPeriode == $p ? 'selected' : '' }}>
-                                    {{ \Carbon\Carbon::parse($p)->translatedFormat('F Y') }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </form>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped datatable-paket">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Paket</th>
-                                    <th>Unit Kerja</th>
-                                    <th>Kuota</th>
-                                    <th>Total Nilai Kontrak</th>
-                                    <th>Periode</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($pakets as $item)
-                                    @php
-                                        $nilaiKontrak = $nilaiKontrakData[$item->paket_id] ?? null;
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $item->paket }}</td>
-                                        <td>{{ $item->unitKerja->unit_kerja ?? '-' }}</td>
-                                        <td class="text-center">{{ $item->kuota_paket }} orang</td>
-                                        <td class="text-end">
-                                            @if($nilaiKontrak)
-                                                <strong class="text-success">
-                                                    Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}
-                                                </strong>
-                                            @else
-                                                <span class="text-muted">Belum dihitung</span>
-                                            @endif
-                                        </td>
-                                        <td class="text-center">
-                                            @if($nilaiKontrak)
-                                                <small>{{ \Carbon\Carbon::parse($nilaiKontrak->periode)->format('M Y') }}</small>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
-                                        @php
-                                            // Use actual contract periode if available, otherwise use current periode
-                                            $routePeriode = $nilaiKontrak ? \Carbon\Carbon::parse($nilaiKontrak->periode)->format('Y-m') : $currentPeriode;
-                                        @endphp
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="{{ route('kalkulator.show', ['paket_id' => $item->paket_id, 'periode' => $routePeriode]) }}"
-                                                    class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                                                    title="Hitung & Lihat Detail">
-                                                    <i class="fas fa-calculator"></i>
-                                                </a>
-                                                @if($nilaiKontrak)
-                                                    <a href="{{ route('paket.tagihan', $item->paket_id) }}"
-                                                        class="btn btn-sm btn-info" data-bs-toggle="tooltip"
-                                                        title="Lihat Tagihan BOQ">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="{{ route('paket.pdf.download', $item->paket_id) }}"
-                                                        class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Unduh PDF"
-                                                        target="_blank">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>
-                                                    <a href="{{ route('kalkulator.history', $item->paket_id) }}"
-                                                        class="btn btn-sm btn-secondary" data-bs-toggle="tooltip"
-                                                        title="Lihat Riwayat">
-                                                        <i class="fas fa-history"></i>
-                                                    </a>
-                                                @else
-                                                    <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
-                                                        title="Hitung kontrak terlebih dahulu">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
-                                                        title="Hitung kontrak terlebih dahulu">
-                                                        <i class="fas fa-download"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip"
-                                                        title="Hitung kontrak terlebih dahulu">
-                                                        <i class="fas fa-history"></i>
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot class="table-light">
-                                <tr>
-                                    <th colspan="4" class="text-end">TOTAL SEMUA PAKET:</th>
-                                    <th class="text-end">
-                                        @php
-                                            $grandTotal = 0;
-                                            foreach ($nilaiKontrakData as $nk) {
-                                                if ($nk) {
-                                                    $grandTotal += $nk->total_nilai_kontrak;
-                                                }
-                                            }
-                                        @endphp
-                                        <strong class="text-primary">
-                                            Rp {{ number_format($grandTotal, 0, ',', '.') }}
-                                        </strong>
-                                    </th>
-                                    <th colspan="2"></th>
-                                </tr>
-                            </tfoot>
-                        </table>
                     </div>
                 </div>
             </div>
