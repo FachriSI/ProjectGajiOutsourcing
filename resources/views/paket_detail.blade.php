@@ -91,13 +91,7 @@
 
             </form>
 
-            <form action="{{ route('paket.hitung', $paketList->first()->paket_id) }}" method="POST" class="d-inline">
-                @csrf
-                <input type="hidden" name="periode" value="{{ $selectedPeriode }}">
-                <button type="submit" class="btn btn-primary shadow-sm me-2">
-                    <i class="fas fa-calculator me-1"></i> Hitung / Refresh
-                </button>
-            </form>
+
 
 
             <a href="/gettambah-karyawan?paket_id={{ $paketList->first()->paket_id ?? '' }}" class="btn btn-outline-primary shadow-sm">
@@ -343,7 +337,9 @@
             data-thr-base-thn="{{ number_format($thr_base_thn, 0, ',', '.') }}"
             data-fee-thr-thn="{{ number_format($fee_thr_thn, 0, ',', '.') }}"
             data-thr-thn="{{ number_format($thr_thn, 0, ',', '.') }}"
-            data-total-pakaian="{{ number_format($total_pakaian, 0, ',', '.') }}">
+            data-total-pakaian="{{ number_format($total_pakaian, 0, ',', '.') }}"
+            data-ukuran-baju="{{ $item->ukuran_baju ?? '-' }}"
+            data-ukuran-celana="{{ $item->ukuran_celana ?? '-' }}">
             
             <td class="details-control" style="cursor: pointer; text-align: center;">
                 <button class="btn btn-sm btn-outline-primary toggle-details" style="font-size: 11px; padding: 2px 8px;">
@@ -441,6 +437,7 @@
                             <tr><td><strong>Fee THR (5%) / Tahun</strong></td><td class="text-right">Rp${data.feeThrThn}</td></tr>
                             <tr><td><strong>Total THR/Tahun</strong></td><td class="text-right">Rp${data.thrThn}</td></tr>
                             <tr><td><strong>Total Pakaian/Tahun</strong></td><td class="text-right">Rp${data.totalPakaian}</td></tr>
+                            <tr><td><strong>Ukuran Baju / Celana</strong></td><td class="text-right">${data.ukuranBaju} / ${data.ukuranCelana}</td></tr>
                         </table>
                     </div>
                 </div>
@@ -547,7 +544,9 @@
                     thrBaseThn: tr.attr('data-thr-base-thn'),
                     feeThrThn: tr.attr('data-fee-thr-thn'),
                     thrThn: tr.attr('data-thr-thn'),
-                    totalPakaian: tr.attr('data-total-pakaian')
+                    totalPakaian: tr.attr('data-total-pakaian'),
+                    ukuranBaju: tr.attr('data-ukuran-baju'),
+                    ukuranCelana: tr.attr('data-ukuran-celana')
                 };
                 
                 row.child(formatChildRow(data)).show();

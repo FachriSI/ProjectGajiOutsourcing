@@ -252,7 +252,21 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p><strong>Paket saat ini:</strong> <span id="mutasi_paket_sekarang"></span></p>
+            <div class="alert alert-info border-0 d-flex align-items-center mb-3">
+                <i class="fas fa-user-circle fa-2x me-3"></i>
+                <div>
+                    <div class="small text-uppercase text-muted fw-bold">Karyawan</div>
+                    <div class="h6 mb-0 fw-bold" id="mutasi_nama_detail"></div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label text-muted small text-uppercase fw-bold">Paket Saat Ini</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
+                    <input type="text" class="form-control bg-white fw-bold text-primary" id="mutasi_paket_sekarang" readonly>
+                </div>
+            </div>
             <div class="mb-3">
               <label for="paket_id" class="form-label">Mutasi ke Paket:</label>
               <select name="paket_id" class="form-select" required>
@@ -415,69 +429,70 @@
     </div>
   </div>
 
+@push('scripts')
   <script>
+    $(document).ready(function() {
+        // Event delegation for Mutasi Paket
+        $(document).on('click', '.btn-mutasi', function () {
+            const nama = $(this).data('nama');
+            const paket = $(this).data('paket');
+            const id = $(this).data('id');
 
+            $('#mutasi_nama').text(nama); // Title
+            $('#mutasi_nama_detail').text(nama); // Body
+            $('#mutasi_paket_sekarang').val(paket); // Body Input
+            $('#mutasi_karyawan_id').val(id);
+        });
 
-    // Initialize Bootstrap Tooltips for links
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-            });
+        // Event delegation for Promosi Jabatan
+        $(document).on('click', '.btn-promosi', function () {
+            const nama = $(this).data('nama');
+            const jabatan = $(this).data('jabatan');
+            const id = $(this).data('id');
 
-    $(document).on('click', '.btn-mutasi', function () {
-      const nama = $(this).data('nama');
-      const paket = $(this).data('paket');
-      const id = $(this).data('id');
+            $('#promosi_nama').text(nama);
+            $('#promosi_jabatan_sekarang').text(jabatan);
+            $('#promosi_karyawan_id').val(id);
+        });
 
-      $('#mutasi_nama').text(nama);
-      $('#mutasi_paket_sekarang').text(paket);
-      $('#mutasi_karyawan_id').val(id);
-    });
+        // Event delegation for Edit Shift
+        $(document).on('click', '.btn-edit-shift', function () {
+            const nama = $(this).data('nama');
+            const shift = $(this).data('shift');
+            const id = $(this).data('id');
 
-    $(document).on('click', '.btn-promosi', function () {
-      const nama = $(this).data('nama');
-      const paket = $(this).data('jabatan');
-      const id = $(this).data('id');
+            $('#shift_nama').text(nama);
+            $('#shift_saat_ini').text(shift);
+            $('#shift_karyawan_id').val(id);
+        });
 
-      $('#promosi_nama').text(nama);
-      $('#promosi_jabatan_sekarang').text(paket);
-      $('#promosi_karyawan_id').val(id);
-    });
+        // Event delegation for Edit Area
+        $(document).on('click', '.btn-edit-area', function () {
+            const nama = $(this).data('nama');
+            const area = $(this).data('area');
+            const id = $(this).data('id');
 
-    $(document).on('click', '.btn-edit-shift', function () {
-      const nama = $(this).data('nama');
-      const shift = $(this).data('shift');
-      const id = $(this).data('id');
+            $('#area_nama').text(nama);
+            $('#area_saat_ini').text(area);
+            $('#area_karyawan_id').val(id);
+        });
 
-      $('#shift_nama').text(nama);
-      $('#shift_saat_ini').text(shift);
-      $('#shift_karyawan_id').val(id);
-    });
-
-    $(document).on('click', '.btn-edit-area', function () {
-      const nama = $(this).data('nama');
-      const area = $(this).data('area');
-      const id = $(this).data('id');
-
-      $('#area_nama').text(nama);
-      $('#area_saat_ini').text(area);
-      $('#area_karyawan_id').val(id);
-    });
-
-    $(document).on('click', '.btn-edit-pakaian', function () {
-      const nama = $(this).data('nama');
-      const id = $(this).data('id');
-      const nilai = $(this).data('nilai');
-      const baju = $(this).data('baju');
-      const celana = $(this).data('celana');
-
-      $('#pakaian_nama').text(nama);
-      $('#pakaian_karyawan_id').val(id);
-      $('#nilai_saat_ini').text(nilai);
-      $('#baju_saat_ini').text(baju);
-      $('#celana_saat_ini').text(celana);
+        // Event delegation for Edit Pakaian
+        $(document).on('click', '.btn-edit-pakaian', function () {
+            const nama = $(this).data('nama');
+            const id = $(this).data('id');
+            const nilai = $(this).data('nilai');
+            const baju = $(this).data('baju');
+            const celana = $(this).data('celana');
+            
+            $('#pakaian_nama').text(nama);
+            $('#pakaian_karyawan_id').val(id);
+            $('#nilai_saat_ini').text(nilai);
+            $('#baju_saat_ini').text(baju);
+            $('#celana_saat_ini').text(celana);
+        });
     });
   </script>
+@endpush
 
 @endsection

@@ -240,6 +240,9 @@ class NilaiKontrakController extends Controller
         // Eligibility Cutoff: 1st day of the Eid month
         $cutoffDate = $tanggalLebaran->copy()->startOfMonth();
 
+        // Document Date: H-14 from Lebaran
+        $tanggalDokumen = $tanggalLebaran->copy()->subDays(14);
+
         $breakdown = $nilaiKontrak->breakdown_json ?? [];
         
         $totalBasicThr = 0;
@@ -320,11 +323,13 @@ class NilaiKontrakController extends Controller
             'jumlah_pekerja' => $filteredKaryawanCount,
             'unit_kerja' => $nilaiKontrak->paket->unitKerja->unit_kerja ?? '-',
             'pekerjaan_pos' => $nilaiKontrak->paket->paket, 
+            'nilai_thr' => $totalBasicThr,
             'fee_thr' => $feeThr,
             'total' => $totalNilaiThr,
             'qr_code' => $qrCode,
             'validation_url' => $validationUrl,
-            'tanggal_lebaran' => $lebaran->tanggal // Add this line
+            'tanggal_lebaran' => $lebaran->tanggal,
+            'tanggal_dokumen' => $tanggalDokumen
         ];
 
         $pdf = \PDF::loadView('pdf.thr', compact('data', 'nilaiKontrak'));

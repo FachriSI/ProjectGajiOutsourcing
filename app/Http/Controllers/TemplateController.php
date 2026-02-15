@@ -10,20 +10,26 @@ class TemplateController extends Controller
 {
     public function downloadMutasi()
     {
-        // Headers based on MutasiImport logic (Indexed)
-        // Index 0: osis_id, 1: paket, 2: tanggal_mutasi, 3: kode_jabatan, 4: tanggal_promosi
+        // Headers based on MutasiImport logic
+        // 0: OSIS ID
+        // 1: Paket Pekerjaan (Nama Paket Tujuan Mutasi)
+        // 2: Tanggal Mutasi (YYYY-MM-DD)
+        // 3: Kode Jabatan (Tujuan Promosi)
+        // 4: Tanggal Promosi (YYYY-MM-DD)
+        
         $headings = [
-            'OSIS ID',
-            'Paket Pekerjaan (Nama Paket)',
+            'OSIS ID (Wajib)',
+            'Nama Paket Tujuan (Isi jika Mutasi)',
             'Tanggal Mutasi (YYYY-MM-DD)',
-            'Kode Jabatan',
+            'Kode Jabatan Tujuan (Isi jika Promosi)',
             'Tanggal Promosi (YYYY-MM-DD)'
         ];
 
         // Example data to guide the user
         $data = [
-            ['12345', 'Paket Kebersihan', '2023-01-01', 'JAB001', '2023-01-01'],
-            ['67890', '', '', 'JAB002', '2023-02-01']
+            ['12345', 'Paket Kebersihan', '2023-05-01', '', ''], // Contoh Mutasi Saja
+            ['67890', '', '', 'JAB002', '2023-06-01'],           // Contoh Promosi Saja
+            ['11223', 'Paket Keamanan', '2023-07-01', 'JAB003', '2023-07-01'] // Contoh Keduanya
         ];
 
         return Excel::download(new TemplateExport($headings, $data), 'templateMutasiPromosi_import.xlsx');

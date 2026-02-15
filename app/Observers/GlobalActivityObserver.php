@@ -23,10 +23,20 @@ class GlobalActivityObserver
             $details = [];
             $original = $model->getOriginal();
             
+
+            // Fields to exclude from detailed diff
+            $hiddenFields = ['breakdown_json', 'payload', 'data', 'meta'];
+
             foreach ($changes as $key => $newValue) {
+                // If the field is in hidden list, just say it changed without showing value
+                if (in_array($key, $hiddenFields)) {
+                    $details[] = "$key: (Updated)";
+                    continue;
+                }
+
                 // Handle non-scalar values (arrays/objects)
                 if (!is_scalar($newValue) && !is_null($newValue)) {
-                    $newValue = json_encode($newValue);
+                    $newValue = '(Complex Data)';
                 }
 
                 // Skip long text fields to avoid cluttering logs
@@ -37,7 +47,8 @@ class GlobalActivityObserver
                 $oldValue = $original[$key] ?? '-';
 
                 if (!is_scalar($oldValue) && !is_null($oldValue)) {
-                    $oldValue = json_encode($oldValue);
+                    // $oldValue = json_encode($oldValue);
+                     $oldValue = '(Complex Data)';
                 }
                 
                  if (strlen((string)$oldValue) > 50) {
@@ -46,6 +57,7 @@ class GlobalActivityObserver
 
                 $details[] = "$key: '$oldValue' -> '$newValue'";
             }
+
 
             $description = 'Updated ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . '). Changes: ' . implode(', ', $details);
             $this->logActivity($model, 'Update', $description);

@@ -142,7 +142,7 @@
             </td>
             <td width="33%"></td>
             <td width="33%">
-                Padang, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+                Padang, {{ \Carbon\Carbon::parse($data['tanggal_dokumen'])->translatedFormat('d F Y') }}<br>
                 {{ $data['nama_perusahaan'] }}<br><br><br><br>
                 ({{ $data['pimpinan_vendor'] }})<br>
                 {{ $data['jabatan_vendor'] }}
