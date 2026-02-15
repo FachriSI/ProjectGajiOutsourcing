@@ -1,4 +1,4 @@
-<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+<nav class="sb-topnav navbar navbar-expand navbar-light bg-white shadow-sm">
     <a class="navbar-brand ps-3 d-flex align-items-center" href="{{ url('/') }}">
         <img src="{{ asset('assets/img/sp-white2.png') }}" alt="Logo" style="height: 30px; margin-right: 10px;">
         Outsourcing SP

@@ -13,14 +13,14 @@
       </div>
       <div class="d-flex gap-2">
         @if($hasDeleted)
-          <a href="/karyawan/sampah" class="btn btn-secondary shadow-sm">
+          <a href="/karyawan/sampah" class="btn btn-outline-secondary shadow-sm">
             <i class="fas fa-trash-restore me-1"></i> Sampah
           </a>
         @endif
 
         <!-- Button Template & Import -->
-        <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#templateModal"
-          title="Template & Import Data">
+        <button type="button" class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal"
+          data-bs-target="#templateModal" title="Template & Import Data">
           <i class="fas fa-file-excel me-1"></i> Import / Template
         </button>
 
@@ -35,7 +35,7 @@
   <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
-        <div class="modal-header bg-success text-white">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title" id="templateModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import Data
           </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -58,13 +58,13 @@
           <div class="tab-content p-3 border border-top-0 rounded-bottom" id="importTabsContent">
             <!-- Tab Mutasi -->
             <div class="tab-pane fade show active" id="mutasi" role="tabpanel" aria-labelledby="mutasi-tab">
-              <div class="alert alert-info">
+              <div class="alert alert-light border border-primary text-primary">
                 <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk melakukan mutasi atau promosi karyawan secara
                 massal.
               </div>
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <span>1. Download Template Mutasi:</span>
-                <a href="{{ route('template.mutasi') }}" class="btn btn-outline-success btn-sm">
+                <a href="{{ route('template.mutasi') }}" class="btn btn-outline-primary btn-sm">
                   <i class="fas fa-download"></i> Download Template
                 </a>
               </div>
@@ -76,21 +76,21 @@
                   <input type="file" name="file" id="fileMutasi" class="form-control" accept=".xlsx, .xls, .csv" required>
                 </div>
                 <div class="text-end">
-                  <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import Mutasi</button>
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Import Mutasi</button>
                 </div>
               </form>
             </div>
 
             <!-- Tab Karyawan Baru -->
             <div class="tab-pane fade" id="baru" role="tabpanel" aria-labelledby="baru-tab">
-              <div class="alert alert-info">
+              <div class="alert alert-light border border-primary text-primary">
                 <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk mengimport data karyawan <strong>BARU</strong>
                 yang belum ada di sistem.
                 <br>Pastikan OSIS ID dan No KTP belum terdaftar.
               </div>
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <span>1. Download Template Karyawan Baru:</span>
-                <a href="{{ route('template.karyawan-baru') }}" class="btn btn-outline-success btn-sm">
+                <a href="{{ route('template.karyawan-baru') }}" class="btn btn-outline-primary btn-sm">
                   <i class="fas fa-download"></i> Download Template
                 </a>
               </div>
@@ -102,7 +102,7 @@
                   <input type="file" name="file" id="fileBaru" class="form-control" accept=".xlsx, .xls, .csv" required>
                 </div>
                 <div class="text-end">
-                  <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import Karyawan
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Import Karyawan
                     Baru</button>
                 </div>
               </form>
@@ -110,7 +110,7 @@
 
             <!-- Tab Pakaian -->
             <div class="tab-pane fade" id="pakaian" role="tabpanel" aria-labelledby="pakaian-tab">
-              <div class="alert alert-info">
+              <div class="alert alert-light border border-primary text-primary">
                 <i class="fas fa-info-circle"></i> Gunakan fitur ini untuk mengupdate ukuran pakaian karyawan secara
                 massal.
                 <br><strong>Note:</strong> Pastikan ukuran baju sesuai dengan Master Data (S, M, L, XL, etc.)
@@ -118,7 +118,7 @@
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <span>1. Download Template Pakaian:</span>
                 <!-- Anda perlu menyediakan file template ini -->
-                <a href="{{ asset('templates/templatePakaian_import.xlsx') }}" class="btn btn-outline-success btn-sm"
+                <a href="{{ asset('templates/templatePakaian_import.xlsx') }}" class="btn btn-outline-primary btn-sm"
                   download>
                   <i class="fas fa-download"></i> Download Template
                 </a>
@@ -132,7 +132,7 @@
                     required>
                 </div>
                 <div class="text-end">
-                  <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Import Pakaian</button>
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Import Pakaian</button>
                 </div>
               </form>
             </div>
@@ -167,16 +167,16 @@
                 <td>{{ $item->perusahaan->perusahaan }}</td>
                 <td class="text-center">
                   <div class="d-flex gap-1 justify-content-center">
-                    <a href="/detail-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-info text-white"
+                    <a href="/detail-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-outline-primary"
                       data-bs-toggle="tooltip" title="Detail">
                       <i class="fas fa-info-circle"></i>
                     </a>
-                    <a href="/getupdate-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-warning"
+                    <a href="/getupdate-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-outline-secondary"
                       data-bs-toggle="tooltip" title="Edit">
                       <i class="fas fa-edit"></i>
                     </a>
-                    <a href="{{ url('delete-karyawan', $item->karyawan_id) }}" class="btn btn-sm btn-danger btn-delete"
-                      data-bs-toggle="tooltip" title="Hapus">
+                    <a href="{{ url('delete-karyawan', $item->karyawan_id) }}"
+                      class="btn btn-sm btn-outline-danger btn-delete" data-bs-toggle="tooltip" title="Hapus">
                       <i class="fas fa-trash"></i>
                     </a>
 
@@ -207,7 +207,7 @@
                             data-bs-target="#editShiftModal" data-id="{{ $item->karyawan_id }}"
                             data-nama="{{ $item->nama_tk }}"
                             data-shift="{{ $harianShift[$item->karyawan_id]->harianshift ?? 'Belum ada' }}">
-                            <i class="fas fa-clock me-2 text-warning"></i> Jadwal Kerja
+                            <i class="fas fa-clock me-2 text-secondary"></i> Jadwal Kerja
                           </button>
                         </li>
                         <li>
@@ -215,7 +215,7 @@
                             data-bs-target="#editAreaModal" data-id="{{ $item->karyawan_id }}"
                             data-nama="{{ $item->nama_tk }}"
                             data-area="{{ $area[$item->karyawan_id]->area ?? 'Belum ada' }}">
-                            <i class="fas fa-map-marker-alt me-2 text-danger"></i> Penempatan
+                            <i class="fas fa-map-marker-alt me-2 text-secondary"></i> Penempatan
                           </button>
                         </li>
                         <li>
@@ -225,7 +225,7 @@
                             data-nilai="{{ $item->pakaianTerakhir->nilai_jatah ?? 'Belum ada' }}"
                             data-baju="{{ $item->pakaianTerakhir->ukuran_baju ?? 'Belum ada' }}"
                             data-celana="{{ $item->pakaianTerakhir->ukuran_celana ?? 'Belum ada' }}">
-                            <i class="fas fa-tshirt me-2 text-success"></i> Pakaian
+                            <i class="fas fa-tshirt me-2 text-secondary"></i> Pakaian
                           </button>
                         </li>
                       </ul>
@@ -423,7 +423,7 @@
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-          });
+            });
 
     $(document).on('click', '.btn-mutasi', function () {
       const nama = $(this).data('nama');

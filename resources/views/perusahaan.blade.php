@@ -14,13 +14,13 @@
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/perusahaan/sampah" class="btn btn-secondary shadow-sm">
+                    <a href="/perusahaan/sampah" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
 
                 <!-- Button Template & Import -->
-                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal"
+                <button type="button" class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal"
                     data-bs-target="#importTemplateBaruModal" title="Template & Import Data">
                     <i class="fas fa-file-excel me-1"></i> Import / Template
                 </button>
@@ -37,7 +37,7 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="importTemplateBaruModalLabel"><i class="fas fa-file-excel me-2"></i>Template
                         & Import Data Perusahaan</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
@@ -45,7 +45,7 @@
                 </div>
                 <div class="modal-body">
                     <!-- Info Box -->
-                    <div class="alert alert-info mb-4">
+                    <div class="alert alert-light border border-primary text-primary mb-4">
                         <i class="fas fa-info-circle me-2"></i>Gunakan fitur ini untuk menambah atau mengupdate data
                         perusahaan secara massal.
                         <br><strong>Kolom Template:</strong> No, Nama, Alamat, CP, CP Jabatan, CP Telp, CP Email, ID Mesin,
@@ -55,7 +55,7 @@
                     <!-- 1. Download Template -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <span class="fw-bold">1. Download Template Perusahaan:</span>
-                        <a href="{{ route('template.perusahaan') }}" class="btn btn-outline-success">
+                        <a href="{{ route('template.perusahaan') }}" class="btn btn-outline-primary">
                             <i class="fas fa-download me-1"></i> Download Template
                         </a>
                     </div>
@@ -70,7 +70,7 @@
                             <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
                         </div>
                         <div class="text-end">
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-upload me-1"></i> Import Perusahaan
                             </button>
                         </div>
@@ -117,11 +117,13 @@
                                 <td>{{ $item->npp }}</td>
                                 <td class="text-center">
                                     <a href="/getupdate-perusahaan/{{ $item->perusahaan_id }}"
-                                        class="btn btn-sm btn-warning shadow-sm" data-bs-toggle="tooltip" title="Edit">
+                                        class="btn btn-sm btn-outline-secondary shadow-sm" data-bs-toggle="tooltip"
+                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{{ url('delete-perusahaan', $item->perusahaan_id) }}"
-                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip" title="Hapus">
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        title="Hapus">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
@@ -171,14 +173,14 @@
                             // Create the checkbox HTML with separator
                             const switchId = 'showAllSwitch_perusahaan';
                             const checkboxHtml = `
-                                                    <div class="d-inline-block me-2" style="vertical-align: middle;">
-                                                        <div class="form-check d-inline-block me-2">
-                                                            <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
-                                                            <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                                        <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                                            <div class="form-check d-inline-block me-2">
+                                                                <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                                                <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                                            </div>
+                                                            <span class="text-muted me-2">|</span>
                                                         </div>
-                                                        <span class="text-muted me-2">|</span>
-                                                    </div>
-                                                `;
+                                                    `;
 
                             // Create a wrapper for same-line alignment without affecting siblings (pagination)
                             const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');

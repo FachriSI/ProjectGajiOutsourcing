@@ -100,21 +100,21 @@
             </form>
 
 
-            <a href="/gettambah-karyawan?paket_id={{ $paketList->first()->paket_id ?? '' }}" class="btn btn-success shadow-sm">
+            <a href="/gettambah-karyawan?paket_id={{ $paketList->first()->paket_id ?? '' }}" class="btn btn-outline-primary shadow-sm">
                 <i class="fas fa-user-plus me-1"></i> Tambah Karyawan
             </a>
-            <a href="/paket" class="btn btn-secondary shadow-sm">Kembali</a>
+            <a href="/paket" class="btn btn-outline-secondary shadow-sm">Kembali</a>
         </div>
     </div>
 
     <div class="row mb-4">
         <!-- Annual Stat: Total Kontrak / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #e0e7ff; color: #4e73df;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-star fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total Kontrak/Tahun</div>
@@ -127,11 +127,11 @@
 
         <!-- Annual Stat: THR / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #ffe2e5; color: #e74a3b;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-gift fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total THR/Tahun</div>
@@ -143,11 +143,11 @@
 
         <!-- Annual Stat: MCU / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #e0f7fa; color: #00bcd4;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-heartbeat fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total MCU/Tahun</div>
@@ -159,11 +159,11 @@
 
         <!-- Annual Stat: Pakaian / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #fff3cd; color: #f6c23e;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-tshirt fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total Pakaian/Tahun</div>
@@ -178,11 +178,11 @@
     <div class="row mb-4">
         <!-- Monthly 1: Fix Cost -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #ccf6ff; color: #17a2b8;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-tags fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total Fix Cost/Bln</div>
@@ -194,11 +194,11 @@
         
         <!-- Monthly 2: Variabel -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #e2e3e5; color: #383d41;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-chart-area fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total Variabel/Bln</div>
@@ -210,11 +210,11 @@
         
         <!-- Monthly 3: Total Kontrak/Bln -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #d1e7dd; color: #0f5132;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-file-contract fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total Kontrak/Bln</div>
@@ -226,11 +226,11 @@
         
         <!-- Monthly 4: THR/Bln -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm h-100 card-hover">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 50px; height: 50px; background-color: #fff3cd; color: #856404;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
+                             style="width: 50px; height: 50px;">
                             <i class="fas fa-hand-holding-usd fa-lg"></i>
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total THR/Bln</div>
@@ -248,7 +248,7 @@
     <div class="card mb-4 border-0 shadow">
         <div class="card-body">
             <table id="datatablesSimple" class="table table-bordered table-hover display nowrap" style="width:100%">
-                <thead class="thead-dark">
+                <thead class="table-light">
                     <tr>
                         <th style="width: 30px;"></th> <!-- Expand icon -->
                         <th>No.</th>
@@ -322,7 +322,7 @@
 
                                     $mcu = $item->mcu ?? 0;
                                 @endphp
-           <tr class="parent-row" 
+            <tr class="parent-row" 
             data-tj-umum="{{ number_format($tj_umum, 0, ',', '.') }}"
             data-tj-jabatan="{{ number_format($tj_jabatan, 0, ',', '.') }}"
             data-tj-masakerja="{{ number_format($tj_masakerja, 0, ',', '.') }}"
@@ -427,13 +427,13 @@
                 <!-- Bottom Row: Total & THR -->
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <h6 class="text-success"><i class="fas fa-file-invoice-dollar"></i> Total Kontrak & Benefit</h6>
+                        <h6 class="text-primary"><i class="fas fa-file-invoice-dollar"></i> Total Kontrak & Benefit</h6>
                         <table class="table table-sm table-bordered">
-                            <tr class="table-info">
+                            <tr class="table-primary">
                                 <td><strong>Total Kontrak/Bulan</strong></td>
                                 <td class="text-right"><strong>Rp${data.totalKontrakBln}</strong></td>
                             </tr>
-                            <tr class="table-info">
+                            <tr class="table-primary">
                                 <td><strong>Total Kontrak/Tahun</strong></td>
                                 <td class="text-right"><strong>Rp${data.totalKontrakThn}</strong></td>
                             </tr>
@@ -630,4 +630,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
 @endsection

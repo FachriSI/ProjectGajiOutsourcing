@@ -10,14 +10,14 @@
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/fungsi/sampah" class="btn btn-secondary shadow-sm">
+                    <a href="/fungsi/sampah" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
 
                 <!-- Button Template & Import -->
-                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal"
-                    title="Template & Import Data">
+                <button type="button" class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#importModal" title="Template & Import Data">
                     <i class="fas fa-file-excel me-1"></i> Import / Template
                 </button>
 
@@ -63,13 +63,14 @@
                                 <td class="fw-bold">{{ $item->fungsi }}</td>
                                 <td>{{ $item->keterangan }}</td>
                                 <td class="text-center">
-                                    <a href="/getupdate-fungsi/{{ $item->kode_fungsi }}" class="btn btn-sm btn-warning shadow-sm"
-                                        data-bs-toggle="tooltip" title="Edit">
+                                    <a href="/getupdate-fungsi/{{ $item->kode_fungsi }}"
+                                        class="btn btn-sm btn-outline-secondary shadow-sm" data-bs-toggle="tooltip"
+                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{{ url('delete-fungsi', $item->kode_fungsi) }}"
-                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip" title="Delete"
-                                        onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        title="Delete" onclick="return confirm('Yakin ingin menghapus data ini?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
@@ -85,7 +86,7 @@
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import
                         Data Fungsi</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
@@ -93,7 +94,7 @@
                 </div>
                 <div class="modal-body">
                     <!-- Info Box -->
-                    <div class="alert alert-info mb-4">
+                    <div class="alert alert-light border border-primary text-primary mb-4">
                         <i class="fas fa-info-circle me-2"></i>Gunakan fitur ini untuk menambah atau mengupdate data fungsi
                         secara massal.
                         <br><strong>Kolom Template:</strong> Nama Fungsi, Keterangan
@@ -102,7 +103,7 @@
                     <!-- 1. Download Template -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <span class="fw-bold">1. Download Template Fungsi:</span>
-                        <a href="{{ route('template.fungsi') }}" class="btn btn-outline-success">
+                        <a href="{{ route('template.fungsi') }}" class="btn btn-outline-primary">
                             <i class="fas fa-download me-1"></i> Download Template
                         </a>
                     </div>
@@ -117,7 +118,7 @@
                             <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
                         </div>
                         <div class="text-end">
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-upload me-1"></i> Import Fungsi
                             </button>
                         </div>

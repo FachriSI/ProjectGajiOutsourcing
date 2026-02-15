@@ -25,7 +25,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Atur Nilai Jatah Pakaian</h6>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info">
+                    <div class="alert alert-light border border-primary text-primary">
                         <i class="fas fa-info-circle me-1"></i>
                         Pengaturan ini akan memperbarui nilai jatah pakaian untuk <strong>semua karyawan aktif</strong>.
                     </div>
@@ -35,7 +35,7 @@
 
                         <div class="mb-4 text-center">
                             <label class="text-muted mb-1">Nilai Jatah Saat Ini</label>
-                            <h2 class="font-weight-bold text-success">Rp {{ number_format($currentNilai, 0, ',', '.') }}
+                            <h2 class="font-weight-bold text-primary">Rp {{ number_format($currentNilai, 0, ',', '.') }}
                             </h2>
                         </div>
 

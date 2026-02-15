@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8">
@@ -29,6 +29,9 @@
 
     <!-- Global Table Styles -->
     <link href="{{ asset('css/custom-tables.css') }}" rel="stylesheet">
+
+    <!-- Professional ERP Theme -->
+    <link href="{{ asset('css/erp-style.css') }}" rel="stylesheet">
 
     <style>
         /* Modern DataTables Search Bar */

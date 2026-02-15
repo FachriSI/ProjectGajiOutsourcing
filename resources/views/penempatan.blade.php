@@ -4,14 +4,14 @@
 
 @section('content')
     <!-- Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-danger border-5">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-map-marker-alt me-2 text-danger"></i> Penempatan</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Penempatan</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola penempatan dan distribusi karyawan</p>
             </div>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+                <button type="button" class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal">
                     <i class="fas fa-file-excel me-1"></i> Import/Template
                 </button>
             </div>
@@ -22,13 +22,13 @@
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import Data Karyawan</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Info Box -->
-                    <div class="alert alert-info mb-4">
+                    <div class="alert alert-light border border-primary text-primary mb-4">
                         <i class="fas fa-info-circle me-2"></i>Gunakan fitur ini untuk menambah karyawan pengganti secara massal.
                         <br><strong>Kolom Template:</strong> OSIS ID Lama, OSIS ID Baru, No KTP, Nama, Tanggal Lahir, dsb.
                     </div>
@@ -36,7 +36,7 @@
                     <!-- 1. Download Template -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <span class="fw-bold">1. Download Template Karyawan:</span>
-                        <a href="{{ route('template.karyawan') }}" class="btn btn-outline-success">
+                        <a href="{{ route('template.karyawan') }}" class="btn btn-outline-primary">
                             <i class="fas fa-download me-1"></i> Download Template
                         </a>
                     </div>
@@ -51,7 +51,7 @@
                             <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
                         </div>
                         <div class="text-end">
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-upload me-1"></i> Import Karyawan
                             </button>
                         </div>
@@ -120,34 +120,34 @@
                                 <td class="fw-bold">{{$item->nama_tk}}</td>
                                 <td>{{$item->perusahaan}}</td>
                                 <td>{{$item->unit_kerja['unit_kerja']}}</td>
-                                <td><span class="badge bg-secondary">{{$item->paket}}</span></td>
+                                <td><span class="badge bg-light text-primary border border-primary">{{$item->paket}}</span></td>
                                 <td>{{$item->jabatan}}</td>
                                 <td>{{$item->aktif_mulai }}</td>
                                 <td class="text-center">
                                     @if($item->status_aktif == 'Aktif')
-                                        <span class="badge bg-success">Aktif</span>
+                                        <span class="badge bg-success-subtle text-success border border-success">Aktif</span>
                                     @else
-                                        <span class="badge bg-danger">Berhenti</span>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger">Berhenti</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
                                     @if($item->status_aktif === 'Aktif')
                                         <div class="d-flex gap-1 justify-content-center">
-                                            <a href="#" class="btn btn-danger btn-sm btn-berhenti" data-id="{{ $item->karyawan_id }}"
+                                            <a href="#" class="btn btn-outline-danger btn-sm btn-berhenti shadow-sm" data-id="{{ $item->karyawan_id }}"
                                                 data-bs-toggle="tooltip" title="Berhentikan">
                                                 <i class="fa fa-times-circle"></i>
                                             </a>
-                                            <a href="#" class="btn btn-warning btn-sm btn-ganti" data-id="{{ $item->karyawan_id }}"
+                                            <a href="#" class="btn btn-outline-secondary btn-sm btn-ganti shadow-sm" data-id="{{ $item->karyawan_id }}"
                                                 data-bs-toggle="tooltip" title="Ganti">
                                                 <i class="fas fa-exchange-alt"></i>
                                             </a>
-                                            <a href="#" class="btn btn-info btn-sm btn-history text-white" data-id="{{ $item->karyawan_id }}"
+                                            <a href="#" class="btn btn-outline-info btn-sm btn-history shadow-sm" data-id="{{ $item->karyawan_id }}"
                                                 data-bs-toggle="tooltip" title="History">
                                                 <i class="fas fa-history"></i>
                                             </a>
                                         </div>
                                     @elseif($item->status_aktif === 'Berhenti')
-                                        <a href="/tambah-pengganti/{{ $item->karyawan_id }}" class="btn btn-success btn-sm w-100">
+                                        <a href="/tambah-pengganti/{{ $item->karyawan_id }}" class="btn btn-outline-primary btn-sm w-100 shadow-sm">
                                             <i class="fa fa-user-plus me-1"></i> Pengganti
                                         </a>
                                     @endif
@@ -328,7 +328,7 @@
                 <div class="modal-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped" id="tableHistory">
-                            <thead class="table-dark">
+                            <thead class="table-light">
                                 <tr>
                                     <th>No</th>
                                     <th>Nama Karyawan</th>

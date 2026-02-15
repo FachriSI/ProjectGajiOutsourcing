@@ -1,27 +1,33 @@
 @extends('layouts.main')
 
-@section('title', 'Paket')
+@section('title', 'Tambah Paket')
 
 @section('content')
 
-    <h3 class="mt-4">Tambah Paket</h3>
-    <!-- Input Date Range -->
+    <!-- Modern Page Header -->
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
+        <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-box me-2 text-primary"></i> Tambah Paket</h1>
+        <p class="text-muted small mb-0 mt-1">Formulir penambahan data paket baru</p>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-box me-2"></i>Data Paket Baru</h6>
-                </div>
+            <div class="card shadow-sm border-0 mb-4 border-top border-primary border-4">
                 <div class="card-body">
-                    <form id="form-paket" class="form-horizontal" method="post" enctype="multipart/form-data" action="/tambah-paket">
+                    <h5 class="card-title text-primary fw-bold mb-4">
+                        <i class="fas fa-plus-circle me-2"></i>Data Paket Baru
+                    </h5>
+
+                    <form id="form-paket" class="form-horizontal" method="post" enctype="multipart/form-data"
+                        action="/tambah-paket">
                         @csrf
                         <div class="mb-3">
-                            <label for="paket_suffix" class="form-label fw-bold">Nama Paket <span class="text-danger">*</span></label>
+                            <label for="paket_suffix" class="form-label fw-bold text-dark">Nama Paket <span
+                                    class="text-danger">*</span></label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text bg-light" id="paket-prefix">Paket</span>
-                                <input type="number" class="form-control" name="paket_suffix" id="paket_suffix" placeholder="Contoh: 1"
-                                    aria-describedby="paket-prefix" min="1" required
-                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                <input type="number" class="form-control" name="paket_suffix" id="paket_suffix"
+                                    placeholder="Contoh: 1" aria-describedby="paket-prefix" min="1" required>
                                 <div id="paket-feedback" class="invalid-feedback">
                                     Nama paket sudah ada.
                                 </div>
@@ -31,15 +37,17 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="kuota_paket" class="form-label fw-bold">Kuota Paket <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" name="kuota_paket" id="kuota_paket" min="1" placeholder="0" required
-                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                <label for="kuota_paket" class="form-label fw-bold text-dark">Kuota Paket <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="kuota_paket" id="kuota_paket" min="1"
+                                    placeholder="0" required>
                                 <div id="kuota-feedback" class="invalid-feedback">
                                     Kuota paket harus lebih dari 0.
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="unit_kerja" class="form-label fw-bold">Unit Kerja <span class="text-danger">*</span></label>
+                                <label for="unit_kerja" class="form-label fw-bold text-dark">Unit Kerja <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-select select2" name="unit_kerja" id="unit_kerja" required>
                                     <option value="" selected disabled>Pilih Unit Kerja</option>
                                     @foreach ($unit as $item)
@@ -49,11 +57,11 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="/paket" class="btn btn-secondary">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="/paket" class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-arrow-left me-2"></i>Kembali
                             </a>
-                            <button type="submit" class="btn btn-primary" id="btn-submit">
+                            <button type="submit" class="btn btn-primary px-4" id="btn-submit">
                                 <i class="fas fa-save me-2"></i>Simpan Paket
                             </button>
                         </div>
@@ -65,7 +73,7 @@
 
     <script>
         $(document).ready(function () {
-            $('#unit_kerja').select2({
+            $('.select2').select2({
                 placeholder: "Pilih Unit Kerja",
                 allowClear: false,
                 width: '100%'
@@ -104,7 +112,7 @@
                 const kuota = parseInt(kuotaInput.val());
 
                 if (isNaN(kuota) || kuota <= 0) {
-                    if (kuotaInput.val() !== "") { // Only show invalid if user has typed something or tried to submit
+                    if (kuotaInput.val() !== "") {
                         kuotaInput.addClass('is-invalid').removeClass('is-valid');
                         kuotaFeedback.show();
                     }
@@ -113,12 +121,6 @@
                     kuotaInput.removeClass('is-invalid').addClass('is-valid');
                     kuotaFeedback.hide();
                 }
-
-                // Simple check if inputs are empty for button state (optional, or just rely on HTML5 required)
-                // But user asked for warning immediately. 
-                // We'll keep the button enabled but prevent submit if invalid, 
-                // OR disable it. User said "warning sedari awal", usually implies real-time feedback.
-                // Disabling button is good practice.
 
                 if (isValid) {
                     submitBtn.prop('disabled', false);

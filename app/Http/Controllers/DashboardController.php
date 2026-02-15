@@ -58,7 +58,7 @@ class DashboardController extends Controller
 
         // Average Tenure (years)
         // Total Paket
-        $totalPaket = \App\Models\Paket::count();
+        $totalPaket = \App\Models\Paket::where('is_deleted', 0)->count();
 
         // Average Tenure (years) - DEPRECATED (Moved to replace with Total Paket)
         $avgTenure = \App\Models\Karyawan::where('status_aktif', 'Aktif')

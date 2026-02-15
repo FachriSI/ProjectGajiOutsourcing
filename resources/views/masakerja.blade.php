@@ -2,15 +2,15 @@
 @section('title', 'Masa Kerja')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-success border-5">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-calendar-check me-2 text-success"></i> Masa Kerja</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-calendar-check me-2 text-primary"></i> Masa Kerja</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola data tunjangan berdasarkan masa kerja karyawan</p>
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/masakerja/sampah" class="btn btn-secondary shadow-sm">
+                    <a href="/masakerja/sampah" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
@@ -48,25 +48,26 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-circle bg-success-light text-success me-2">
+                                        <div class="icon-circle bg-light text-primary me-2">
                                             <i class="fas fa-user-clock"></i>
                                         </div>
                                         <span class="fw-bold text-dark">{{ $item->nama }}</span>
                                     </div>
                                 </td>
-                                <td class="text-end fw-bold text-success">
+                                <td class="text-end fw-bold text-primary">
                                     Rp {{ number_format($item->tunjangan_masakerja, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
                                     {{ \Carbon\Carbon::parse($item->beg_date)->translatedFormat('d F Y') }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/getupdate-masakerja/{{ $item->id }}" class="btn btn-sm btn-warning shadow-sm"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                    <a href="/getupdate-masakerja/{{ $item->id }}"
+                                        class="btn btn-sm btn-outline-secondary shadow-sm" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{{ url('delete-masakerja', $item->id) }}"
-                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
                                         data-bs-placement="top" title="Delete"
                                         onclick="return confirm('Hapus data masa kerja ini?')">
                                         <i class="fas fa-trash"></i>

@@ -47,22 +47,23 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-circle bg-info-light text-info me-2">
+                                        <div class="icon-circle bg-light text-primary me-2">
                                             <i class="fas fa-user-tie"></i>
                                         </div>
                                         <span class="fw-bold text-dark">{{ $item->jabatan }}</span>
                                     </div>
                                 </td>
-                                <td class="text-end fw-bold text-success">
+                                <td class="text-end fw-bold text-primary">
                                     Rp {{ number_format($item->tunjangan_jabatan, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/getupdate-jabatan/{{ $item->kode_jabatan }}" class="btn btn-sm btn-warning shadow-sm"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                    <a href="/getupdate-jabatan/{{ $item->kode_jabatan }}"
+                                        class="btn btn-sm btn-outline-secondary shadow-sm" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{{ url('delete-jabatan', $item->kode_jabatan) }}"
-                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
                                         data-bs-placement="top" title="Delete"
                                         onclick="return confirm('Hapus data jabatan ini?')">
                                         <i class="fas fa-trash"></i>

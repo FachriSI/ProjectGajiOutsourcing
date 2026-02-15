@@ -2,16 +2,16 @@
 @section('title', 'Tunjangan Risiko')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-warning border-5">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Tunjangan
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-exclamation-triangle me-2 text-primary"></i> Tunjangan
                     Risiko</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola data tunjangan berdasarkan tingkat risiko pekerjaan</p>
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/resiko/sampah" class="btn btn-secondary shadow-sm">
+                    <a href="/resiko/sampah" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
@@ -48,22 +48,23 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-circle bg-warning-light text-warning me-2">
+                                        <div class="icon-circle bg-light text-primary me-2">
                                             <i class="fas fa-shield-alt"></i>
                                         </div>
                                         <span class="fw-bold text-dark">{{ $item->resiko }}</span>
                                     </div>
                                 </td>
-                                <td class="text-end fw-bold text-success">
+                                <td class="text-end fw-bold text-primary">
                                     Rp {{ number_format($item->tunjangan_resiko, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/getupdate-resiko/{{ $item->kode_resiko }}" class="btn btn-sm btn-warning shadow-sm"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                    <a href="/getupdate-resiko/{{ $item->kode_resiko }}"
+                                        class="btn btn-sm btn-outline-secondary shadow-sm" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{{ url('delete-resiko', $item->kode_resiko) }}"
-                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
                                         data-bs-placement="top" title="Delete"
                                         onclick="return confirm('Hapus data risiko ini?')">
                                         <i class="fas fa-trash"></i>

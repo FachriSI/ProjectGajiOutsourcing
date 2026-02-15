@@ -2,10 +2,10 @@
 @section('title', 'Medical Checkup')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-heartbeat me-2 text-danger"></i> Medical Checkup</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-heartbeat me-2 text-primary"></i> Medical Checkup</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola data biaya medical checkup (Global)</p>
             </div>
         </div>
@@ -25,7 +25,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Atur Biaya Medical Checkup</h6>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info">
+                    <div class="alert alert-light border border-primary text-primary">
                         <i class="fas fa-info-circle me-1"></i>
                         Pengaturan ini akan memperbarui biaya medical checkup untuk <strong>semua karyawan aktif</strong>.
                     </div>
@@ -35,7 +35,7 @@
 
                         <div class="mb-4 text-center">
                             <label class="text-muted mb-1">Biaya MCU Saat Ini</label>
-                            <h2 class="font-weight-bold text-success">Rp {{ number_format($currentBiaya, 0, ',', '.') }}
+                            <h2 class="font-weight-bold text-primary">Rp {{ number_format($currentBiaya, 0, ',', '.') }}
                             </h2>
                         </div>
 

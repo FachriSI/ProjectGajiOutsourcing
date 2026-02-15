@@ -2,15 +2,15 @@
 @section('title', 'Kuota Jam')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-danger border-5">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-hourglass-half me-2 text-danger"></i> Kuota Jam</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-hourglass-half me-2 text-primary"></i> Kuota Jam</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola kuota jam lembur karyawan</p>
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/kuotajam/sampah" class="btn btn-secondary shadow-sm">
+                    <a href="/kuotajam/sampah" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
@@ -48,7 +48,7 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-circle bg-danger-light text-danger me-2">
+                                        <div class="icon-circle bg-light text-primary me-2">
                                             <i class="fas fa-user-clock"></i>
                                         </div>
                                         <div>
@@ -58,7 +58,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge bg-danger rounded-pill px-3">{{ $item->kuota }} Jam</span>
+                                    <span class="badge bg-secondary rounded-pill px-3">{{ $item->kuota }} Jam</span>
                                 </td>
                                 <td class="text-center">
                                     <div class="small text-dark">
@@ -71,12 +71,13 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <a href="/getupdate-kuotajam/{{ $item->kuota_id }}" class="btn btn-sm btn-warning shadow-sm"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                    <a href="/getupdate-kuotajam/{{ $item->kuota_id }}"
+                                        class="btn btn-sm btn-outline-secondary shadow-sm" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{{ url('delete-kuotajam', $item->kuota_id) }}"
-                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
                                         data-bs-placement="top" title="Delete"
                                         onclick="return confirm('Hapus data kuota jam ini?')">
                                         <i class="fas fa-trash"></i>

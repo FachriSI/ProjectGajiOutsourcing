@@ -4,29 +4,30 @@
 
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-file-contract me-2 text-primary"></i> Nilai Kontrak</h1>
                 <p class="text-muted small mb-0 mt-1">Hitung dan kelola nilai kontrak per paket berdasarkan UMP dan
                     distribusi karyawan</p>
             </div>
-            <button type="button" class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#exportModal">
+            <button type="button" class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal"
+                data-bs-target="#exportModal">
                 <i class="fas fa-file-excel me-1"></i> Export Laporan
             </button>
         </div>
     </div>
 
     @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
+        <div class="alert alert-light border border-success text-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
+        <div class="alert alert-light border border-danger text-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -34,7 +35,7 @@
     <!-- Daftar Semua Paket (Moved to Top) -->
     <div class="row mb-5">
         <div class="col-md-12">
-            <div class="card shadow border-primary border-top border-3">
+            <div class="card shadow border-0">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
                     <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-list me-2"></i> Daftar Paket Kontrak</h5>
 
@@ -53,8 +54,8 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped datatable-paket">
-                            <thead class="table-dark">
+                        <table class="table table-bordered table-hover datatable-paket">
+                            <thead class="table-light">
                                 <tr>
                                     <th>No.</th>
                                     <th>Paket</th>
@@ -77,7 +78,7 @@
                                         <td class="text-center">{{ $item->kuota_paket }} orang</td>
                                         <td class="text-end">
                                             @if($nilaiKontrak)
-                                                <strong class="text-success">
+                                                <strong class="text-primary">
                                                     Rp {{ number_format($nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}
                                                 </strong>
                                             @else
@@ -98,15 +99,10 @@
                                         <td>
                                             <div class="d-flex justify-content-center gap-1">
                                                 <a href="{{ route('kalkulator.show', ['paket_id' => $item->paket_id, 'periode' => $routePeriode]) }}"
-                                                    class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                                                    class="btn btn-sm btn-outline-primary shadow-sm" data-bs-toggle="tooltip"
                                                     title="Hitung & Lihat Detail">
                                                     <i class="fas fa-calculator"></i>
                                                 </a>
-
-
-
-
-
                                             </div>
                                         </td>
                                     </tr>
@@ -144,7 +140,8 @@
             <h5 class="text-gray-800 border-bottom pb-2">
                 <i class="fas fa-calculator me-2"></i> Kalkulator Manual
             </h5>
-            <p class="text-muted small">Gunakan formulir ini untuk simulasi perhitungan pada periode yang berbeda atau jika terdapat perubahan UMP.</p>
+            <p class="text-muted small">Gunakan formulir ini untuk simulasi perhitungan pada periode yang berbeda atau jika
+                terdapat perubahan UMP.</p>
         </div>
     </div>
 
@@ -160,7 +157,8 @@
                         @csrf
 
                         <div class="mb-2">
-                            <label for="paket_id" class="form-label fw-bold small text-uppercase text-muted" style="font-size: 0.75rem;">Pilih Paket <span class="text-danger">*</span></label>
+                            <label for="paket_id" class="form-label fw-bold small text-uppercase text-muted"
+                                style="font-size: 0.75rem;">Pilih Paket <span class="text-danger">*</span></label>
                             <select name="paket_id" id="paket_id" class="form-select form-select-sm select2" required>
                                 <option value="">-- Cari Paket --</option>
                                 @foreach ($pakets as $paket)
@@ -172,7 +170,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="periode" class="form-label fw-bold small text-uppercase text-muted" style="font-size: 0.75rem;">Periode <span class="text-danger">*</span></label>
+                            <label for="periode" class="form-label fw-bold small text-uppercase text-muted"
+                                style="font-size: 0.75rem;">Periode <span class="text-danger">*</span></label>
                             <input type="month" name="periode" id="periode" class="form-control form-control-sm"
                                 value="{{ $currentPeriode }}" required>
                         </div>
@@ -189,7 +188,8 @@
                             onsubmit="return confirm('Hitung ulang semua paket? Proses ini bisa memakan waktu.')">
                             @csrf
                             <input type="hidden" name="periode" value="{{ $currentPeriode }}">
-                            <button type="submit" class="btn btn-link btn-sm text-warning text-decoration-none small p-0" style="font-size: 0.8rem;">
+                            <button type="submit" class="btn btn-link btn-sm text-secondary text-decoration-none small p-0"
+                                style="font-size: 0.8rem;">
                                 <i class="fas fa-sync me-1"></i> Hitung Ulang Semua
                             </button>
                         </form>
@@ -232,7 +232,8 @@
                 <div class="card-body">
                     <div id="resultContent">
                         <!-- Total Nilai Kontrak -->
-                        <div class="alert alert-success d-flex align-items-center shadow-sm border-0">
+                        <div
+                            class="alert alert-light border border-primary text-primary d-flex align-items-center shadow-sm">
                             <div class="display-4 me-3"><i class="fas fa-money-bill-wave"></i></div>
                             <div>
                                 <small class="text-uppercase fw-bold opacity-75">Total Nilai Kontrak / Bulan</small>
@@ -243,7 +244,8 @@
                         <!-- Breakdown Pengawas vs Pelaksana -->
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <div class="p-3 border rounded bg-light h-100 position-relative overflow-hidden">
+                                <div
+                                    class="p-3 border rounded bg-white h-100 position-relative overflow-hidden border-primary">
                                     <div class="position-absolute end-0 top-0 p-3 opacity-25">
                                         <i class="fas fa-user-tie fa-3x text-primary"></i>
                                     </div>
@@ -253,11 +255,12 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="p-3 border rounded bg-light h-100 position-relative overflow-hidden">
+                                <div
+                                    class="p-3 border rounded bg-white h-100 position-relative overflow-hidden border-secondary">
                                     <div class="position-absolute end-0 top-0 p-3 opacity-25">
-                                        <i class="fas fa-users fa-3x text-success"></i>
+                                        <i class="fas fa-users fa-3x text-secondary"></i>
                                     </div>
-                                    <strong class="text-success d-block mb-2">Pelaksana</strong>
+                                    <strong class="text-secondary d-block mb-2">Pelaksana</strong>
                                     <h5 class="mb-1">Rp <span id="totalPelaksana">0</span></h5>
                                     <small class="text-muted"><span id="jumlahPelaksana">0</span> Orang</small>
                                 </div>
@@ -286,10 +289,10 @@
 
                         <!-- Action Buttons -->
                         <div class="d-grid gap-2 d-md-flex">
-                            <a href="#" id="btnLihatDetail" class="btn btn-info shadow-sm text-white">
+                            <a href="#" id="btnLihatDetail" class="btn btn-outline-info shadow-sm">
                                 <i class="fas fa-eye me-1"></i> Lihat Detail Rincian
                             </a>
-                            <a href="#" id="btnLihatHistory" class="btn btn-secondary shadow-sm">
+                            <a href="#" id="btnLihatHistory" class="btn btn-outline-secondary shadow-sm">
                                 <i class="fas fa-history me-1"></i> Riwayat
                             </a>
                         </div>
@@ -303,10 +306,11 @@
     <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="exportModalLabel"><i class="fas fa-file-excel"></i> Export Laporan Kontrak
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <form action="{{ route('kalkulator.export') }}" method="POST">
                     @csrf
@@ -469,7 +473,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-success"><i class="fas fa-file-export"></i> Export
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-file-export"></i> Export
                             Excel</button>
                     </div>
                 </form>
@@ -531,14 +535,14 @@
                     // Create the checkbox HTML with separator
                     const switchId = 'showAllSwitch_kalkulator';
                     const checkboxHtml = `
-                                    <div class="d-inline-block me-2" style="vertical-align: middle;">
-                                        <div class="form-check d-inline-block me-2">
-                                            <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
-                                            <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                        <div class="d-inline-block me-2" style="vertical-align: middle;">
+                                            <div class="form-check d-inline-block me-2">
+                                                <input class="form-check-input btn-show-all-switch" type="checkbox" id="${switchId}" style="cursor: pointer;">
+                                                <label class="form-check-label small fw-bold text-muted" for="${switchId}" style="cursor: pointer;">Tampilkan semua</label>
+                                            </div>
+                                            <span class="text-muted me-2">|</span>
                                         </div>
-                                        <span class="text-muted me-2">|</span>
-                                    </div>
-                                `;
+                                    `;
 
                     // Create a wrapper for same-line alignment without affecting siblings (pagination)
                     const flexWrapper = $('<div class="d-flex align-items-center flex-wrap mt-2"></div>');

@@ -12,7 +12,7 @@
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/ump/sampah" class="btn btn-secondary shadow-sm">
+                    <a href="/ump/sampah" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
@@ -50,26 +50,26 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-circle bg-primary-light text-primary me-2">
+                                        <div class="icon-circle bg-light text-primary me-2">
                                             <i class="fas fa-map-marker-alt"></i>
                                         </div>
                                         <span class="fw-bold text-dark">{{ $item->lokasi }}</span>
                                     </div>
                                 </td>
-                                <td class="text-end fw-bold text-success">
+                                <td class="text-end fw-bold text-primary">
                                     Rp {{ number_format($item->ump, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge bg-info text-dark">{{ $item->tahun }}</span>
+                                    <span class="badge bg-secondary text-white">{{ $item->tahun }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="/getupdate-ump/{{ $item->id }}" class="btn btn-sm btn-warning shadow-sm"
+                                    <a href="/getupdate-ump/{{ $item->id }}" class="btn btn-sm btn-outline-secondary shadow-sm"
                                         data-bs-toggle="tooltip" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{{ url('delete-ump', $item->id) }}" class="btn btn-sm btn-danger shadow-sm btn-delete"
-                                        data-bs-toggle="tooltip" title="Hapus"
-                                        onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                    <a href="{{ url('delete-ump', $item->id) }}"
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>

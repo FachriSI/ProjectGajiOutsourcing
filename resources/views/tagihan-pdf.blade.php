@@ -25,7 +25,8 @@
 
         /* Header */
         .header-title {
-            background-color: #8B0000;
+            background-color: #2c3e50;
+            /* Changed from Dark Red to Dark Blue/Gray */
             color: white;
             border: 1px solid #333;
             padding: 6px;
@@ -47,7 +48,8 @@
         }
 
         .info-label {
-            color: #8B0000;
+            color: #2c3e50;
+            /* Changed from Dark Red */
             font-weight: bold;
             width: 180px;
         }
@@ -69,13 +71,16 @@
         }
 
         table.boq-table th {
-            background-color: #D8BFD8;
+            background-color: #e9ecef;
+            /* Changed from Purple */
             font-weight: bold;
             text-align: center;
+            color: #212529;
         }
 
         table.boq-table .section-header {
-            background-color: #FAFAD2;
+            background-color: #f8f9fa;
+            /* Changed from Yellow */
             font-weight: bold;
         }
 
@@ -88,12 +93,14 @@
         }
 
         table.boq-table .total-row {
-            background-color: #FFE4E1;
+            background-color: #e9ecef;
+            /* Changed from Pink */
             font-weight: bold;
         }
 
         table.boq-table .grand-total {
-            background-color: #D8BFD8;
+            background-color: #dee2e6;
+            /* Changed from Purple */
             font-weight: bold;
         }
 
@@ -138,13 +145,16 @@
         }
 
         table.tambah-table th {
-            background-color: #D8BFD8;
+            background-color: #e9ecef;
+            /* Changed from Purple */
             font-weight: bold;
             text-align: center;
+            color: #212529;
         }
 
         table.tambah-table .total-row {
-            background-color: #E6E6FA;
+            background-color: #f8f9fa;
+            /* Changed from Lavender */
             font-weight: bold;
         }
 
@@ -453,7 +463,8 @@
             <div class="signature-left">
                 <div class="qr-section">
                     {!! $qrCode !!}
-                    <p style="font-size: 8px; margin-top: 4px; text-align: center; font-weight: bold;">Scan untuk verifikasi</p>
+                    <p style="font-size: 8px; margin-top: 4px; text-align: center; font-weight: bold;">Scan untuk
+                        verifikasi</p>
                     <p style="font-size: 6px; word-break: break-all; max-width: 200px; text-align: center;">Token:
                         {{ substr($token, 0, 20) }}...
                     </p>

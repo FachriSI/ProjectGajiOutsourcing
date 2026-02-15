@@ -13,11 +13,11 @@
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/lebaran/trash" class="btn btn-secondary shadow-sm">
+                    <a href="/lebaran/trash" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
-                
+
                 <a href="/gettambah-lebaran" class="btn btn-primary shadow-sm">
                     <i class="fas fa-plus me-1"></i> Tambah Data
                 </a>
@@ -54,26 +54,27 @@
                     </thead>
                     <tbody>
                         @foreach($data as $item)
-                        <tr>
-                            <td class="text-center">{{ $loop->iteration }}</td>
-                            <td class="fw-bold text-center">{{ $item->tahun }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') }}</td>
-                            <td>{{ $item->tahun_hijriyah ?? '-' }}</td>
+                            <tr>
+                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="fw-bold text-center">{{ $item->tahun }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') }}</td>
+                                <td>{{ $item->tahun_hijriyah ?? '-' }}</td>
 
-                            <td class="text-center">
-                                <a href="/getupdate-lebaran/{{ $item->id }}" class="btn btn-warning btn-sm shadow-sm" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="/delete-lebaran/{{ $item->id }}" class="btn btn-danger btn-sm shadow-sm" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
+                                <td class="text-center">
+                                    <a href="/getupdate-lebaran/{{ $item->id }}"
+                                        class="btn btn-outline-secondary btn-sm shadow-sm" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/delete-lebaran/{{ $item->id }}" class="btn btn-outline-danger btn-sm shadow-sm"
+                                        title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
 @endsection

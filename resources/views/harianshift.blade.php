@@ -2,15 +2,15 @@
 @section('title', 'Harian/Shift')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-clock me-2 text-info"></i> Harian/Shift</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-clock me-2 text-primary"></i> Harian/Shift</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola data tunjangan harian dan shift</p>
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
-                    <a href="/harianshift/sampah" class="btn btn-secondary shadow-sm">
+                    <a href="/harianshift/sampah" class="btn btn-outline-secondary shadow-sm">
                         <i class="fas fa-trash-restore me-1"></i> Data Sampah
                     </a>
                 @endif
@@ -47,24 +47,24 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-circle bg-info-light text-info me-2">
+                                        <div class="icon-circle bg-light text-primary me-2">
                                             <i class="fas fa-business-time"></i>
                                         </div>
                                         <span class="fw-bold text-dark">{{ $item->harianshift }}</span>
                                     </div>
                                 </td>
-                                <td class="text-end fw-bold text-success">
+                                <td class="text-end fw-bold text-primary">
                                     Rp {{ number_format($item->tunjangan_shift, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <a href="/getupdate-harianshift/{{ $item->kode_harianshift }}"
-                                            class="btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Edit">
+                                            class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="{{ url('delete-harianshift', $item->kode_harianshift) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
+                                            class="btn btn-sm btn-outline-danger btn-delete" data-bs-toggle="tooltip"
                                             data-bs-placement="top" title="Delete"
                                             onclick="return confirm('Hapus data harian/shift ini?')">
                                             <i class="fas fa-trash"></i>

@@ -31,17 +31,19 @@
     <div class="row mb-4">
         <!-- Total Karyawan -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100"
-                style="border-radius: 20px; border-left: 5px solid #4e73df !important;">
+            <div class="card h-100">
                 <div class="card-body p-4 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-4"
-                        style="width: 70px; height: 70px; background-color: #e0e7ff; color: #4e73df; min-width: 70px;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-4 card-icon-bg-white"
+                        style="width: 60px; height: 60px; min-width: 60px;">
                         <i class="fas fa-users fa-2x"></i>
                     </div>
                     <div>
-                        <div class="text-uppercase fw-bold text-muted small mb-1" style="letter-spacing: 0.5px;">TOTAL
+                        <div class="text-uppercase fw-bold small mb-1"
+                            style="color: var(--text-secondary); letter-spacing: 1px;">TOTAL
                             KARYAWAN</div>
-                        <div class="display-6 fw-bold text-dark mb-0">{{ number_format($totalKaryawan) }}</div>
+                        <div class="display-6 fw-bold mb-0" style="color: var(--text-primary);">
+                            {{ number_format($totalKaryawan) }}
+                        </div>
                         <div class="text-muted small mt-2">
                             Karyawan Terdaftar
                         </div>
@@ -53,17 +55,19 @@
 
         <!-- Total Paket -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100"
-                style="border-radius: 20px; border-left: 5px solid #17a2b8 !important;">
+            <div class="card h-100">
                 <div class="card-body p-4 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-4"
-                        style="width: 70px; height: 70px; background-color: #ccf6ff; color: #17a2b8; min-width: 70px;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-4 card-icon-bg-white"
+                        style="width: 60px; height: 60px; min-width: 60px;">
                         <i class="fas fa-box fa-2x"></i>
                     </div>
                     <div>
-                        <div class="text-uppercase fw-bold text-muted small mb-1" style="letter-spacing: 0.5px;">TOTAL PAKET
+                        <div class="text-uppercase fw-bold small mb-1" translate="no"
+                            style="color: var(--text-secondary); letter-spacing: 1px;">TOTAL PAKET
                         </div>
-                        <div class="display-6 fw-bold text-dark mb-0">{{ number_format($totalPaket) }}</div>
+                        <div class="display-6 fw-bold mb-0" style="color: var(--text-primary);">
+                            {{ number_format($totalPaket) }}
+                        </div>
                         <div class="text-muted small mt-2">
                             Paket Terdaftar
                         </div>
@@ -84,7 +88,7 @@
                 <div class="col-lg-6 mb-4">
                     <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan Jumlah Karyawan Terbanyak</h6>
+                            <h6 class="text-center font-weight-bold mb-3">10 Paket dengan Jumlah Karyawan Terbanyak</h6>
                             <div style="height: 300px;">
                                 <canvas id="topQuotaChart"></canvas>
                             </div>
@@ -94,7 +98,7 @@
                 <div class="col-lg-6 mb-4">
                     <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan % Kuota Kosong Tertinggi</h6>
+                            <h6 class="text-center font-weight-bold mb-3">10 Paket % Kuota Kosong Tertinggi</h6>
                             <div style="height: 300px;">
                                 <canvas id="emptyQuotaChart"></canvas>
                             </div>
@@ -108,7 +112,7 @@
                 <div class="col-lg-6 mb-4">
                     <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
                         <div class="card-body">
-                            <h6 class="text-center font-weight-bold mb-3">Top 10 Paket dengan Total Nilai Kontrak Tertinggi
+                            <h6 class="text-center font-weight-bold mb-3">10 Paket dengan Total Nilai Kontrak Tertinggi
                             </h6>
                             <div style="height: 300px;">
                                 <canvas id="costChart"></canvas>
@@ -153,8 +157,8 @@
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-6 mb-2">
                                     <div class="border-end">
-                                        <i class="fas fa-venus text-info d-block mb-2"></i>
-                                        <div class="h4 mb-0 font-weight-bold text-info">
+                                        <i class="fas fa-venus d-block mb-2" style="color: #6ea8fe;"></i>
+                                        <div class="h4 mb-0 font-weight-bold" style="color: #6ea8fe;">
                                             {{ number_format($genderCount['Perempuan'] ?? 0) }}
                                             @php
                                                 $pct2 = $total > 0 ? round((($genderCount['Perempuan'] ?? 0) / $total) * 100, 1) : 0;
@@ -166,8 +170,8 @@
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-6 mb-2">
                                     <div class="border-end">
-                                        <i class="fas fa-user-check text-success d-block mb-2"></i>
-                                        <div class="h4 mb-0 font-weight-bold text-success">
+                                        <i class="fas fa-user-check text-primary d-block mb-2"></i>
+                                        <div class="h4 mb-0 font-weight-bold text-primary">
                                             {{ number_format($statusAktifCount['Aktif'] ?? 0) }}
                                             @php
                                                 $totalStatus = array_sum($statusAktifCount);
@@ -179,8 +183,8 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-6 mb-2">
-                                    <i class="fas fa-user-times text-warning d-block mb-2"></i>
-                                    <div class="h4 mb-0 font-weight-bold text-warning">
+                                    <i class="fas fa-user-times text-secondary d-block mb-2"></i>
+                                    <div class="h4 mb-0 font-weight-bold text-secondary">
                                         {{ number_format($statusAktifCount['Tidak Aktif'] ?? 0) }}
                                         @php
                                             $pct4 = $totalStatus > 0 ? round((($statusAktifCount['Tidak Aktif'] ?? 0) / $totalStatus) * 100, 1) : 0;
@@ -312,9 +316,22 @@
                                 datasets: [{
                                     label: label,
                                     data: data || [],
-                                    backgroundColor: options.backgroundColor || 'rgba(54, 162, 235, 0.7)',
-                                    borderColor: options.borderColor || 'rgba(54, 162, 235, 1)',
-                                    borderWidth: 1
+                                    // Dark Mode Gradient for Bar
+                                    backgroundColor: function (context) {
+                                        const chart = context.chart;
+                                        const { ctx, chartArea } = chart;
+                                        if (!chartArea) return null;
+                                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                                        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+                                        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.8)');
+                                        return gradient;
+                                    },
+                                    borderColor: 'rgba(59, 130, 246, 1)',
+                                    borderWidth: 0,
+                                    borderRadius: 4,
+                                    fill: true,
+                                    tension: 0.4, // Smooth Curves (Spline)
+                                    categoryPercentage: 0.8
                                 }]
                             },
                             options: finalOptions
@@ -360,8 +377,8 @@
                         // Demographics (Gender & Status moved to summary card - charts removed)
                         makeBarChart('ageChart', {!! json_encode(array_keys($usiaCount)) !!}, {!! json_encode(array_values($usiaCount)) !!}, 'Jumlah');
                         makeBarChart('tenureChart', {!! json_encode(array_keys($masaKerjaCount)) !!}, {!! json_encode(array_values($masaKerjaCount)) !!}, 'Jumlah', {
-                            backgroundColor: 'rgba(255, 159, 64, 0.7)',
-                            borderColor: 'rgba(255, 159, 64, 1)'
+                            backgroundColor: 'rgba(100, 116, 139, 0.7)',
+                            borderColor: 'rgba(100, 116, 139, 1)'
                         });
                         // originChart removed - no decision-making value
 
@@ -377,13 +394,13 @@
                                         {
                                             label: 'Masuk',
                                             data: {!! json_encode($employeeDynamics->pluck('masuk') ?? []) !!},
-                                            borderColor: 'rgb(75, 192, 192)',
+                                            borderColor: 'rgb(14, 165, 233)',
                                             tension: 0.1
                                         },
                                         {
                                             label: 'Keluar',
                                             data: {!! json_encode($employeeDynamics->pluck('keluar') ?? []) !!},
-                                            borderColor: 'rgb(255, 99, 132)',
+                                            borderColor: 'rgb(239, 68, 68)',
                                             tension: 0.1
                                         }
                                     ]
@@ -403,8 +420,8 @@
                                     datasets: [{
                                         label: 'Total Populasi',
                                         data: {!! json_encode($employeeDynamics->pluck('populasi') ?? []) !!},
-                                        borderColor: 'rgb(153, 102, 255)',
-                                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                        borderColor: 'rgb(59, 130, 246)',
+                                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
                                         fill: true,
                                         tension: 0.4
                                     }]
@@ -416,22 +433,22 @@
 
                         makeBarChart('shiftChart', {!! json_encode(array_keys($shiftCount)) !!}, {!! json_encode(array_values($shiftCount)) !!}, 'Jumlah Karyawan', {
                             indexAxis: 'y',
-                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                            borderColor: 'rgba(255, 99, 132, 1)'
+                            backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                            borderColor: 'rgba(14, 165, 233, 1)'
                         });
 
 
                         // Added Jabatan Chart
                         makeBarChart('jabatanChart', {!! json_encode(array_keys($jabatanCount)) !!}, {!! json_encode(array_values($jabatanCount)) !!}, 'Jumlah Karyawan', {
                             indexAxis: 'y',
-                            backgroundColor: 'rgba(153, 102, 255, 0.7)',
-                            borderColor: 'rgba(153, 102, 255, 1)'
+                            backgroundColor: 'rgba(100, 116, 139, 0.7)',
+                            borderColor: 'rgba(100, 116, 139, 1)'
                         });
 
                         // Added Departemen Chart (Vertical Bar for better readability with many depts)
                         makeBarChart('departemenChart', {!! json_encode(array_keys($departemenCount)) !!}, {!! json_encode(array_values($departemenCount)) !!}, 'Jumlah Karyawan', {
-                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                            borderColor: 'rgba(75, 192, 192, 1)'
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)'
                         });
 
                     } catch (e) { console.error('Error rendering karyawan charts', e); }
@@ -452,6 +469,11 @@
                     });
                 });
 
+                // Initial Render for Active Tab
+                if (document.querySelector('#paket.active')) {
+                    renderPacketCharts();
+                }
+
                 // Packet Charts Rendering
                 function renderPacketCharts() {
                     try {
@@ -464,62 +486,33 @@
                         );
 
                         // 2. Empty Quota (Stacked: Terisi vs Kosong)
-                        const emptyCtx = document.getElementById('emptyQuotaChart');
-                        if (emptyCtx) {
-                            if (chartInstances['emptyQuotaChart']) chartInstances['emptyQuotaChart'].destroy();
-
-                            // Prepare Data
-                            const paketNames = {!! json_encode($topPaketKosong->pluck('nama_paket')) !!};
-                            const paketTerisi = {!! json_encode($topPaketKosong->pluck('terisi')) !!};
-                            const paketKosong = {!! json_encode($topPaketKosong->pluck('kosong')) !!};
-                            const paketTotal = {!! json_encode($topPaketKosong->pluck('kuota')) !!};
-                            const paketPersen = {!! json_encode($topPaketKosong->pluck('persen_kosong')) !!};
-
-
-                            // Revert to Percentage Chart based on User Request
-                            chartInstances['emptyQuotaChart'] = new Chart(emptyCtx.getContext('2d'), {
-                                type: 'bar',
-                                data: {
-                                    labels: paketNames,
-                                    datasets: [{
-                                        label: '% Kekosongan',
-                                        data: paketPersen,
-                                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    indexAxis: 'y',
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: { position: 'top' },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    return tooltipItem.formattedValue + '%';
-                                                },
-                                                footer: function (tooltipItems) {
-                                                    let index = tooltipItems[0].dataIndex;
-                                                    let total = paketTotal[index];
-                                                    let terisi = paketTerisi[index];
-                                                    let kosong = paketKosong[index];
-                                                    return `Total Kuota: ${total}\nTerisi: ${terisi}\nKosong: ${kosong}`;
-                                                }
+                        // Use makeBarChart to ensure Gradient Consistency
+                        makeBarChart('emptyQuotaChart',
+                            {!! json_encode($topPaketKosong->pluck('nama_paket')) !!},
+                            {!! json_encode($topPaketKosong->pluck('persen_kosong')) !!},
+                            '% Kekosongan',
+                            {
+                                indexAxis: 'y',
+                                scales: { x: { ticks: { callback: value => value + '%' } } },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (tooltipItem) {
+                                                return tooltipItem.formattedValue + '%';
+                                            },
+                                            footer: function (tooltipItems) {
+                                                const index = tooltipItems[0].dataIndex;
+                                                const paketTotal = {!! json_encode($topPaketKosong->pluck('kuota')) !!};
+                                                const paketTerisi = {!! json_encode($topPaketKosong->pluck('terisi')) !!};
+                                                const paketKosong = {!! json_encode($topPaketKosong->pluck('kosong')) !!};
+                                                return `Total: ${paketTotal[index]}\nTerisi: ${paketTerisi[index]}\nKosong: ${paketKosong[index]}`;
                                             }
                                         }
-                                    },
-                                    scales: {
-                                        x: {
-                                            stacked: false,
-                                            ticks: { callback: value => value + '%' }
-                                        },
-                                        y: { stacked: false }
                                     }
                                 }
-                            });
-                        }
+                            }
+                        );
+
 
                         // 3. Cost Analysis
                         // 3. Cost Analysis (Estimation per Paket)
@@ -529,8 +522,7 @@
                             'Total Nilai (Rp)',
                             {
                                 indexAxis: 'y',
-                                backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                                borderColor: 'rgba(46, 204, 113, 1)',
+                                // Note: makeBarChart enforces Blue Gradient by default, overriding manual colors
                                 scales: { x: { ticks: { callback: value => 'Rp ' + (value / 1000000).toFixed(0) + ' Jt' } } }
                             }
                         );
@@ -546,6 +538,11 @@
                             // Use Bar chart if less than 2 data points for better visibility
                             const chartType = trendLabels.length < 2 ? 'bar' : 'line';
 
+                            // Define Gradient for Line Chart Fill
+                            const trendGradient = trendCtx.getContext('2d').createLinearGradient(0, 400, 0, 0);
+                            trendGradient.addColorStop(0, 'rgba(59, 130, 246, 0.0)');
+                            trendGradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
+
                             chartInstances['contractTrendChart'] = new Chart(trendCtx.getContext('2d'), {
                                 type: chartType,
                                 data: {
@@ -553,20 +550,29 @@
                                     datasets: [{
                                         label: 'Total Nilai Kontrak',
                                         data: trendData,
-                                        borderColor: 'rgb(44, 62, 80)',
-                                        backgroundColor: 'rgba(44, 62, 80, 0.5)',
+                                        borderColor: 'rgb(59, 130, 246)', // Blue 500
+                                        backgroundColor: trendGradient,   // Matching Line Gradient
                                         fill: true,
-                                        tension: 0.1,
-                                        barPercentage: 0.5 // For single bar width control
+                                        tension: 0.4, // Smooth Spline
+                                        pointBackgroundColor: '#fff',
+                                        pointBorderColor: 'rgb(59, 130, 246)',
+                                        pointBorderWidth: 2,
+                                        pointRadius: 4,
+                                        pointHoverRadius: 6,
+                                        barPercentage: 0.5
                                     }]
                                 },
                                 options: {
                                     responsive: true,
                                     maintainAspectRatio: false,
+                                    interaction: { mode: 'index', intersect: false },
+                                    plugins: { legend: { display: false } }, // Hide Legend for consistency with bars
                                     scales: {
                                         y: {
                                             title: { display: true, text: 'Total Nilai (Rp)' },
+                                            beginAtZero: true,
                                             ticks: {
+                                                color: '#64748b',
                                                 callback: function (value) {
                                                     if (value >= 1000000000) {
                                                         return 'Rp ' + (value / 1000000000).toFixed(1) + ' M';
@@ -574,9 +580,12 @@
                                                         return 'Rp ' + (value / 1000000).toFixed(0) + ' Jt';
                                                     }
                                                 }
-                                            }
+                                            },
+                                            grid: { color: '#e2e8f0' }
                                         },
                                         x: {
+                                            ticks: { color: '#64748b' },
+                                            grid: { display: false },
                                             title: { display: true, text: 'Tahun' }
                                         }
                                     }

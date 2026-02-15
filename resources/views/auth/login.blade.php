@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #eef2f6;
+            background-color: #f5f6fa;
             /* Light gray background like screenshot */
             height: 100vh;
             display: flex;
@@ -64,15 +64,15 @@
 
         .form-control:focus {
             box-shadow: none;
-            border-color: #c0392b;
-            /* Red focus border */
+            border-color: #0ea5e9;
+            /* Blue focus border */
             background-color: white;
         }
 
         .btn-login {
-            background-color: #c0392b;
-            /* Semen Padang Red */
-            border-color: #c0392b;
+            background-color: #0ea5e9;
+            /* ERP Blue */
+            border-color: #0ea5e9;
             color: white;
             padding: 12px;
             border-radius: 8px;
@@ -82,8 +82,8 @@
         }
 
         .btn-login:hover {
-            background-color: #a93226;
-            border-color: #a93226;
+            background-color: #0284c7;
+            border-color: #0284c7;
         }
 
         .copyright {
