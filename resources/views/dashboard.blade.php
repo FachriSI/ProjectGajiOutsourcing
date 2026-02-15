@@ -3,10 +3,15 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <h1 class="mt-4">Laporan</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item active">Ringkasan & Analisis Laporan</li>
-    </ol>
+    <!-- Modern Header -->
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-chart-line me-2 text-primary"></i> Dashboard</h1>
+                <p class="text-muted small mb-0 mt-1">Ringkasan & Analisis Laporan</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Tabs Navigation (Pills Style with Container) -->
     <div class="bg-white p-3 rounded shadow-sm mb-4">
