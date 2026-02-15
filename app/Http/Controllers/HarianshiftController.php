@@ -31,15 +31,17 @@ class HarianshiftController extends Controller
 
     public function setTambah(Request $request)
     {
-        $request->validate(['nama' => 'required']);
+        $request->validate(['harianshift' => 'required', 'tunjangan' => 'required']);
 
         $last = Harianshift::latest('kode_harianshift')->first();
         $newId = $last ? $last->kode_harianshift + 1 : 1;
 
+        $tunjangan = str_replace('.', '', $request->tunjangan);
+
         Harianshift::create([
             'kode_harianshift' => $newId,
-            'harianshift' => $request->nama,
-            'tunjangan_shift' => $request->tunjangan ?? 0,
+            'harianshift' => $request->harianshift,
+            'tunjangan_shift' => $tunjangan,
         ]);
 
         return redirect('/harianshift')->with('success', 'Data Berhasil Tersimpan');

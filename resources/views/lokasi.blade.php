@@ -53,17 +53,15 @@
                                 <td class="fw-bold">{{ $item->lokasi }}</td>
                                 <td><span class="badge bg-info text-dark">{{ $item->jenis }}</span></td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="/getupdate-lokasi/{{ $item->kode_lokasi }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-lokasi', $item->kode_lokasi) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Delete"
-                                            onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/getupdate-lokasi/{{ $item->kode_lokasi }}" class="btn btn-sm btn-warning shadow-sm"
+                                        data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-lokasi', $item->kode_lokasi) }}"
+                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip" title="Delete"
+                                        onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

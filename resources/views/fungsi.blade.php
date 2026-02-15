@@ -2,10 +2,10 @@
 @section('title', 'Fungsi')
 @section('content')
     <!-- Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-info border-5">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-cogs me-2 text-info"></i> Fungsi</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-cogs me-2 text-primary"></i> Fungsi</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola data fungsi dan keterangan</p>
             </div>
             <div class="d-flex gap-2">
@@ -63,17 +63,15 @@
                                 <td class="fw-bold">{{ $item->fungsi }}</td>
                                 <td>{{ $item->keterangan }}</td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="/getupdate-fungsi/{{ $item->kode_fungsi }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-fungsi', $item->kode_fungsi) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Delete"
-                                            onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/getupdate-fungsi/{{ $item->kode_fungsi }}" class="btn btn-sm btn-warning shadow-sm"
+                                        data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-fungsi', $item->kode_fungsi) }}"
+                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip" title="Delete"
+                                        onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

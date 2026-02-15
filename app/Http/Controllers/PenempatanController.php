@@ -5,8 +5,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Penempatan;
 use App\Models\Bidang;
-use App\Models\Area;
-use App\Models\Karyawan;
 use App\Models\UnitKerja;
 use Carbon\Carbon;
 use App\Models\Perusahaan;
@@ -533,7 +531,9 @@ class PenempatanController extends Controller
     {
         // Ambil data utama karyawan
         $dataM = DB::table('md_karyawan')
-            ->where('karyawan_id', '=', $id)
+            ->leftJoin('md_perusahaan', 'md_karyawan.perusahaan_id', '=', 'md_perusahaan.perusahaan_id')
+            ->select('md_karyawan.*', 'md_perusahaan.perusahaan as nama_perusahaan')
+            ->where('md_karyawan.karyawan_id', '=', $id)
             ->first();
 
         // Ambil semua data perusahaan & jabatan 
@@ -562,6 +562,10 @@ class PenempatanController extends Controller
             ->select('paket.*')
             ->first();
 
+        // Fetch existing unique fields for client-side validation
+        $existingOsis = Karyawan::pluck('osis_id')->toArray();
+        $existingKtp = Karyawan::pluck('ktp')->toArray();
+
         return view('form-pengganti', [
             'dataM' => $dataM,
             'dataJ' => $dataJ,
@@ -569,6 +573,8 @@ class PenempatanController extends Controller
             'quotaJam' => $quotaJam,
             'lokasiTerakhir' => $lokasiTerakhir,
             'paketTerakhir' => $paketTerakhir,
+            'existingOsis' => $existingOsis,
+            'existingKtp' => $existingKtp
         ]);
     }
 
@@ -576,12 +582,25 @@ class PenempatanController extends Controller
     public function simpanPengganti(Request $request, $id)
     {
         $request->validate([
-            'osis_id' => 'required|numeric|digits:4',
-            'ktp' => 'required|numeric|digits:16',
+            'osis_id' => 'required|numeric|digits:4|unique:md_karyawan,osis_id',
+            'ktp' => 'required|numeric|digits:16|unique:md_karyawan,ktp',
             'nama' => 'required',
             'perusahaan_id' => 'required', // pastikan field ini ada di form
             'tanggal_lahir' => 'required|date',
+            'tanggal_bekerja' => 'required|date',
+        ], [
+            'osis_id.unique' => 'OSIS ID sudah terdaftar.',
+            'ktp.unique' => 'Nomor KTP sudah terdaftar.',
         ]);
+
+        // Validasi Umur (18 - 56 Tahun)
+        $tglLahir = \Carbon\Carbon::parse($request->tanggal_lahir);
+        $tglMasuk = \Carbon\Carbon::parse($request->tanggal_bekerja);
+        $umur = $tglLahir->diffInYears($tglMasuk);
+
+        if ($umur < 18 || $umur > 56) {
+            return back()->with('error', 'Gagal menyimpan: Umur karyawan harus antara 18 s/d 56 tahun saat mulai bekerja (Umur saat ini: ' . $umur . ' tahun).')->withInput();
+        }
 
         DB::beginTransaction();
         // dd($request);
@@ -631,7 +650,7 @@ class PenempatanController extends Controller
             // Simpan quota jam real 
             DB::table('kuota_jam')->insert([
                 'karyawan_id' => $newId,
-                'kuota' => $request->quota_jam_real,
+                'kuota' => $request->quota_jam_real ?? 0,
                 'beg_date' => $request->tanggal_bekerja,
             ]);
 
@@ -692,18 +711,46 @@ class PenempatanController extends Controller
             ]);
 
             // Update catatan pengganti pada karyawan lama (status sudah 'Berhenti' sebelumnya)
-            DB::table('md_karyawan')
-                ->where('karyawan_id', $id)
-                ->update([
-                    'catatan_pengganti' => 'Digantikan oleh ID ' . $newId . ', ' . $request->nama . ' pada ' . $tmt,
-                ]);
+        DB::table('md_karyawan')
+            ->where('karyawan_id', $id)
+            ->update([
+                'status_aktif' => 'Sudah Diganti',
+                'tanggal_berhenti' => $tmt, // Set berhenti di tanggal TMT pengganti
+                'catatan_pengganti' => 'Digantikan oleh ID ' . $newId . ', ' . $request->nama . ' pada ' . $tmt,
+            ]);
 
-            DB::commit();
-            return redirect('/penempatan')->with('success', 'Data pengganti berhasil disimpan!');
+        // Auto-Calculate Contract
+        try {
+            $activePaket = DB::table('paket_karyawan')
+                ->where('karyawan_id', $newId) // Use new employee to find the current package
+                ->orderByDesc('beg_date')
+                ->first();
+
+            if ($activePaket) {
+                $calculatorService = app(\App\Services\ContractCalculatorService::class);
+                
+                // Calculate for the current period
+                $currentPeriode = date('Y-m');
+                $calculatorService->calculateForPaket($activePaket->paket_id, $currentPeriode);
+                
+                // If the replacement date is in a different month (e.g. future), calculate for that too
+                $replacementPeriode = \Carbon\Carbon::parse($tmt)->format('Y-m');
+                if ($replacementPeriode !== $currentPeriode) {
+                     $calculatorService->calculateForPaket($activePaket->paket_id, $replacementPeriode);
+                }
+            }
         } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan data pengganti: ' . $e->getMessage());
+             \Log::error('Auto-calculation failed after replacement: ' . $e->getMessage());
+             // Don't fail the transaction just for this, but ideally warn user.
+             // For now we just log it.
         }
+
+        DB::commit();
+        return redirect('/penempatan')->with('success', 'Data pengganti berhasil disimpan, status karyawan lama diperbarui, dan kontrak dihitung ulang!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Gagal menyimpan data pengganti: ' . $e->getMessage());
+    }
     }
 
     public function getHistory($id)

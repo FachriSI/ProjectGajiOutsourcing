@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-money-bill-wave me-2 text-primary"></i> Data UMP</h1>
@@ -13,7 +13,7 @@
             <div class="d-flex gap-2">
                 @if($hasDeleted)
                     <a href="/ump/sampah" class="btn btn-secondary shadow-sm">
-                        <i class="fas fa-trash-restore me-1"></i> Data Sampah
+                        <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
                 <a href="/gettambah-ump" class="btn btn-primary shadow-sm">
@@ -63,17 +63,15 @@
                                     <span class="badge bg-info text-dark">{{ $item->tahun }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="/getupdate-ump/{{ $item->id }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-ump', $item->id) }}" class="btn btn-sm btn-danger btn-delete"
-                                            data-bs-toggle="tooltip" title="Hapus"
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/getupdate-ump/{{ $item->id }}" class="btn btn-sm btn-warning shadow-sm"
+                                        data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-ump', $item->id) }}" class="btn btn-sm btn-danger shadow-sm btn-delete"
+                                        data-bs-toggle="tooltip" title="Hapus"
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

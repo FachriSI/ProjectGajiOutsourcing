@@ -1,0 +1,38 @@
+{
+    "karyawan": {
+        "id": 720,
+        "name": "Hari Setiawan",
+        "status_aktif": "Aktif"
+    },
+    "history": [
+        {
+            "paket_id": 215,
+            "beg_date": "0000-00-00"
+        }
+    ],
+    "paket_search_115": [
+        {
+            "id": 106,
+            "name": "Paket 115",
+            "kuota": 93
+        }
+    ],
+    "paket_id_215": {
+        "id": 215,
+        "name": "Paket 228",
+        "kuota": 6
+    },
+    "paket": {
+        "id": 115,
+        "name": "Paket 124",
+        "kuota": 1
+    },
+    "nilai_kontrak": {
+        "total_employees": 1,
+        "calculated_at": "2026-02-10T09:34:17.000000Z",
+        "breakdown_ids": [
+            1800
+        ]
+    },
+    "is_in_calculation": false
+}

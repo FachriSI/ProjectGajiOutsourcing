@@ -7,99 +7,145 @@
     <h3 class="mt-4">Tambah Karyawan</h3>
     <form class="form-horizontal form-bordered" method="post" enctype="multipart/form-data" action="/tambah-karyawan">
         @csrf
-        <div class="mb-3">
-            <label for="osis_id" class="form-label">OSIS ID <span class="text-danger">*</span></label>
-            <input type="number" class="form-control" name="osis_id" id="osis_id" required
-                onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-            <div id="osis-feedback" class="invalid-feedback">
-                OSIS ID harus 4 digit angka dan belum terdaftar.
+    <div class="row">
+        <!-- Kolom Kiri: Data Personal -->
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-user me-2"></i>Data Personal</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="nama" class="form-label fw-bold">Nama Tenaga Kerja <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="nama" id="nama" value="{{ old('nama') }}" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="osis_id" class="form-label fw-bold">OSIS ID <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="osis_id" id="osis_id" required
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57" value="{{ old('osis_id') }}">
+                            <div id="osis-feedback" class="invalid-feedback">
+                                OSIS ID harus 4 digit angka dan belum terdaftar.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="ktp" class="form-label fw-bold">Nomor KTP <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="ktp" id="ktp" required
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57" value="{{ old('ktp') }}">
+                            <div id="ktp-feedback" class="invalid-feedback">
+                                Nomor KTP harus 16 digit angka dan belum terdaftar.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tanggal_lahir" class="form-label fw-bold">Tanggal Lahir <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir"
+                            min="{{ date('Y-m-d', strtotime('-56 years')) }}" max="{{ date('Y-m-d', strtotime('-18 years')) }}"
+                            value="{{ old('tanggal_lahir') }}"
+                            required>
+                        <div id="tgl-feedback" class="invalid-feedback">
+                            Usia tidak memenuhi syarat (18-56 tahun).
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="laki" name="jenis_kelamin" value="L" {{ old('jenis_kelamin') == 'L' ? 'checked' : '' }} required>
+                            <label class="form-check-label" for="laki">Laki-laki</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="perempuan" name="jenis_kelamin" value="P" {{ old('jenis_kelamin') == 'P' ? 'checked' : '' }} required>
+                            <label class="form-check-label" for="perempuan">Perempuan</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="agama" class="form-label fw-bold">Agama <span class="text-danger">*</span></label>
+                            <select class="form-select" name="agama" id="agama" required>
+                                <option value="" selected disabled>Pilih...</option>
+                                <option value="Islam" {{ old('agama') == 'Islam' ? 'selected' : '' }}>Islam</option>
+                                <option value="Kristen" {{ old('agama') == 'Kristen' ? 'selected' : '' }}>Kristen</option>
+                                <option value="Katolik" {{ old('agama') == 'Katolik' ? 'selected' : '' }}>Katolik</option>
+                                <option value="Hindu" {{ old('agama') == 'Hindu' ? 'selected' : '' }}>Hindu</option>
+                                <option value="Buddha" {{ old('agama') == 'Buddha' ? 'selected' : '' }}>Buddha</option>
+                                <option value="Konghucu" {{ old('agama') == 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                            <select class="form-select" name="status" id="status" required>
+                                <option value="" selected disabled>Pilih...</option>
+                                <option value="S" {{ old('status') == 'S' ? 'selected' : '' }}>Single</option>
+                                <option value="M" {{ old('status') == 'M' ? 'selected' : '' }}>Menikah</option>
+                                <option value="D" {{ old('status') == 'D' ? 'selected' : '' }}>Duda</option>
+                                <option value="J" {{ old('status') == 'J' ? 'selected' : '' }}>Janda</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="alamat" class="form-label fw-bold">Alamat</label>
+                        <textarea class="form-control" name="alamat" id="alamat" rows="2">{{ old('alamat') }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="asal" class="form-label fw-bold">Asal</label>
+                        <input type="text" class="form-control" name="asal" id="asal" value="{{ old('asal') }}">
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="mb-3">
-            <label for="ktp" class="form-label">Nomor KTP <span class="text-danger">*</span></label>
-            <input type="number" class="form-control" name="ktp" id="ktp" required
-                onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-            <div id="ktp-feedback" class="invalid-feedback">
-                Nomor KTP harus 16 digit angka dan belum terdaftar.
-            </div>
-        </div>
-        <div class="mb-3">
-            <label for="nama" class="form-label">Nama Tenaga Kerja <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="nama" id="nama" required>
-        </div>
-        <div class="mb-3">
-            <label for="paket_id" class="form-label">Pilih Paket <span class="text-danger">*</span></label>
-            <select class="custom-select select2" name="paket_id" id="paket_id" required>
-                <option value="">Pilih Paket...</option>
-                @foreach ($paketList as $paket)
-                    <option value="{{ $paket->paket_id }}"
-                        {{ (old('paket_id') == $paket->paket_id || request('paket_id') == $paket->paket_id) ? 'selected' : '' }}>
-                        {{ $paket->paket }} (Sisa Kuota: {{ $paket->sisa_kuota }})
-                    </option>
-                @endforeach
-            </select>
-            @error('paket_id')
-                <div class="text-danger small">{{ $message }}</div>
-            @enderror
         </div>
 
-        <div class="mb-3">
-            <label for="perusahaan" class="form-label">Vendor/Perusahaan <span class="text-danger">*</span></label>
-            <select class="custom-select select2" name="perusahaan" id="perusahaan" required>
-                <option selected value="">Pilih Perusahaan</option>
-                @foreach ($dataP as $item)
-                    <option value="{{$item->perusahaan_id}}">{{$item->perusahaan}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="tanggal_lahir" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir"
-                min="{{ date('Y-m-d', strtotime('-56 years')) }}" max="{{ date('Y-m-d', strtotime('-18 years')) }}"
-                required>
-            <div id="tgl-feedback" class="invalid-feedback">
-                Usia tidak memenuhi syarat (18-56 tahun).
+        <!-- Kolom Kanan: Data Pekerjaan -->
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-briefcase me-2"></i>Data Pekerjaan</h6>
+                </div>
+                <div class="card-body">
+                     <div class="mb-3">
+                        <label for="perusahaan" class="form-label fw-bold">Vendor/Perusahaan <span class="text-danger">*</span></label>
+                        <select class="form-select select2" name="perusahaan" id="perusahaan" required>
+                            <option selected value="">Pilih Perusahaan...</option>
+                            @foreach ($dataP as $item)
+                                <option value="{{$item->perusahaan_id}}" {{ old('perusahaan') == $item->perusahaan_id ? 'selected' : '' }}>{{$item->perusahaan}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="paket_id" class="form-label fw-bold">Pilih Paket <span class="text-danger">*</span></label>
+                        <select class="form-select select2" name="paket_id" id="paket_id" required>
+                            <option value="">Pilih Paket...</option>
+                            @foreach ($paketList as $paket)
+                                <option value="{{ $paket->paket_id }}"
+                                    {{ (old('paket_id') == $paket->paket_id || request('paket_id') == $paket->paket_id) ? 'selected' : '' }}>
+                                    {{ $paket->paket }} (Sisa Kuota: {{ $paket->sisa_kuota }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('paket_id')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                    <i class="fas fa-save me-2"></i>Simpan Karyawan
+                </button>
+                <a href="/karyawan" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Kembali
+                </a>
             </div>
         </div>
-        <div class="mb-3">
-            <label for="jenis-kelamin" class="form-label">Jenis Kelamin</label> <br>
-            <input type="radio" id="laki" name="jenis_kelamin" value="L">
-            <label for="laki">Laki-laki</label>
-            <input type="radio" id="perempuan" name="jenis_kelamin" value="P">
-            <label for="perempuan">Perempuan</label><br>
-        </div>
-        <div class="mb-3">
-            <label for="agama" class="form-label">Agama</label>
-            <select class="form-select" aria-label="Default select example" name="agama" id="agama">
-                <option selected>Pilih...</option>
-                <option value="Islam">Islam</option>
-                <option value="Kristen">Kristen</option>
-                <option value="Katolik">Katolik</option>
-                <option value="Hindu">Hindu</option>
-                <option value="Buddha">Buddha</option>
-                <option value="Konghucu">Konghucu</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select class="form-select" aria-label="Default select example" name="status" id="status">
-                <option selected>Pilih...</option>
-                <option value="S">Single</option>
-                <option value="M">Menikah</option>
-                <option value="D">Duda</option>
-                <option value="J">Janda</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="alamat" class="form-label">Alamat</label>
-            <input type="text" class="form-control" name="alamat" id="alamat">
-        </div>
-
-        <div class="mb-3">
-            <label for="asal" class="form-label">Asal</label>
-            <input type="text" class="form-control" name="asal" id="asal">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
     </form>
     <script>
         $(document).ready(function () {

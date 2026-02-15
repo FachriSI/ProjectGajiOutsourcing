@@ -2,7 +2,7 @@
 @section('title', 'Tunjangan Risiko')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-warning border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Tunjangan
@@ -12,11 +12,11 @@
             <div class="d-flex gap-2">
                 @if($hasDeleted)
                     <a href="/resiko/sampah" class="btn btn-secondary shadow-sm">
-                        <i class="fas fa-trash-restore me-1"></i> Data Sampah
+                        <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
                 <a href="/gettambah-resiko" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Tunjangan Risiko
+                    <i class="fas fa-plus me-1"></i> Tambah Data
                 </a>
             </div>
         </div>
@@ -58,18 +58,16 @@
                                     Rp {{ number_format($item->tunjangan_resiko, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="/getupdate-resiko/{{ $item->kode_resiko }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-resiko', $item->kode_resiko) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Delete"
-                                            onclick="return confirm('Hapus data risiko ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/getupdate-resiko/{{ $item->kode_resiko }}" class="btn btn-sm btn-warning shadow-sm"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-resiko', $item->kode_resiko) }}"
+                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Delete"
+                                        onclick="return confirm('Hapus data risiko ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

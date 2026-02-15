@@ -2,7 +2,7 @@
 @section('title', 'Masa Kerja')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-success border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-calendar-check me-2 text-success"></i> Masa Kerja</h1>
@@ -11,11 +11,11 @@
             <div class="d-flex gap-2">
                 @if($hasDeleted)
                     <a href="/masakerja/sampah" class="btn btn-secondary shadow-sm">
-                        <i class="fas fa-trash-restore me-1"></i> Data Sampah
+                        <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
                 <a href="/gettambah-masakerja" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Masa Kerja
+                    <i class="fas fa-plus me-1"></i> Tambah Data
                 </a>
             </div>
         </div>
@@ -61,18 +61,16 @@
                                     {{ \Carbon\Carbon::parse($item->beg_date)->translatedFormat('d F Y') }}
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="/getupdate-masakerja/{{ $item->id }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-masakerja', $item->id) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Delete"
-                                            onclick="return confirm('Hapus data masa kerja ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/getupdate-masakerja/{{ $item->id }}" class="btn btn-sm btn-warning shadow-sm"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-masakerja', $item->id) }}"
+                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Delete"
+                                        onclick="return confirm('Hapus data masa kerja ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

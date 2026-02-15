@@ -2,7 +2,7 @@
 @section('title', 'Tunjangan Jabatan')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-briefcase me-2 text-primary"></i> Tunjangan Jabatan</h1>
@@ -11,11 +11,11 @@
             <div class="d-flex gap-2">
                 @if($hasDeleted)
                     <a href="/jabatan/sampah" class="btn btn-secondary shadow-sm">
-                        <i class="fas fa-trash-restore me-1"></i> Data Sampah
+                        <i class="fas fa-trash-restore me-1"></i> Sampah
                     </a>
                 @endif
                 <a href="/gettambah-jabatan" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah Tunjangan Jabatan
+                    <i class="fas fa-plus me-1"></i> Tambah Data
                 </a>
             </div>
         </div>
@@ -57,18 +57,16 @@
                                     Rp {{ number_format($item->tunjangan_jabatan, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="/getupdate-jabatan/{{ $item->kode_jabatan }}" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-jabatan', $item->kode_jabatan) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Delete"
-                                            onclick="return confirm('Hapus data jabatan ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/getupdate-jabatan/{{ $item->kode_jabatan }}" class="btn btn-sm btn-warning shadow-sm"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-jabatan', $item->kode_jabatan) }}"
+                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Delete"
+                                        onclick="return confirm('Hapus data jabatan ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

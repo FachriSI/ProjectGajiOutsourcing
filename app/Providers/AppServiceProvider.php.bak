@@ -27,12 +27,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Force HTTPS if APP_ENV is not local OR if we detect ngrok/tunnel
-        // But for simplicity in this specific user context, we might just force it if APP_URL starts with https
-        if(\Illuminate\Support\Str::startsWith(config('app.url'), 'https://')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
-        }
-
         User::observe(UserObserver::class);
         Paginator::useBootstrapFive();
 

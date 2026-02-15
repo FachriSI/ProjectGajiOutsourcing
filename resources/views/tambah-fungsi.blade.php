@@ -7,21 +7,43 @@
     <h3 class="mt-4">Tambah Fungsi</h3>
 
     <div class="card mb-4">
-        <div class="card-body">
-            <form action="/tambah-fungsi" method="POST">
-                @csrf
-                <div class="mb-3">
-                    <label for="nama" class="form-label">Nama Fungsi</label>
-                    <input type="text" class="form-control" id="nama" name="nama" required>
+        <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-cogs me-2"></i>Data Fungsi Baru</h6>
                 </div>
-                <div class="mb-3">
-                    <label for="keterangan" class="form-label">Keterangan</label>
-                    <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
+                <div class="card-body">
+                    <form class="form-horizontal form-bordered" method="post" enctype="multipart/form-data" action="/tambah-fungsi">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="fungsi" class="form-label fw-bold">Nama Fungsi <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="fungsi" id="fungsi" placeholder="Contoh: Recruitment, Payroll" required>
+                        </div>
+
+                        <div class="mb-3">
+                             <label for="departemen_id" class="form-label fw-bold">Pilih Departemen <span class="text-danger">*</span></label>
+                            <select class="custom-select select2" name="departemen_id" id="departemen_id" required>
+                                <option value="" selected disabled>Pilih Departemen</option>
+                                @foreach ($dep as $item)
+                                    <option value="{{$item->departemen_id}}">{{$item->departemen}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="/fungsi" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Kembali
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Simpan Fungsi
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-                <a href="/fungsi" class="btn btn-secondary">Kembali</a>
-            </form>
+            </div>
         </div>
+    </div>
     </div>
 
 @endsection

@@ -29,24 +29,20 @@ class UnitKerjaController extends Controller
 
     public function getTambah()
     {        
-        return view('tambah-unit');
+        $fungsi = \App\Models\Fungsi::where('is_deleted', 0)->get();
+        return view('tambah-unit', ['fungsi' => $fungsi]);
     }
 
     public function setTambah(Request $request)
     {
         $request->validate([
-            'unit_id' => 'required',
-            'unit' => 'required',
-            'fungsi' => 'fungsi'
+            'unit_kerja' => 'required',
+            'fungsi_id' => 'required'
         ]); 
 
-        $paket = 'paket';
-        $fungsi = 'fungsi';
         UnitKerja::create([
-            'unit_id' =>$request->unit_id,
-            'unit_kerja' => $request->unit,
-            'paket' => $paket,
-            'fungsi' => $fungsi
+            'unit_kerja' => $request->unit_kerja,
+            'fungsi_id' => $request->fungsi_id,
         ]);
 
         return redirect('/unit-kerja')->with('success', 'Data Berhasil Tersimpan');

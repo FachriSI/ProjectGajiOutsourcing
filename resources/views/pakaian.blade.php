@@ -2,10 +2,10 @@
 @section('title', 'Pakaian')
 @section('content')
     <!-- Modern Header -->
-    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4">
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-tshirt me-2" style="color: #6f42c1;"></i> Pakaian</h1>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-tshirt me-2 text-primary"></i> Pakaian</h1>
                 <p class="text-muted small mb-0 mt-1">Kelola data jatah pakaian dinas (Global)</p>
             </div>
         </div>

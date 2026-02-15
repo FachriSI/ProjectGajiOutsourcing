@@ -34,7 +34,7 @@ class DepartemenController extends Controller
     public function setTambah(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
+            'departemen' => 'required',
         ]);
 
         $lastDepartemen = Departemen::latest('departemen_id')->first();
@@ -42,8 +42,8 @@ class DepartemenController extends Controller
 
         Departemen::create([
             'departemen_id' => $newId,
-            'departemen' => $request->nama,
-            'is_si' => $request->is_si ?? 0,
+            'departemen' => $request->departemen,
+            'is_si' => 0,
         ]);
 
         return redirect('/departemen')->with('success', 'Data Berhasil Tersimpan');

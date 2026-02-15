@@ -32,16 +32,19 @@ class JabatanController extends Controller
     public function setTambah(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
+            'jabatan' => 'required',
+            'tunjangan' => 'required'
         ]);
 
         $last = Jabatan::latest('kode_jabatan')->first();
         $newId = $last ? $last->kode_jabatan + 1 : 1;
 
+        $tunjangan = str_replace('.', '', $request->tunjangan);
+
         Jabatan::create([
             'kode_jabatan' => $newId,
-            'jabatan' => $request->nama,
-            'tunjangan_jabatan' => $request->tunjangan ?? 0,
+            'jabatan' => $request->jabatan,
+            'tunjangan_jabatan' => $tunjangan,
         ]);
 
         return redirect('/jabatan')->with('success', 'Data Berhasil Tersimpan');

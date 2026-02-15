@@ -39,16 +39,18 @@ class MasakerjaController extends Controller
 
     public function setTambah(Request $request)
     {
-        $request->validate(['karyawan_id' => 'required', 'tunjangan_masakerja' => 'required']);
+        $request->validate(['karyawan_id' => 'required', 'tunjangan_masakerja' => 'required', 'beg_date' => 'required']);
 
         $last = Masakerja::latest('id')->first();
         $newId = $last ? $last->id + 1 : 1;
 
+        $tunjangan = str_replace('.', '', $request->tunjangan_masakerja);
+
         Masakerja::create([
             'id' => $newId,
             'karyawan_id' => $request->karyawan_id,
-            'tunjangan_masakerja' => $request->tunjangan_masakerja,
-            'beg_date' => $request->beg_date ?? now(),
+            'tunjangan_masakerja' => $tunjangan,
+            'beg_date' => $request->beg_date,
         ]);
 
         return redirect('/masakerja')->with('success', 'Data Berhasil Tersimpan');

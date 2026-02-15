@@ -116,16 +116,14 @@
                                 <td>{{ $item->tkp }}</td>
                                 <td>{{ $item->npp }}</td>
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-1">
-                                        <a href="/getupdate-perusahaan/{{ $item->perusahaan_id }}"
-                                            class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('delete-perusahaan', $item->perusahaan_id) }}"
-                                            class="btn btn-sm btn-danger btn-delete" data-bs-toggle="tooltip" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/getupdate-perusahaan/{{ $item->perusahaan_id }}"
+                                        class="btn btn-sm btn-warning shadow-sm" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url('delete-perusahaan', $item->perusahaan_id) }}"
+                                        class="btn btn-sm btn-danger shadow-sm btn-delete" data-bs-toggle="tooltip" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

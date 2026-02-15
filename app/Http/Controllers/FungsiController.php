@@ -18,13 +18,15 @@ class FungsiController extends Controller
 
     public function getTambah()
     {
-        return view('tambah-fungsi');
+        $dep = \App\Models\Departemen::where('is_deleted', 0)->get();
+        return view('tambah-fungsi', ['dep' => $dep]);
     }
 
     public function setTambah(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
+            'fungsi' => 'required',
+            'departemen_id' => 'required'
         ]);
 
         $lastFungsi = Fungsi::latest('kode_fungsi')->first();
@@ -32,8 +34,9 @@ class FungsiController extends Controller
 
         Fungsi::create([
             'kode_fungsi' => $newId,
-            'fungsi' => $request->nama,
-            'keterangan' => $request->keterangan ?? '',
+            'fungsi' => $request->fungsi,
+            'd_id' => $request->departemen_id, // Assuming 'd_id' is the foreign key column in md_fungsi
+            'keterangan' => '',
         ]);
 
         return redirect('/fungsi')->with('success', 'Data Berhasil Tersimpan');

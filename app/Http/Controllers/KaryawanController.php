@@ -329,7 +329,7 @@ class KaryawanController extends Controller
             'beg_date' => 'required',
         ]);
 
-        // Simpan mutasi dengan tanggal sekarang
+        // Simpan mutasi
         DB::table('paket_karyawan')->insert([
             'karyawan_id' => $request->karyawan_id,
             'paket_id' => $request->paket_id,
@@ -339,12 +339,21 @@ class KaryawanController extends Controller
         // Auto-Calculate for the NEW Paket
         try {
             $calculatorService = app(\App\Services\ContractCalculatorService::class);
-            $calculatorService->calculateForPaket($request->paket_id, date('Y-m'));
             
-            // Optional: Calculate for OLD paket too if we knew what it was, but that requires extra query.
-            // For now, ensuring the destination package has data is the priority.
+            // 1. Calculate for the Mutation Period
+            $mutationPeriode = \Carbon\Carbon::parse($request->beg_date)->format('Y-m');
+            $calculatorService->calculateForPaket($request->paket_id, $mutationPeriode);
+
+            // 2. If Mutation Period is different from Current Period, calculate for Current as well
+            // This ensures Dashboard (Current Month) and Detail Page (Mutation Month) are both up to date
+            $currentPeriode = date('Y-m');
+            if ($mutationPeriode !== $currentPeriode) {
+                $calculatorService->calculateForPaket($request->paket_id, $currentPeriode);
+            }
+
         } catch (\Exception $e) {
             \Log::error('Auto-calculation failed after mutation: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Mutasi paket berhasil disimpan, namun pembaharuan data kontrak gagal. Silakan buka detail paket untuk memuat ulang data. Error: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'Mutasi paket berhasil disimpan.');
@@ -367,6 +376,31 @@ class KaryawanController extends Controller
             'beg_date' => $request->beg_date,
         ]);
 
+        // Auto-Calculate for the Employee's Active Paket
+        try {
+            $activePaket = DB::table('paket_karyawan')
+                ->where('karyawan_id', $request->karyawan_id)
+                ->orderByDesc('beg_date')
+                ->first();
+
+            if ($activePaket) {
+                $calculatorService = app(\App\Services\ContractCalculatorService::class);
+                
+                // Calculate for the Change Period
+                $changePeriode = \Carbon\Carbon::parse($request->beg_date)->format('Y-m');
+                $calculatorService->calculateForPaket($activePaket->paket_id, $changePeriode);
+
+                // If Change Period is different from Current Period, calculate for Current as well
+                $currentPeriode = date('Y-m');
+                if ($changePeriode !== $currentPeriode) {
+                    $calculatorService->calculateForPaket($activePaket->paket_id, $currentPeriode);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Auto-calculation failed after shift change: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Pergantian Harian/Shift berhasil disimpan, namun pembaharuan data kontrak gagal. Error: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('success', 'Pergantian Harian/Shift berhasil disimpan.');
     }
 
@@ -386,6 +420,31 @@ class KaryawanController extends Controller
             'beg_date' => $request->beg_date,
         ]);
 
+        // Auto-Calculate for the Employee's Active Paket
+        try {
+            $activePaket = DB::table('paket_karyawan')
+                ->where('karyawan_id', $request->karyawan_id)
+                ->orderByDesc('beg_date')
+                ->first();
+
+            if ($activePaket) {
+                $calculatorService = app(\App\Services\ContractCalculatorService::class);
+                
+                // Calculate for the Change Period
+                $changePeriode = \Carbon\Carbon::parse($request->beg_date)->format('Y-m');
+                $calculatorService->calculateForPaket($activePaket->paket_id, $changePeriode);
+
+                // If Change Period is different from Current Period, calculate for Current as well
+                $currentPeriode = date('Y-m');
+                if ($changePeriode !== $currentPeriode) {
+                    $calculatorService->calculateForPaket($activePaket->paket_id, $currentPeriode);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Auto-calculation failed after promotion: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Promosi jabatan berhasil disimpan, namun pembaharuan data kontrak gagal. Error: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('success', 'Promosi jabatan berhasil disimpan.');
     }
 
@@ -402,6 +461,26 @@ class KaryawanController extends Controller
             ->update([
                 'area_id' => $request->area_id,
             ]);
+
+        // Auto-Calculate for the Employee's Active Paket
+        try {
+            $activePaket = DB::table('paket_karyawan')
+                ->where('karyawan_id', $request->karyawan_id)
+                ->orderByDesc('beg_date')
+                ->first();
+
+            if ($activePaket) {
+                $calculatorService = app(\App\Services\ContractCalculatorService::class);
+                
+                // For Area change (which doesn't have beg_date input, assume immediate/current effect)
+                // or we should calculate for current month.
+                $currentPeriode = date('Y-m');
+                $calculatorService->calculateForPaket($activePaket->paket_id, $currentPeriode);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Auto-calculation failed after area change: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Pergantian Area berhasil disimpan, namun pembaharuan data kontrak gagal. Error: ' . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Pergantian Area berhasil disimpan.');
     }

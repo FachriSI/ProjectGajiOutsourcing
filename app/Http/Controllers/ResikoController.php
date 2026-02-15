@@ -31,15 +31,15 @@ class ResikoController extends Controller
 
     public function setTambah(Request $request)
     {
-        $request->validate(['nama' => 'required']);
+        $request->validate(['resiko' => 'required', 'nominal' => 'required']);
 
         $last = Resiko::latest('kode_resiko')->first();
         $newId = $last ? $last->kode_resiko + 1 : 1;
 
         Resiko::create([
             'kode_resiko' => $newId,
-            'resiko' => $request->nama,
-            'tunjangan_resiko' => $request->tunjangan ?? 0,
+            'resiko' => $request->resiko,
+            'tunjangan_resiko' => $request->nominal ?? 0,
         ]);
 
         return redirect('/resiko')->with('success', 'Data Berhasil Tersimpan');
