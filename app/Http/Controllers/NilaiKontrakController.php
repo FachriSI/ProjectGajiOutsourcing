@@ -10,6 +10,7 @@ use App\Exports\NilaiKontrakExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Services\ContractValidationService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -333,7 +334,7 @@ class NilaiKontrakController extends Controller
             $validation->save();
         }
 
-        $validationUrl = route('contract.validate', $validation->validation_token);
+        $validationUrl = route('thr.view', $validation->validation_token);
         $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate($validationUrl));
 
         // Find vendor details
@@ -373,7 +374,27 @@ class NilaiKontrakController extends Controller
 
         $pdf = \PDF::loadView('pdf.thr', compact('data', 'nilaiKontrak'));
         $pdf->setPaper('A4', 'portrait');
-        return $pdf->stream('THR_' . $nilaiKontrak->paket->paket . '_' . $nilaiKontrak->tahun . '.pdf');
+        
+        // Generate filename dan path
+        $filename = 'THR_' . $nilaiKontrak->paket->paket . '_' . $nilaiKontrak->tahun . '_' . substr($validation->validation_token, 0, 8) . '.pdf';
+        $pdfPath = 'thr/' . $filename;
+        
+        // Save PDF to storage
+        $pdfContent = $pdf->output();
+        Storage::disk('public')->makeDirectory('thr');
+        Storage::disk('public')->put($pdfPath, $pdfContent);
+        
+        // Generate document hash
+        $documentHash = hash('sha256', $pdfContent);
+        
+        // Update validation with path and hash
+        $validation->update([
+            'pdf_path' => $pdfPath,
+            'document_hash' => $documentHash
+        ]);
+        
+        // Stream PDF to browser
+        return $pdf->stream($filename);
     }
 
     /**
@@ -415,5 +436,44 @@ class NilaiKontrakController extends Controller
         $filename = "Laporan_Kontrak_{$periode}_{$timestamp}.xlsx";
 
         return Excel::download(new NilaiKontrakExport($data, $columns), $filename);
+    }
+
+    /**
+     * View THR PDF directly from QR code scan
+     * 
+     * @param string $token
+     * @return \Illuminate\Http\Response
+     */
+    public function viewThrPdf($token)
+    {
+        try {
+            // Find validation by token
+            $validation = \App\Models\ContractValidation::where('validation_token', $token)
+                ->where('metadata->type', 'THR')
+                ->firstOrFail();
+
+            // Check if PDF exists in storage
+            if ($validation->pdf_path && Storage::disk('public')->exists($validation->pdf_path)) {
+                // Serve PDF from storage
+                return response()->file(storage_path('app/public/' . $validation->pdf_path));
+            }
+
+            // If PDF not found, regenerate
+            $nilaiKontrak = $validation->nilaiKontrak;
+            
+            // Redirect to cetak-thr to regenerate PDF
+            return redirect()->route('kalkulator.cetak-thr', [
+                'paket_id' => $nilaiKontrak->paket_id,
+                'periode' => $nilaiKontrak->periode
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to view THR PDF', [
+                'token' => $token,
+                'error' => $e->getMessage()
+            ]);
+
+            abort(404, 'Dokumen THR tidak ditemukan atau sudah tidak valid');
+        }
     }
 }

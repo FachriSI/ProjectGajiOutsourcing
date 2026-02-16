@@ -51,6 +51,9 @@ Route::get('/verify-tagihan/{token}/download', [PaketController::class, 'downloa
 Route::get('/validate/{token}', [App\Http\Controllers\ContractValidationController::class, 'showValidation'])->name('contract.validate');
 Route::get('/api/validate/{token}', [App\Http\Controllers\ContractValidationController::class, 'validateApi'])->name('contract.validate.api');
 
+// Public route for THR PDF direct view (from QR code)
+Route::get('/thr/view/{token}', [App\Http\Controllers\NilaiKontrakController::class, 'viewThrPdf'])->name('thr.view');
+
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index']);

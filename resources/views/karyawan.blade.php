@@ -340,8 +340,7 @@
             <div class="mb-3">
               <label class="form-label">Pilih Shift Baru:</label>
               <select name="kode_harianshift" class="form-select" required>
-                <option value="">-- Pilih --</option>
-                <option value="1">Harian</option>
+                <option value="1" selected>Harian</option>
                 <option value="2">Shift</option>
               </select>
             </div>
