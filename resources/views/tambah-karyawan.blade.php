@@ -154,6 +154,22 @@
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="mb-3">
+                            <label for="kode_lokasi" class="form-label fw-bold text-dark">Lokasi Kerja <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select select2" name="kode_lokasi" id="kode_lokasi" required>
+                                <option value="">Pilih Lokasi...</option>
+                                @foreach ($lokasiList as $lokasi)
+                                    <option value="{{ $lokasi->kode_lokasi }}" {{ old('kode_lokasi') == $lokasi->kode_lokasi ? 'selected' : '' }}>
+                                        {{ $lokasi->lokasi }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('kode_lokasi')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 

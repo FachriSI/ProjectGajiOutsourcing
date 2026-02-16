@@ -88,6 +88,7 @@
                     <thead class="table-light">
                         <tr>
                             <th class="text-center" width="5%">No.</th>
+                            <th class="text-center">ID Perusahaan</th>
                             <th>Perusahaan</th>
                             <th>Alamat</th>
                             <th>CP</th>
@@ -105,6 +106,7 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center"><span class="badge bg-secondary">{{ $item->perusahaan_id }}</span></td>
                                 <td class="fw-bold">{{ $item->perusahaan }}</td>
                                 <td>{{ $item->alamat }}</td>
                                 <td>{{ $item->cp }}</td>

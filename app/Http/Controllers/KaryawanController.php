@@ -158,12 +158,16 @@ class KaryawanController extends Controller
         $existingOsis = Karyawan::pluck('osis_id')->toArray();
         $existingKtp = Karyawan::pluck('ktp')->toArray();
 
+        // Fetch lokasi data for dropdown
+        $lokasiList = DB::table('md_lokasi')->where('is_deleted', 0)->get();
+
         return view('tambah-karyawan', [
             'dataP' => $dataP,
             'dataU' => $dataU,
             'paketList' => $paketList,
             'existingOsis' => $existingOsis,
-            'existingKtp' => $existingKtp
+            'existingKtp' => $existingKtp,
+            'lokasiList' => $lokasiList
         ]);
     }
 
@@ -181,6 +185,7 @@ class KaryawanController extends Controller
             'alamat' => 'required',
             'asal' => 'nullable',
             'paket_id' => 'required|exists:md_paket,paket_id',
+            'kode_lokasi' => 'required|exists:md_lokasi,kode_lokasi',
         ], [
             'osis_id.unique' => 'OSIS ID sudah terdaftar.',
             'osis_id.digits' => 'OSIS ID harus 4 digit angka.',
@@ -242,6 +247,20 @@ class KaryawanController extends Controller
             'paket_id' => $request->paket_id,
             'karyawan_id' => $karyawan->karyawan_id,
             'beg_date' => now()->format('Y-m-d'), // Start date in package
+        ]);
+
+        // Auto-assign default Harian/Shift (kode_harianshift = 1 untuk "Harian")
+        Riwayat_shift::create([
+            'karyawan_id' => $karyawan->karyawan_id,
+            'kode_harianshift' => 1, // Default ke "Harian"
+            'beg_date' => now()->format('Y-m-d'),
+        ]);
+
+        // Auto-assign lokasi kerja
+        DB::table('riwayat_lokasi')->insert([
+            'karyawan_id' => $karyawan->karyawan_id,
+            'kode_lokasi' => $request->kode_lokasi,
+            'beg_date' => now()->format('Y-m-d'),
         ]);
 
         // Auto-Calculate to ensure data appears immediately in Paket Detail
