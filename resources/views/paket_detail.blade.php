@@ -81,23 +81,24 @@
         }
     @endphp
 
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-        <h3>Detail {{ $paketList->first()->paket ?? 'Paket' }}</h3>
-        <div class="d-flex align-items-center gap-2">
-            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center">
-                <label class="me-2 text-nowrap fw-bold text-muted small text-uppercase">Periode Kontrak:</label>
-                <input type="month" name="periode" class="form-control form-control-sm me-2" 
-                       value="{{ $selectedPeriode }}" onchange="this.form.submit()">
-
-            </form>
-
-
-
-
-            <a href="/gettambah-karyawan?paket_id={{ $paketList->first()->paket_id ?? '' }}" class="btn btn-outline-primary shadow-sm">
-                <i class="fas fa-user-plus me-1"></i> Tambah Karyawan
-            </a>
-            <a href="/paket" class="btn btn-outline-secondary shadow-sm">Kembali</a>
+    <!-- Modern Header -->
+    <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-box-open me-2 text-primary"></i> Detail {{ $paketList->first()->paket ?? 'Paket' }}</h1>
+                <p class="text-muted small mb-0 mt-1">Rincian biaya dan komponen kontrak per karyawan</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center">
+                    <label class="me-2 text-nowrap fw-bold text-muted small text-uppercase">Periode Kontrak:</label>
+                    <input type="month" name="periode" class="form-control form-control-sm me-2" 
+                           value="{{ $selectedPeriode }}" onchange="this.form.submit()">
+                </form>
+                <a href="/gettambah-karyawan?paket_id={{ $paketList->first()->paket_id ?? '' }}" class="btn btn-outline-primary shadow-sm">
+                    <i class="fas fa-user-plus me-1"></i> Tambah Karyawan
+                </a>
+                <a href="/paket" class="btn btn-outline-secondary shadow-sm">Kembali</a>
+            </div>
         </div>
     </div>
 
@@ -113,7 +114,7 @@
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total Kontrak/Tahun</div>
                     </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_kontrak_tahunan_all, 0, ',', '.') }}</div>
+                    <div class="h4 fw-bold text-primary mb-0">Rp{{ number_format($total_kontrak_tahunan_all, 0, ',', '.') }}</div>
 
                 </div>
             </div>
@@ -130,7 +131,7 @@
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total THR/Tahun</div>
                     </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_thr_thn, 0, ',', '.') }}</div>
+                    <div class="h4 fw-bold text-primary mb-0">Rp{{ number_format($total_thr_thn, 0, ',', '.') }}</div>
                 </div>
             </div>
         </div>
@@ -146,7 +147,7 @@
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total MCU/Tahun</div>
                     </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_mcu_paket, 0, ',', '.') }}</div>
+                    <div class="h4 fw-bold text-primary mb-0">Rp{{ number_format($total_mcu_paket, 0, ',', '.') }}</div>
                 </div>
             </div>
         </div>
@@ -162,7 +163,7 @@
                         </div>
                         <div class="text-uppercase fw-bold text-muted small">Total Pakaian/Tahun</div>
                     </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_pakaian_all, 0, ',', '.') }}</div>
+                    <div class="h4 fw-bold text-primary mb-0">Rp{{ number_format($total_pakaian_all, 0, ',', '.') }}</div>
                 </div>
             </div>
         </div>

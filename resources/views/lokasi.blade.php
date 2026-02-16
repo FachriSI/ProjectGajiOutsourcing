@@ -50,7 +50,7 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="fw-bold">{{ $item->lokasi }}</td>
+                                <td class="fw-bold text-dark">{{ $item->lokasi }}</td>
                                 <td><span class="badge bg-secondary text-white">{{ $item->jenis }}</span></td>
                                 <td class="text-center">
                                     <a href="/getupdate-lokasi/{{ $item->kode_lokasi }}"

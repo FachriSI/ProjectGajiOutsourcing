@@ -247,6 +247,7 @@ class NilaiKontrakController extends Controller
         
         $totalBasicThr = 0;
         $filteredKaryawanCount = 0;
+        $eligibleKaryawan = [];
 
         foreach (($breakdown['karyawan'] ?? []) as $karyawan) {
             // Check eligibility against current DB status
@@ -255,6 +256,7 @@ class NilaiKontrakController extends Controller
             if (!$karyawanDb) continue;
 
             $isEligible = false;
+            $status = $karyawanDb->status_aktif;
 
             // Rule: Aktif OR (Resigned but worked until >= 1st of Eid Month)
             if ($karyawanDb->status_aktif == 'Aktif') {
@@ -264,6 +266,7 @@ class NilaiKontrakController extends Controller
                     $tglBerhenti = \Carbon\Carbon::parse($karyawanDb->tanggal_berhenti);
                     if ($tglBerhenti->gte($cutoffDate)) {
                         $isEligible = true;
+                        $status = 'Berhenti (masih berhak)';
                     }
                 }
             }
@@ -272,9 +275,20 @@ class NilaiKontrakController extends Controller
                 $upah = $karyawan['upah_pokok'] ?? 0;
                 $tjTetap = $karyawan['tj_tetap'] ?? 0;
                 $tjLokasi = $karyawan['tj_lokasi'] ?? 0;
+                $thrAmount = $upah + $tjTetap + $tjLokasi;
+
                 // THR = 1 month salary (Upah + Tj Tetap + Tj Lokasi)
-                $totalBasicThr += ($upah + $tjTetap + $tjLokasi);
+                $totalBasicThr += $thrAmount;
                 $filteredKaryawanCount++;
+
+                $eligibleKaryawan[] = [
+                    'nama' => $karyawanDb->nama_tk ?? '-',
+                    'upah_pokok' => $upah,
+                    'tj_tetap' => $tjTetap,
+                    'tj_lokasi' => $tjLokasi,
+                    'thr_amount' => $thrAmount,
+                    'status' => $status,
+                ];
             }
         }
 
@@ -329,7 +343,9 @@ class NilaiKontrakController extends Controller
             'qr_code' => $qrCode,
             'validation_url' => $validationUrl,
             'tanggal_lebaran' => $lebaran->tanggal,
-            'tanggal_dokumen' => $tanggalDokumen
+            'tanggal_dokumen' => $tanggalDokumen,
+            'karyawan_list' => $eligibleKaryawan,
+            'cutoff_date' => $cutoffDate->format('d F Y'),
         ];
 
         $pdf = \PDF::loadView('pdf.thr', compact('data', 'nilaiKontrak'));

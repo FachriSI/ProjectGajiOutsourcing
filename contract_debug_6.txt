@@ -1,0 +1,52 @@
+﻿Warning: TTY mode is not supported on Windows platform.
+
+  [37;41;1m FAIL [39;49;22m[39m Tests\Feature\ContractCalculatorTest[39m
+  [31;1mΓ¿»[39;22m[39m [2mcan calculate monthly contract value[22m[39m
+  [31;1mΓ¿»[39;22m[39m [2mcan calculate thr value[22m[39m
+
+  [2m---[22m
+
+  [31;1mΓÇó Tests\Feature\ContractCalculatorTest [39;22m> [31;1mcan calculate monthly contract value[39;22m
+[39;1m  Failed asserting that 3182955 matches expected 1000000.[39;22m
+
+  at [32mC:\Tugas Aufa\Outsourcing KP\tests\Feature\ContractCalculatorTest.php[39m:[32m87[39m
+     83Γûò         $this->assertEquals($paket->paket_id, $nilaiKontrak->paket_id);
+     84Γûò         
+     85Γûò         $breakdown = $nilaiKontrak->breakdown_json;
+     86Γûò         $this->assertNotEmpty($breakdown['karyawan']);
+  Γ₧£  87Γûò         $this->assertEquals(1000000, $breakdown['karyawan'][0]['upah_pokok']);
+     88Γûò 
+     89Γûò         // Cleanup
+     90Γûò         $paket->delete();
+     91Γûò         $karyawan->delete();
+
+  [33m1   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\phpunit\phpunit\phpunit[39;22m:[39;1m107[39;22m
+  [90m    PHPUnit\TextUI\Command::main()[39m
+  
+  [31;1mΓÇó Tests\Feature\ContractCalculatorTest [39;22m> [31;1mcan calculate thr value[39;22m
+  [41;1m Illuminate\Database\QueryException [49;22m
+
+[39;1m  SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`outsourcing_kp`.`paket_karyawan`, CONSTRAINT `paket_karyawan_ibfk_1` FOREIGN KEY (`paket_id`) REFERENCES `md_paket` (`paket_id`)) (SQL: delete from `md_paket` where `paket_id` = 338)[39;22m
+
+  at [32mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39m:[32m760[39m
+    756Γûò         // If an exception occurs when attempting to run a query, we'll format the error
+    757Γûò         // message to include the bindings with SQL, which will make this exception a
+    758Γûò         // lot more helpful to the developer instead of just the database's errors.
+    759Γûò         catch (Exception $e) {
+  Γ₧£ 760Γûò             throw new QueryException(
+    761Γûò                 $query, $this->prepareBindings($bindings), $e
+    762Γûò             );
+    763Γûò         }
+    764Γûò     }
+
+  [33m1   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m570[39;22m
+  [90m    PDOException::("SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`outsourcing_kp`.`paket_karyawan`, CONSTRAINT `paket_karyawan_ibfk_1` FOREIGN KEY (`paket_id`) REFERENCES `md_paket` (`paket_id`))")[39m
+
+  [33m2   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m570[39;22m
+  [90m    PDOStatement::execute()[39m
+
+
+  [37;1mTests:  [39;22m[31;1m2 failed[39;22m
+  [37;1mTime:   [39;22m[39m1.27s[39m
+
+

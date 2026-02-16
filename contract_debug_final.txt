@@ -1,0 +1,10 @@
+﻿Warning: TTY mode is not supported on Windows platform.
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ContractCalculatorTest[39m
+  [32;1mΓ£ô[39;22m[39m [2mcan calculate monthly contract value[22m[39m
+  [32;1mΓ£ô[39;22m[39m [2mcan calculate thr value[22m[39m
+
+  [37;1mTests:  [39;22m[32;1m2 passed[39;22m
+  [37;1mTime:   [39;22m[39m1.09s[39m
+
+

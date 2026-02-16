@@ -1,0 +1,57 @@
+﻿Warning: TTY mode is not supported on Windows platform.
+
+  [37;41;1m FAIL [39;49;22m[39m Tests\Feature\ContractCalculatorTest[39m
+  [31;1mΓ¿»[39;22m[39m [2mcan calculate monthly contract value[22m[39m
+  [31;1mΓ¿»[39;22m[39m [2mcan calculate thr value[22m[39m
+
+  [2m---[22m
+
+  [31;1mΓÇó Tests\Feature\ContractCalculatorTest [39;22m> [31;1mcan calculate monthly contract value[39;22m
+  [41;1m Illuminate\Database\QueryException [49;22m
+
+[39;1m  SQLSTATE[HY000]: General error: 1364 Field 'kuota_paket' doesn't have a default value (SQL: insert into `md_paket` (`paket`, `unit_id`, `is_deleted`, `updated_at`, `created_at`) values (Paket Test Calc, 1, 0, 2026-02-16 06:33:41, 2026-02-16 06:33:41))[39;22m
+
+  at [32mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39m:[32m760[39m
+    756Γûò         // If an exception occurs when attempting to run a query, we'll format the error
+    757Γûò         // message to include the bindings with SQL, which will make this exception a
+    758Γûò         // lot more helpful to the developer instead of just the database's errors.
+    759Γûò         catch (Exception $e) {
+  Γ₧£ 760Γûò             throw new QueryException(
+    761Γûò                 $query, $this->prepareBindings($bindings), $e
+    762Γûò             );
+    763Γûò         }
+    764Γûò     }
+
+  [33m1   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m545[39;22m
+  [90m    PDOException::("SQLSTATE[HY000]: General error: 1364 Field 'kuota_paket' doesn't have a default value")[39m
+
+  [33m2   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m545[39;22m
+  [90m    PDOStatement::execute()[39m
+
+  [31;1mΓÇó Tests\Feature\ContractCalculatorTest [39;22m> [31;1mcan calculate thr value[39;22m
+  [41;1m Illuminate\Database\QueryException [49;22m
+
+[39;1m  SQLSTATE[HY000]: General error: 1364 Field 'kuota_paket' doesn't have a default value (SQL: insert into `md_paket` (`paket`, `unit_id`, `is_deleted`, `updated_at`, `created_at`) values (Paket THR Test, 1, 0, 2026-02-16 06:33:41, 2026-02-16 06:33:41))[39;22m
+
+  at [32mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39m:[32m760[39m
+    756Γûò         // If an exception occurs when attempting to run a query, we'll format the error
+    757Γûò         // message to include the bindings with SQL, which will make this exception a
+    758Γûò         // lot more helpful to the developer instead of just the database's errors.
+    759Γûò         catch (Exception $e) {
+  Γ₧£ 760Γûò             throw new QueryException(
+    761Γûò                 $query, $this->prepareBindings($bindings), $e
+    762Γûò             );
+    763Γûò         }
+    764Γûò     }
+
+  [33m1   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m545[39;22m
+  [90m    PDOException::("SQLSTATE[HY000]: General error: 1364 Field 'kuota_paket' doesn't have a default value")[39m
+
+  [33m2   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m545[39;22m
+  [90m    PDOStatement::execute()[39m
+
+
+  [37;1mTests:  [39;22m[31;1m2 failed[39;22m
+  [37;1mTime:   [39;22m[39m0.33s[39m
+
+

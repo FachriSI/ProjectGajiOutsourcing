@@ -1,0 +1,210 @@
+﻿array:26 [ // vendor\psy\psysh\src\ExecutionClosure.php(41) : eval()'d code:1
+  0 => {#5412
+    +"Field": "karyawan_id"
+    +"Type": "int"
+    +"Null": "NO"
+    +"Key": "PRI"
+    +"Default": null
+    +"Extra": "auto_increment"
+  }
+  1 => {#5421
+    +"Field": "osis_id"
+    +"Type": "int"
+    +"Null": "NO"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  2 => {#5397
+    +"Field": "ktp"
+    +"Type": "varchar(20)"
+    +"Null": "NO"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  3 => {#5422
+    +"Field": "nama_tk"
+    +"Type": "varchar(50)"
+    +"Null": "NO"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  4 => {#5423
+    +"Field": "perusahaan_id"
+    +"Type": "int"
+    +"Null": "NO"
+    +"Key": "MUL"
+    +"Default": null
+    +"Extra": ""
+  }
+  5 => {#5424
+    +"Field": "tanggal_lahir"
+    +"Type": "date"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  6 => {#5425
+    +"Field": "jenis_kelamin"
+    +"Type": "char(1)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  7 => {#5426
+    +"Field": "agama"
+    +"Type": "varchar(20)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  8 => {#5427
+    +"Field": "status"
+    +"Type": "char(1)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  9 => {#5428
+    +"Field": "alamat"
+    +"Type": "text"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  10 => {#5429
+    +"Field": "asal"
+    +"Type": "varchar(50)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  11 => {#5430
+    +"Field": "tanggal_bekerja"
+    +"Type": "date"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  12 => {#5431
+    +"Field": "tahun_pensiun"
+    +"Type": "date"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  13 => {#5432
+    +"Field": "tanggal_pensiun"
+    +"Type": "date"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  14 => {#5433
+    +"Field": "status_aktif"
+    +"Type": "varchar(20)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  15 => {#5434
+    +"Field": "catatan_pengganti"
+    +"Type": "varchar(200)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  16 => {#5435
+    +"Field": "catatan_berhenti"
+    +"Type": "varchar(255)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  17 => {#5436
+    +"Field": "diberhentikan_oleh"
+    +"Type": "bigint unsigned"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  18 => {#5437
+    +"Field": "tanggal_berhenti"
+    +"Type": "date"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  19 => {#5438
+    +"Field": "tunjangan_penyesuaian"
+    +"Type": "int"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  20 => {#5439
+    +"Field": "area_id"
+    +"Type": "int"
+    +"Null": "YES"
+    +"Key": "MUL"
+    +"Default": null
+    +"Extra": ""
+  }
+  21 => {#5440
+    +"Field": "created_at"
+    +"Type": "timestamp"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  22 => {#5441
+    +"Field": "updated_at"
+    +"Type": "timestamp"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  23 => {#5442
+    +"Field": "deleted_at"
+    +"Type": "timestamp"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  24 => {#5443
+    +"Field": "deleted_by"
+    +"Type": "varchar(255)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  25 => {#5444
+    +"Field": "is_deleted"
+    +"Type": "tinyint(1)"
+    +"Null": "NO"
+    +"Key": ""
+    +"Default": "0"
+    +"Extra": ""
+  }
+]

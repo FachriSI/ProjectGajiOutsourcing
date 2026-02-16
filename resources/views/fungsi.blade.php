@@ -60,7 +60,7 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="fw-bold">{{ $item->fungsi }}</td>
+                                <td class="fw-bold text-dark">{{ $item->fungsi }}</td>
                                 <td>{{ $item->keterangan }}</td>
                                 <td class="text-center">
                                     <a href="/getupdate-fungsi/{{ $item->kode_fungsi }}"

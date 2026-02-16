@@ -1,0 +1,74 @@
+﻿array:9 [ // vendor\psy\psysh\src\ExecutionClosure.php(41) : eval()'d code:1
+  0 => {#5412
+    +"Field": "paket_id"
+    +"Type": "int"
+    +"Null": "NO"
+    +"Key": "PRI"
+    +"Default": null
+    +"Extra": "auto_increment"
+  }
+  1 => {#5421
+    +"Field": "paket"
+    +"Type": "varchar(15)"
+    +"Null": "NO"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  2 => {#5397
+    +"Field": "kuota_paket"
+    +"Type": "int"
+    +"Null": "NO"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  3 => {#5422
+    +"Field": "unit_id"
+    +"Type": "int"
+    +"Null": "NO"
+    +"Key": "MUL"
+    +"Default": null
+    +"Extra": ""
+  }
+  4 => {#5423
+    +"Field": "created_at"
+    +"Type": "timestamp"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  5 => {#5424
+    +"Field": "updated_at"
+    +"Type": "timestamp"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  6 => {#5425
+    +"Field": "deleted_at"
+    +"Type": "timestamp"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  7 => {#5426
+    +"Field": "deleted_by"
+    +"Type": "varchar(50)"
+    +"Null": "YES"
+    +"Key": ""
+    +"Default": null
+    +"Extra": ""
+  }
+  8 => {#5427
+    +"Field": "is_deleted"
+    +"Type": "int"
+    +"Null": "NO"
+    +"Key": ""
+    +"Default": "0"
+    +"Extra": ""
+  }
+]

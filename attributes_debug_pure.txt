@@ -1,0 +1,8 @@
+﻿Warning: TTY mode is not supported on Windows platform.
+array:4 [ // tests\Feature\ContractCalculatorTest.php:44
+  "paket" => "Paket Test Calc"
+  "unit_id" => 1
+  "kuota_paket" => 5
+  "is_deleted" => 0
+]
+

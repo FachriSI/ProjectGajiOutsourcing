@@ -60,7 +60,7 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="fw-bold">{{ $item->departemen }}</td>
+                                <td class="fw-bold text-dark">{{ $item->departemen }}</td>
                                 <td class="text-center">
                                     @if($item->is_si == 1)
                                         <span class="badge bg-primary"><i class="fas fa-check me-1"></i> Ya</span>

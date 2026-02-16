@@ -124,9 +124,48 @@
         </tr>
     </table>
 
+    <!-- Eligible Employee Detail Table -->
+    @if(!empty($data['karyawan_list']))
+    <div style="margin-top: 15px; margin-bottom: 10px; font-size: 11px; font-weight: bold;">
+        Daftar Tenaga Kerja Penerima THR (Aktif s.d. {{ $data['cutoff_date'] }})
+    </div>
+    <table class="table-data" style="width: 100%; font-size: 9px;">
+        <thead>
+            <tr style="background-color: #f0f0f0; font-weight: bold; text-align: center;">
+                <td style="width: 5%;">No</td>
+                <td style="width: 28%;">Nama</td>
+                <td style="width: 14%;">Upah Pokok</td>
+                <td style="width: 14%;">Tj. Tetap</td>
+                <td style="width: 14%;">Tj. Lokasi</td>
+                <td style="width: 15%;">Jumlah THR</td>
+                <td style="width: 10%;">Status</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($data['karyawan_list'] as $i => $k)
+            <tr>
+                <td style="text-align: center;">{{ $i + 1 }}</td>
+                <td>{{ $k['nama'] }}</td>
+                <td style="text-align: right;">{{ number_format($k['upah_pokok'], 0, ',', '.') }}</td>
+                <td style="text-align: right;">{{ number_format($k['tj_tetap'], 0, ',', '.') }}</td>
+                <td style="text-align: right;">{{ number_format($k['tj_lokasi'], 0, ',', '.') }}</td>
+                <td style="text-align: right; font-weight: bold;">{{ number_format($k['thr_amount'], 0, ',', '.') }}</td>
+                <td style="text-align: center; font-size: 8px;">{{ $k['status'] }}</td>
+            </tr>
+            @endforeach
+            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                <td colspan="5" style="text-align: right;">Total THR</td>
+                <td style="text-align: right;">{{ number_format($data['nilai_thr'], 0, ',', '.') }}</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    @endif
+
     <div class="notes" style="width: 80%; margin: 0 auto;">
         * Total nilai THR diatas sudah termasuk Fee Pengusaha (sesuai proposal yang disetujui Direksi PT Semen Padang)<br>
         * Permintaan Pembayaran harus ditambahkan PPh dan PPN<br>
+        * Karyawan yang berhak menerima THR adalah yang masih aktif bekerja sampai dengan tanggal {{ $data['cutoff_date'] }}<br>
         <br>
         Catatan :<br>
         - Pembayaran THR kepada tenaga kerja sesuai dengan peraturan perundang-undangan yang berlaku.<br>
