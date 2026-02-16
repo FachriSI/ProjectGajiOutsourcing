@@ -238,7 +238,7 @@ class KaryawanController extends Controller
         ]);
 
         // Assign to Paket
-        DB::table('paket_karyawan')->insert([
+        PaketKaryawan::create([
             'paket_id' => $request->paket_id,
             'karyawan_id' => $karyawan->karyawan_id,
             'beg_date' => now()->format('Y-m-d'), // Start date in package
