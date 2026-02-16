@@ -16,6 +16,7 @@ class UnitKerja extends Model
     protected $fillable = [
         'unit_id',
         'unit_kerja',
+        'departemen_id',
         'fungsi',
         'is_deleted',
         'deleted_by',

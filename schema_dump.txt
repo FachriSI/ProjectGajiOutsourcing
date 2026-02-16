@@ -1,19 +1,19 @@
-md_departemen:
+md_fungsi:
 Array
 (
     [0] => stdClass Object
         (
-            [Field] => departemen_id
+            [Field] => kode_fungsi
             [Type] => int
             [Null] => NO
             [Key] => PRI
             [Default] => 
-            [Extra] => 
+            [Extra] => auto_increment
         )
 
     [1] => stdClass Object
         (
-            [Field] => departemen
+            [Field] => fungsi
             [Type] => varchar(100)
             [Null] => NO
             [Key] => 
@@ -23,8 +23,8 @@ Array
 
     [2] => stdClass Object
         (
-            [Field] => is_si
-            [Type] => tinyint(1)
+            [Field] => keterangan
+            [Type] => varchar(150)
             [Null] => NO
             [Key] => 
             [Default] => 
@@ -83,23 +83,24 @@ Array
 
 )
 
-md_perusahaan:
+
+md_unit_kerja:
 Array
 (
     [0] => stdClass Object
         (
-            [Field] => perusahaan_id
+            [Field] => unit_id
             [Type] => int
             [Null] => NO
             [Key] => PRI
             [Default] => 
-            [Extra] => auto_increment
+            [Extra] => 
         )
 
     [1] => stdClass Object
         (
-            [Field] => id_pt
-            [Type] => tinyint(1)
+            [Field] => unit_kerja
+            [Type] => varchar(80)
             [Null] => NO
             [Key] => 
             [Default] => 
@@ -108,105 +109,15 @@ Array
 
     [2] => stdClass Object
         (
-            [Field] => perusahaan
-            [Type] => varchar(70)
+            [Field] => departemen_id
+            [Type] => int
             [Null] => NO
-            [Key] => 
+            [Key] => MUL
             [Default] => 
             [Extra] => 
         )
 
     [3] => stdClass Object
-        (
-            [Field] => cp
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [4] => stdClass Object
-        (
-            [Field] => cp_jab
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [5] => stdClass Object
-        (
-            [Field] => cp_telp
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [6] => stdClass Object
-        (
-            [Field] => cp_email
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [7] => stdClass Object
-        (
-            [Field] => id_mesin
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [8] => stdClass Object
-        (
-            [Field] => deleted_data
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [9] => stdClass Object
-        (
-            [Field] => tkp
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [10] => stdClass Object
-        (
-            [Field] => npp
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [11] => stdClass Object
-        (
-            [Field] => alamat
-            [Type] => varchar(255)
-            [Null] => YES
-            [Key] => 
-            [Default] => 
-            [Extra] => 
-        )
-
-    [12] => stdClass Object
         (
             [Field] => created_at
             [Type] => timestamp
@@ -216,7 +127,7 @@ Array
             [Extra] => 
         )
 
-    [13] => stdClass Object
+    [4] => stdClass Object
         (
             [Field] => updated_at
             [Type] => timestamp
@@ -226,7 +137,7 @@ Array
             [Extra] => 
         )
 
-    [14] => stdClass Object
+    [5] => stdClass Object
         (
             [Field] => deleted_at
             [Type] => timestamp
@@ -236,7 +147,7 @@ Array
             [Extra] => 
         )
 
-    [15] => stdClass Object
+    [6] => stdClass Object
         (
             [Field] => deleted_by
             [Type] => varchar(255)
@@ -246,7 +157,7 @@ Array
             [Extra] => 
         )
 
-    [16] => stdClass Object
+    [7] => stdClass Object
         (
             [Field] => is_deleted
             [Type] => tinyint(1)

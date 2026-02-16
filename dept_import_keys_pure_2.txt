@@ -1,0 +1,13 @@
+﻿Warning: TTY mode is not supported on Windows platform.
+array:2 [ // app\Imports\DepartemenImport.php:26
+  0 => "nama_departemen"
+  1 => "is_si_1ya_0tidak"
+]
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\DepartemenImportTest[39m
+  [32;1mΓ£ô[39;22m[39m [2mcan import departemen[22m[39m
+
+  [37;1mTests:  [39;22m[32;1m1 passed[39;22m
+  [37;1mTime:   [39;22m[39m0.78s[39m
+
+

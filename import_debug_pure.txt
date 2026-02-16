@@ -1,0 +1,30 @@
+﻿Warning: TTY mode is not supported on Windows platform.
+
+  [37;41;1m FAIL [39;49;22m[39m Tests\Feature\PerusahaanImportTest[39m
+  [31;1mΓ¿»[39;22m[39m [2mcan import perusahaan with template baru[22m[39m
+
+  [2m---[22m
+
+  [31;1mΓÇó Tests\Feature\PerusahaanImportTest [39;22m> [31;1mcan import perusahaan with template baru[39;22m
+[39;1m  Session is missing expected key [success].
+  Failed asserting that false is true.[39;22m
+
+  at [32mC:\Tugas Aufa\Outsourcing KP\tests\Feature\PerusahaanImportTest.php[39m:[32m40[39m
+     36Γûò             'file' => $file
+     37Γûò         ]);
+     38Γûò 
+     39Γûò         $response->assertStatus(302);
+  Γ₧£  40Γûò         $response->assertSessionHas('success');
+     41Γûò 
+     42Γûò         $perusahaan = Perusahaan::where('perusahaan', 'PT Import Test')->first();
+     43Γûò         $this->assertNotNull($perusahaan, 'Perusahaan not found in DB');
+     44Γûò
+
+  [33m1   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\phpunit\phpunit\phpunit[39;22m:[39;1m107[39;22m
+  [90m    PHPUnit\TextUI\Command::main()[39m
+
+
+  [37;1mTests:  [39;22m[31;1m1 failed[39;22m
+  [37;1mTime:   [39;22m[39m0.44s[39m
+
+

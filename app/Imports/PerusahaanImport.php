@@ -59,8 +59,9 @@ class PerusahaanImport implements ToCollection, WithStartRow
                         'cp_jab' => $row[4],
                         'cp_telp' => $row[5],
                         'cp_email' => $row[6],
+                        'id_pt' => 1, // Default to 1 as it is required but not in template
                         'id_mesin' => $row[7],
-                        'deleted_data' => $row[8],
+                        'is_deleted' => $row[8],
                         'tkp' => $row[9],
                         'npp' => $row[10],
                     ]

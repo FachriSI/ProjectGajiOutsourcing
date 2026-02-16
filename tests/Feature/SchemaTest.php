@@ -2,22 +2,18 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Schema;
 
 class SchemaTest extends TestCase
 {
     /** @test */
     public function check_tables_schema()
     {
-            $tables = ['md_unit_kerja', 'md_paket', 'md_karyawan'];
-            file_put_contents('schema_dump.txt', "");
-            foreach ($tables as $t) {
-                $result = \Illuminate\Support\Facades\DB::select("DESCRIBE $t");
-                file_put_contents('schema_dump.txt', "$t:\n" . print_r($result, true), FILE_APPEND);
-            }
-            file_put_contents('schema_dump.txt', "Error: " . $e->getMessage());
-        }
+        $fungsi = \Illuminate\Support\Facades\DB::select("DESCRIBE md_fungsi");
+        $unit = \Illuminate\Support\Facades\DB::select("DESCRIBE md_unit_kerja");
+        file_put_contents('schema_dump.txt', "md_fungsi:\n" . print_r($fungsi, true) . "\n\nmd_unit_kerja:\n" . print_r($unit, true));
         $this->assertTrue(true);
     }
 }

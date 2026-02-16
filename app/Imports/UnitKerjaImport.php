@@ -24,6 +24,7 @@ class UnitKerjaImport implements ToCollection, WithHeadingRow
                 $rowNumber = $index + 2;
                 $this->total++;
 
+
                 try {
                     // Skip baris kosong
                     if (empty($row['nama_unit_kerja'])) {
@@ -34,13 +35,14 @@ class UnitKerjaImport implements ToCollection, WithHeadingRow
 
                     $unitId = trim($row['id_unit'] ?? '');
                     $namaUnitKerja = trim($row['nama_unit_kerja']);
+                    
+                    // Sanitize ID (remove non-numeric because DB is INT)
+                    $cleanId = preg_replace('/[^0-9]/', '', $unitId);
 
                     // Cari unit kerja berdasarkan nama atau ID
                     $existing = null;
-                    if (!empty($unitId)) {
-                        $existing = UnitKerja::where('unit_id', $unitId)
-                            ->where('is_deleted', 0)
-                            ->first();
+                    if (!empty($cleanId)) {
+                        $existing = UnitKerja::where('unit_id', $cleanId)->first();
                     }
 
                     if (!$existing) {
@@ -53,17 +55,40 @@ class UnitKerjaImport implements ToCollection, WithHeadingRow
                         // Update yang sudah ada
                         $existing->update([
                             'unit_kerja' => $namaUnitKerja,
+                            'is_deleted' => 0,
                         ]);
                         $this->log[] = "Baris {$rowNumber}: Unit Kerja '{$namaUnitKerja}' berhasil diupdate.";
                     } else {
                         // Tambah baru
+                        
+                        // Generate Manual ID
+                        $lastUnit = UnitKerja::latest('unit_id')->first();
+                        $newId = $lastUnit ? $lastUnit->unit_id + 1 : 1;
+                        
+                        // Check transaction-safe max ID (simulated)
+                        static $maxId = null;
+                        if ($maxId === null) {
+                             $last = UnitKerja::latest('unit_id')->first();
+                             $maxId = $last ? $last->unit_id : 0;
+                        }
+                        $maxId++;
+
+                        // Default Departemen ID (Required by DB)
+                        // Use 1 as default or find first available
+                        $deptId = 1; 
+
                         $newData = [
+                            'unit_id' => $maxId,
                             'unit_kerja' => $namaUnitKerja,
+                            'departemen_id' => $deptId,
                             'is_deleted' => 0,
                         ];
 
-                        if (!empty($unitId)) {
-                            $newData['unit_id'] = $unitId;
+                        if (!empty($cleanId)) {
+                             $newData['unit_id'] = $cleanId;
+                             if ($cleanId >= $maxId) {
+                                 $maxId = $cleanId;
+                             }
                         }
 
                         UnitKerja::create($newData);

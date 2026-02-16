@@ -24,6 +24,7 @@ class DepartemenImport implements ToCollection, WithHeadingRow
                 $rowNumber = $index + 2;
                 $this->total++;
 
+
                 try {
                     // Skip baris kosong
                     if (empty($row['nama_departemen'])) {
@@ -48,7 +49,26 @@ class DepartemenImport implements ToCollection, WithHeadingRow
                         $this->log[] = "Baris {$rowNumber}: Departemen '{$namaDepartemen}' berhasil diupdate.";
                     } else {
                         // Tambah baru
+                        // Generate ID manual
+                        $lastDept = Departemen::latest('departemen_id')->first();
+                        $newId = $lastDept ? $lastDept->departemen_id + 1 : 1;
+                        
+                        // Prevent duplicate ID if processing multiple rows in same batch
+                        // Check if this ID is already used in this transaction/collection processing?
+                        // Since we are inside a loop, we should get latest from DB each time? 
+                        // But we are in transaction. The uncommitted insert might be visible? 
+                        // No, usually latest() won't see uncommitted if isolation level is default.
+                        // Better to keep track of max ID manually.
+                        
+                        static $maxId = null;
+                        if ($maxId === null) {
+                             $last = Departemen::latest('departemen_id')->first();
+                             $maxId = $last ? $last->departemen_id : 0;
+                        }
+                        $maxId++;
+                        
                         Departemen::create([
+                            'departemen_id' => $maxId,
                             'departemen' => $namaDepartemen,
                             'is_si' => $isSi,
                             'is_deleted' => 0,

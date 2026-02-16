@@ -45,7 +45,7 @@ class FeatureActionTest extends TestCase
         ]);
 
         $perusahaanId = DB::table('md_perusahaan')->insertGetId([
-            'id_pt' => rand(1000, 9999),
+            'id_pt' => rand(1, 99),
             'perusahaan' => 'PT Test',
             'alamat' => 'Jl. Test',
             'cp' => 'Budi',
@@ -55,9 +55,10 @@ class FeatureActionTest extends TestCase
             'updated_at' => now()
         ]);
         
-        $unitId = DB::table('md_unit_kerja')->insertGetId([
+        $unitId = rand(1000, 9999);
+        DB::table('md_unit_kerja')->insert([
+            'unit_id' => $unitId,
             'unit_kerja' => 'Unit Test',
-            'fungsi' => 'Fungsi Test',
             'departemen_id' => $deptId,
             'created_at' => now(),
             'updated_at' => now()
@@ -80,13 +81,13 @@ class FeatureActionTest extends TestCase
             'tanggal_lahir' => '2000-01-01',
             'jenis_kelamin' => 'L',
             'agama' => 'Islam',
-            'status' => 'Lajang',
+            'status' => 'T',
             'alamat' => 'Jl. Test',
             'paket_id' => $paketId,
         ];
 
         // 3. Post Request
-        $response = $this->actingAs($this->user)->post('/set-tambah-karyawan', $data);
+        $response = $this->actingAs($this->user)->post('/tambah-karyawan', $data);
 
         // 4. Assert
         $response->assertStatus(302);
@@ -112,7 +113,7 @@ class FeatureActionTest extends TestCase
             // other fields omitted
         ];
 
-        $response = $this->actingAs($this->user)->post('/set-tambah-karyawan', $data);
+        $response = $this->actingAs($this->user)->post('/tambah-karyawan', $data);
 
         $response->assertSessionHasErrors(['osis_id', 'ktp']);
     }
@@ -123,7 +124,7 @@ class FeatureActionTest extends TestCase
         $this->withExceptionHandling();
 
         $perusahaanId = DB::table('md_perusahaan')->insertGetId([
-            'id_pt' => rand(1000, 9999),
+            'id_pt' => rand(1, 99),
             'perusahaan' => 'PT Test Val',
             'alamat' => 'Alamat',
             'created_at' => now(),
@@ -156,7 +157,7 @@ class FeatureActionTest extends TestCase
     /** @test */
     public function test_can_generate_pdf_route()
     {
-        $this->withExceptionHandling(); 
+        $this->withoutExceptionHandling(); 
 
         $deptId = rand(1000, 9999);
         DB::table('md_departemen')->insert([
@@ -167,7 +168,9 @@ class FeatureActionTest extends TestCase
             'updated_at' => now()
         ]);
 
-        $unitId = DB::table('md_unit_kerja')->insertGetId([
+        $unitId = rand(1000, 9999);
+        DB::table('md_unit_kerja')->insert([
+            'unit_id' => $unitId,
             'unit_kerja' => 'Unit PDF',
              'departemen_id' => $deptId,
             'created_at' => now(),
@@ -181,9 +184,22 @@ class FeatureActionTest extends TestCase
             'created_at' => now(),
             'updated_at' => now()
         ]);
+
+        $tahun = date('Y');
+        DB::table('nilai_kontrak')->insert([
+            'paket_id' => $paketId,
+            'periode' => date('Y-m'),
+            'tahun' => $tahun,
+            'bulan' => date('m'),
+            'ump_sumbar' => 2500000,
+            'kuota_paket' => 5,
+            'total_nilai_kontrak' => 1000000,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         
          $perusahaanId = DB::table('md_perusahaan')->insertGetId([
-            'id_pt' => rand(1000, 9999),
+            'id_pt' => rand(1, 99),
             'perusahaan' => 'PT PDF',
             'alamat' => 'Alamat PDF',
             'created_at' => now(),
@@ -193,6 +209,8 @@ class FeatureActionTest extends TestCase
         $karyawanId = DB::table('md_karyawan')->insertGetId([
             'nama_tk' => 'Emp PDF',
             'status_aktif' => 'Aktif',
+            'osis_id' => '1234',
+            'ktp' => '1234567890123456',
             'perusahaan_id' => $perusahaanId,
             'created_at' => now(),
             'updated_at' => now()
@@ -222,7 +240,9 @@ class FeatureActionTest extends TestCase
             'updated_at' => now()
         ]);
 
-         $unitId = DB::table('md_unit_kerja')->insertGetId([
+         $unitId = rand(1000, 9999);
+         DB::table('md_unit_kerja')->insert([
+            'unit_id' => $unitId,
             'unit_kerja' => 'Unit THR',
             'departemen_id' => $deptId,
             'created_at' => now(),
@@ -231,6 +251,7 @@ class FeatureActionTest extends TestCase
 
         $paketId = DB::table('md_paket')->insertGetId([
             'paket' => 'Paket THR Test',
+            'kuota_paket' => 10,
             'unit_id' => $unitId,
             'created_at' => now(),
             'updated_at' => now()
@@ -242,6 +263,9 @@ class FeatureActionTest extends TestCase
             'paket_id' => $paketId,
             'periode' => date('Y-m'),
             'tahun' => $tahun,
+            'bulan' => date('m'),
+            'ump_sumbar' => 2500000,
+            'kuota_paket' => 10,
             'total_nilai_kontrak' => 1000000,
             'created_at' => now(),
             'updated_at' => now()

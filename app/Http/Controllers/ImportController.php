@@ -274,7 +274,8 @@ class ImportController extends Controller
                     $msg .= " $gagal gagal.";
                 return redirect()->back()->with('success', $msg);
             } else {
-                return redirect()->back()->with('error', "Gagal memproses file. Pastikan format sesuai template.");
+                $logs = $import->getLog();
+                return redirect()->back()->with('error', "Gagal memproses file. " . implode(', ', $logs));
             }
 
         } catch (\Exception $e) {

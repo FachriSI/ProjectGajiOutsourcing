@@ -1,0 +1,34 @@
+﻿Warning: TTY mode is not supported on Windows platform.
+array:2 [ // app\Imports\UnitKerjaImport.php:26
+  0 => "id_unit"
+  1 => "nama_unit_kerja"
+]
+
+  [37;41;1m FAIL [39;49;22m[39m Tests\Feature\UnitKerjaImportTest[39m
+  [31;1mΓ¿»[39;22m[39m [2mcan import unit kerja[22m[39m
+
+  [2m---[22m
+
+  [31;1mΓÇó Tests\Feature\UnitKerjaImportTest [39;22m> [31;1mcan import unit kerja[39;22m
+[39;1m  Unit 2 not found
+  Failed asserting that null is not null.[39;22m
+
+  at [32mC:\Tugas Aufa\Outsourcing KP\tests\Feature\UnitKerjaImportTest.php[39m:[32m44[39m
+     40Γûò         $this->assertNotNull($unit1, 'Unit 1 not found');
+     41Γûò         // Check default departemen_id if logic added
+     42Γûò         
+     43Γûò         $unit2 = UnitKerja::where('unit_kerja', 'Unit Test 2')->first();
+  Γ₧£  44Γûò         $this->assertNotNull($unit2, 'Unit 2 not found');
+     45Γûò         // $this->assertEquals('UK002', $unit2->unit_id); // If unit_id is int, UK002 might fail. It is int.
+     46Γûò 
+     47Γûò         $unit1->delete();
+     48Γûò         $unit2->delete();
+
+  [33m1   [39m[39;1mC:\Tugas Aufa\Outsourcing KP\vendor\phpunit\phpunit\phpunit[39;22m:[39;1m107[39;22m
+  [90m    PHPUnit\TextUI\Command::main()[39m
+
+
+  [37;1mTests:  [39;22m[31;1m1 failed[39;22m
+  [37;1mTime:   [39;22m[39m0.73s[39m
+
+
