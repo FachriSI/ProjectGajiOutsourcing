@@ -185,58 +185,112 @@
                         $metadata = $validation->metadata['snapshot'] ?? [];
                     @endphp
 
-                    <!-- Main Contract Information -->
+                    <!-- Main Information -->
                     <div class="info-section">
-                        <h3 style="margin-bottom: 20px; color: #333;">
-                            <i class="fas fa-file-contract"></i> Informasi Kontrak
-                        </h3>
+                        @if(($validation->metadata['type'] ?? '') === 'THR')
+                            {{-- THR Document --}}
+                            @php $thrSnap = $validation->metadata['thr_snapshot'] ?? []; @endphp
+                            <h3 style="margin-bottom: 20px; color: #333;">
+                                <i class="fas fa-gift"></i> Informasi THR
+                            </h3>
 
-                        <div class="info-row">
-                            <span class="info-label">Nomor Kontrak:</span>
-                            <span class="info-value">CTR-{{ $nilaiKontrak->tahun }}-{{ str_pad($nilaiKontrak->bulan, 2, '0', STR_PAD_LEFT) }}-PKG{{ str_pad($nilaiKontrak->paket_id, 3, '0', STR_PAD_LEFT) }}</span>
-                        </div>
+                            <div class="info-row">
+                                <span class="info-label">Dokumen:</span>
+                                <span class="info-value">THR Tahun {{ $validation->metadata['tahun'] ?? $nilaiKontrak->tahun }}</span>
+                            </div>
 
-                        <div class="info-row">
-                            <span class="info-label">Periode:</span>
-                            <span class="info-value">{{ $metadata['periode'] ?? $nilaiKontrak->periode }}</span>
-                        </div>
+                            <div class="info-row">
+                                <span class="info-label">Paket:</span>
+                                <span class="info-value">{{ $thrSnap['paket'] ?? $paket->paket }}</span>
+                            </div>
 
-                        <div class="info-row">
-                            <span class="info-label">Paket:</span>
-                            <span class="info-value">{{ $metadata['paket_nama'] ?? $paket->paket }}</span>
-                        </div>
+                            <div class="info-row">
+                                <span class="info-label">Unit Kerja:</span>
+                                <span class="info-value">{{ $thrSnap['unit_kerja'] ?? 'N/A' }}</span>
+                            </div>
 
-                        <div class="info-row">
-                            <span class="info-label">Unit Kerja:</span>
-                            <span class="info-value">{{ $metadata['unit_kerja'] ?? 'N/A' }}</span>
-                        </div>
+                            <div class="info-row">
+                                <span class="info-label">Nama Perusahaan:</span>
+                                <span class="info-value">{{ $thrSnap['nama_perusahaan'] ?? '-' }}</span>
+                            </div>
 
-                        <div class="info-row">
-                            <span class="info-label">Karyawan Aktif:</span>
-                            <span class="info-value">{{ $metadata['jumlah_karyawan_aktif'] ?? $nilaiKontrak->jumlah_karyawan_aktif }} orang</span>
-                        </div>
+                            <div class="info-row">
+                                <span class="info-label">Jumlah Pekerja:</span>
+                                <span class="info-value">{{ $thrSnap['jumlah_pekerja'] ?? '-' }} orang</span>
+                            </div>
 
-                        <div class="info-row">
-                            <span class="info-label">Total Karyawan:</span>
-                            <span class="info-value">{{ $metadata['jumlah_karyawan_total'] ?? $nilaiKontrak->jumlah_karyawan_total }} orang</span>
-                        </div>
+                            <div class="info-row">
+                                <span class="info-label">Nilai THR:</span>
+                                <span class="info-value">Rp {{ number_format($thrSnap['nilai_thr'] ?? 0, 0, ',', '.') }}</span>
+                            </div>
 
-                        <div class="info-row">
-                            <span class="info-label">UMP Sumbar:</span>
-                            <span class="info-value">Rp {{ number_format($metadata['ump_sumbar'] ?? $nilaiKontrak->ump_sumbar, 0, ',', '.') }}</span>
-                        </div>
+                            <div class="info-row">
+                                <span class="info-label">Fee THR (5%):</span>
+                                <span class="info-value">Rp {{ number_format($thrSnap['fee_thr'] ?? 0, 0, ',', '.') }}</span>
+                            </div>
 
-                        <div class="info-row" style="background: #f0f8ff; margin-top: 15px; padding: 20px; border-radius: 10px;">
-                            <span class="info-label" style="font-size: 18px; color: #667eea;">
-                                <i class="fas fa-money-bill-wave"></i> Total Nilai Kontrak:
-                            </span>
-                            <span class="info-value" style="font-size: 22px; color: #667eea;">
-                                Rp {{ number_format($metadata['total_nilai_kontrak'] ?? $nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}
-                            </span>
-                        </div>
+                            <div class="info-row" style="background: #f0f8ff; margin-top: 15px; padding: 20px; border-radius: 10px;">
+                                <span class="info-label" style="font-size: 18px; color: #667eea;">
+                                    <i class="fas fa-money-bill-wave"></i> Total Nilai THR:
+                                </span>
+                                <span class="info-value" style="font-size: 22px; color: #667eea;">
+                                    Rp {{ number_format($thrSnap['total_nilai_thr'] ?? 0, 0, ',', '.') }}
+                                </span>
+                            </div>
+                        @else
+                            {{-- Contract Document --}}
+                            <h3 style="margin-bottom: 20px; color: #333;">
+                                <i class="fas fa-file-contract"></i> Informasi Kontrak
+                            </h3>
+
+                            <div class="info-row">
+                                <span class="info-label">Nomor Kontrak:</span>
+                                <span class="info-value">CTR-{{ $nilaiKontrak->tahun }}-{{ str_pad($nilaiKontrak->bulan, 2, '0', STR_PAD_LEFT) }}-PKG{{ str_pad($nilaiKontrak->paket_id, 3, '0', STR_PAD_LEFT) }}</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Periode:</span>
+                                <span class="info-value">{{ $metadata['periode'] ?? $nilaiKontrak->periode }}</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Paket:</span>
+                                <span class="info-value">{{ $metadata['paket_nama'] ?? $paket->paket }}</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Unit Kerja:</span>
+                                <span class="info-value">{{ $metadata['unit_kerja'] ?? 'N/A' }}</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Karyawan Aktif:</span>
+                                <span class="info-value">{{ $metadata['jumlah_karyawan_aktif'] ?? $nilaiKontrak->jumlah_karyawan_aktif }} orang</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Total Karyawan:</span>
+                                <span class="info-value">{{ $metadata['jumlah_karyawan_total'] ?? $nilaiKontrak->jumlah_karyawan_total }} orang</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">UMP Sumbar:</span>
+                                <span class="info-value">Rp {{ number_format($metadata['ump_sumbar'] ?? $nilaiKontrak->ump_sumbar, 0, ',', '.') }}</span>
+                            </div>
+
+                            <div class="info-row" style="background: #f0f8ff; margin-top: 15px; padding: 20px; border-radius: 10px;">
+                                <span class="info-label" style="font-size: 18px; color: #667eea;">
+                                    <i class="fas fa-money-bill-wave"></i> Total Nilai Kontrak:
+                                </span>
+                                <span class="info-value" style="font-size: 22px; color: #667eea;">
+                                    Rp {{ number_format($metadata['total_nilai_kontrak'] ?? $nilaiKontrak->total_nilai_kontrak, 0, ',', '.') }}
+                                </span>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Breakdown Summary -->
+                    @if(($validation->metadata['type'] ?? '') !== 'THR')
                     <div class="breakdown-section">
                         <div class="breakdown-title">
                             <i class="fas fa-chart-pie"></i> Rincian Nilai Kontrak
@@ -265,6 +319,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <!-- Validation Info -->
                     <div class="scan-info">

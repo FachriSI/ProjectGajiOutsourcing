@@ -306,8 +306,31 @@ class NilaiKontrakController extends Controller
             $validation = $validationService->createValidation($nilaiKontrak, auth()->id(), null, [
                 'type' => 'THR',
                 'tahun' => $nilaiKontrak->tahun,
-                'description' => 'Dokumen THR Tahun ' . $nilaiKontrak->tahun
+                'description' => 'Dokumen THR Tahun ' . $nilaiKontrak->tahun,
+                'thr_snapshot' => [
+                    'paket' => $nilaiKontrak->paket->paket,
+                    'unit_kerja' => $nilaiKontrak->paket->unitKerja->unit_kerja ?? '-',
+                    'jumlah_pekerja' => $filteredKaryawanCount,
+                    'nilai_thr' => $totalBasicThr,
+                    'fee_thr' => $feeThr,
+                    'total_nilai_thr' => $totalNilaiThr,
+                    'nama_perusahaan' => $vendorName ?? '-',
+                ]
             ]);
+        } else {
+            // Update existing validation with latest THR snapshot
+            $meta = $validation->metadata;
+            $meta['thr_snapshot'] = [
+                'paket' => $nilaiKontrak->paket->paket,
+                'unit_kerja' => $nilaiKontrak->paket->unitKerja->unit_kerja ?? '-',
+                'jumlah_pekerja' => $filteredKaryawanCount,
+                'nilai_thr' => $totalBasicThr,
+                'fee_thr' => $feeThr,
+                'total_nilai_thr' => $totalNilaiThr,
+                'nama_perusahaan' => $vendorName ?? '-',
+            ];
+            $validation->metadata = $meta;
+            $validation->save();
         }
 
         $validationUrl = route('contract.validate', $validation->validation_token);
