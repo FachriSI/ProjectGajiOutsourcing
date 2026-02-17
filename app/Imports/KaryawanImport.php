@@ -96,6 +96,8 @@ class KaryawanImport implements ToCollection
                     'status_aktif' => 'Aktif',
                     'tunjangan_penyesuaian' => 0,
                     'perusahaan_id' => $karyawan_lama->perusahaan_id,
+                    'area_id' => $karyawan_lama->area_id,
+                    'tipe_pekerjaan' => $karyawan_lama->tipe_pekerjaan,
                     'catatan_pengganti' => 'Pengganti ID ' . $karyawan_lama->karyawan_id. 'TMT ' . $tanggal_bekerja,
                 ]);
 
@@ -150,8 +152,23 @@ class KaryawanImport implements ToCollection
                     'beg_date' => $tanggal_bekerja
                 ]);
 
+                // Auto-assign default Pakaian record
+                $currentNilaiJatah = DB::table('md_pakaian')
+                    ->where('is_deleted', 0)
+                    ->orderByDesc('beg_date')
+                    ->orderByDesc('created_at')
+                    ->value('nilai_jatah') ?? 0;
+
+                DB::table('md_pakaian')->insert([
+                    'karyawan_id' => $karyawan_baru->karyawan_id,
+                    'nilai_jatah' => $currentNilaiJatah,
+                    'ukuran_baju' => '-',
+                    'ukuran_celana' => '-',
+                    'beg_date' => $tanggal_bekerja,
+                ]);
+
                 $karyawan_lama->update([
-                    'status_aktif' => 'Sudah Diganti', // atau kode status tertentu jika pakai enum
+                    'status_aktif' => 'Berhenti',
                     'catatan_pengganti' => 'Digantikan oleh ID ' . $karyawan_baru->karyawan_id
                 ]);
             }

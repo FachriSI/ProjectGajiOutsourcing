@@ -66,7 +66,7 @@ class PaketController extends Controller
         $currentMonth = date('Y-m');
         $umpSumbar = Ump::where('kode_lokasi', '12')->where('tahun', $currentYear)->value('ump');
 
-        $allPakets = Paket::with(['paketKaryawan.karyawan.perusahaan'])->get();
+        $allPakets = Paket::with(['paketKaryawan.karyawan.perusahaan', 'unitKerja'])->get();
         
         $calculatorService = app(\App\Services\ContractCalculatorService::class);
 

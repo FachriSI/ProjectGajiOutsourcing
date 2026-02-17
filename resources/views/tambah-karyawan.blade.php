@@ -172,12 +172,44 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="kode_jabatan" class="form-label fw-bold text-dark">Jabatan <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select select2" name="kode_jabatan" id="kode_jabatan" required>
+                                <option value="">Pilih Jabatan...</option>
+                                @foreach ($jabatanList as $jabatan)
+                                    <option value="{{ $jabatan->kode_jabatan }}" {{ old('kode_jabatan') == $jabatan->kode_jabatan ? 'selected' : '' }}>
+                                        {{ $jabatan->jabatan }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('kode_jabatan')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="tipe_pekerjaan" class="form-label fw-bold text-dark">Tipe Pekerjaan <span
                                     class="text-danger">*</span></label>
                             <select class="form-select" name="tipe_pekerjaan" id="tipe_pekerjaan" required>
                                 <option value="Lapangan" {{ old('tipe_pekerjaan') == 'Lapangan' ? 'selected' : '' }}>Lapangan</option>
                                 <option value="Non Lapangan" {{ old('tipe_pekerjaan') == 'Non Lapangan' ? 'selected' : '' }}>Non Lapangan</option>
                             </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="area_id" class="form-label fw-bold text-dark">Area <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select select2" name="area_id" id="area_id" required>
+                                <option value="">Pilih Area...</option>
+                                @foreach ($areaList as $area)
+                                    <option value="{{ $area->area_id }}" {{ old('area_id') == $area->area_id ? 'selected' : '' }}>
+                                        {{ $area->area }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('area_id')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">

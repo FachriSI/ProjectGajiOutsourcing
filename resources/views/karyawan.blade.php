@@ -425,8 +425,9 @@
               <label class="form-label">Pilih Area Baru:</label>
               <select name="area_id" class="form-select" required>
                 <option value="">-- Pilih --</option>
-                <option value="1">Lapangan</option>
-                <option value="2">Non Lapangan</option>
+                @foreach ($areaList as $areaItem)
+                  <option value="{{ $areaItem->area_id }}">{{ $areaItem->area }}</option>
+                @endforeach
               </select>
             </div>
           </div>

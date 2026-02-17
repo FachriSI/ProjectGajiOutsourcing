@@ -319,7 +319,7 @@
             data-total-pakaian="{{ number_format($total_pakaian, 0, ',', '.') }}"
             data-ukuran-baju="{{ $item->ukuran_baju ?? '-' }}"
             data-ukuran-celana="{{ $item->ukuran_celana ?? '-' }}"
-            data-lokasi-kerja="{{ $item->lokasi_aktif->lokasi->lokasi ?? '-' }}"
+            data-lokasi-kerja="{{ data_get($item->lokasi, 'lokasi', '-') }}"
             data-tipe-pekerjaan="{{ $item->tipe_pekerjaan ?? '-' }}"
             data-upah-pokok="{{ number_format($upah_pokok, 0, ',', '.') }}"
             data-tj-tetap="{{ number_format($t_tetap, 0, ',', '.') }}"

@@ -211,12 +211,19 @@ class ImportController extends Controller
             $logs = $import->getLog();
 
             if ($berhasil > 0) {
-                $msg = "$berhasil data paket berhasil diimport.";
-                if ($gagal > 0)
-                    $msg .= " $gagal gagal.";
-                return redirect()->back()->with('success', $msg);
+                return view('import_result', [
+                    'successMessage' => "$berhasil data paket berhasil diimport. $gagal baris gagal diproses.",
+                    'logs' => $logs,
+                    'backUrl' => '/paket',
+                    'backLabel' => 'Kembali ke Data Paket',
+                ]);
             } else {
-                return redirect()->back()->with('error', "Gagal memproses file. " . implode(', ', $logs));
+                return view('import_result', [
+                    'errorMessage' => "Semua baris gagal diproses. Tidak ada data paket yang diimport.",
+                    'logs' => $logs,
+                    'backUrl' => '/paket',
+                    'backLabel' => 'Kembali ke Data Paket',
+                ]);
             }
 
         } catch (\Exception $e) {

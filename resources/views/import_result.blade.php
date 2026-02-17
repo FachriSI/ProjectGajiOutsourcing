@@ -3,7 +3,7 @@
 @section('title', 'Hasil import')
 @section('content')
 <div class="container mt-4">
-    <h4>Hasil Import Mutasi & Promosi</h4>
+    <h4>{{ $title ?? 'Hasil Import' }}</h4>
 
     @if (!empty($successMessage))
         <div class="alert alert-success">{{ $successMessage }}</div>
@@ -31,6 +31,6 @@
         @endforeach
     </ul>
 
-    <a href="/karyawan" class="btn btn-primary mt-3">Kembali ke Data Karyawan</a>
+    <a href="{{ $backUrl ?? '/karyawan' }}" class="btn btn-primary mt-3">{{ $backLabel ?? 'Kembali ke Data Karyawan' }}</a>
 </div>
 @endsection

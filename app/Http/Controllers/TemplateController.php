@@ -131,6 +131,11 @@ class TemplateController extends Controller
             8: Status Pernikahan (S/M/D/J)
             9: Alamat
             10: Asal
+            11: Kode Jabatan
+            12: Harian/Shift (1=Harian, 2=Shift)
+            13: Area (Nama Area, misal: Lapangan / Non Lapangan)
+            14: Kode Lokasi Kerja
+            15: Tipe Pekerjaan
         */
 
         $headings = [
@@ -144,7 +149,12 @@ class TemplateController extends Controller
             'Agama',
             'Status Pernikahan (S/M/D/J)',
             'Alamat Domisili',
-            'Asal (Kota/Kab)'
+            'Asal (Kota/Kab)',
+            'Kode Jabatan',
+            'Harian/Shift (1=Harian, 2=Shift)',
+            'Area (Nama Area)',
+            'Kode Lokasi Kerja',
+            'Tipe Pekerjaan'
         ];
 
         $data = [
@@ -159,7 +169,12 @@ class TemplateController extends Controller
                 'Islam',
                 'K0',
                 'Jl. Sudirman No. 1',
-                'Padang'
+                'Padang',
+                'JAB001', // Kode Jabatan
+                '1', // 1=Harian
+                'Lapangan', // Area
+                '12', // Kode Lokasi
+                'Operator', // Tipe Pekerjaan
             ],
             [
                 '1002',
@@ -172,7 +187,12 @@ class TemplateController extends Controller
                 'Islam',
                 'S',
                 'Jl. Khatib No. 5',
-                'Bukittinggi'
+                'Bukittinggi',
+                'JAB002', // Kode Jabatan
+                '2', // 2=Shift
+                'Non Lapangan', // Area
+                '12', // Kode Lokasi
+                'Admin', // Tipe Pekerjaan
             ]
         ];
 

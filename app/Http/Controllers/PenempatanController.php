@@ -714,7 +714,7 @@ class PenempatanController extends Controller
         DB::table('md_karyawan')
             ->where('karyawan_id', $id)
             ->update([
-                'status_aktif' => 'Sudah Diganti',
+                'status_aktif' => 'Berhenti',
                 'tanggal_berhenti' => $tmt, // Set berhenti di tanggal TMT pengganti
                 'catatan_pengganti' => 'Digantikan oleh ID ' . $newId . ', ' . $request->nama . ' pada ' . $tmt,
             ]);

@@ -100,6 +100,9 @@ class KaryawanController extends Controller
 
         $hasDeleted = Karyawan::where('is_deleted', 1)->exists();
 
+        // Fetch area list for modal dropdown
+        $areaList = DB::table('md_area')->where('is_deleted', 0)->get();
+
         return view('karyawan', [
             'data' => $data,
             'paketList' => $paketList,
@@ -109,6 +112,7 @@ class KaryawanController extends Controller
             'jabatanList' => $jabatanList,
 
             'area' => $area,
+            'areaList' => $areaList,
             'masterUkuran' => $masterUkuran,
             'hasDeleted' => $hasDeleted
             // 'pakaian'      => $pakaian
@@ -162,16 +166,10 @@ class KaryawanController extends Controller
             ->get()
             ->keyBy('karyawan_id');
 
-        $area = DB::table('riwayat_area as ra')
-            ->join(DB::raw('(
-                SELECT karyawan_id, MAX(beg_date) as max_date
-                FROM riwayat_area
-                GROUP BY karyawan_id
-            ) as latest'), function ($join) {
-                $join->on('ra.karyawan_id', '=', 'latest.karyawan_id')
-                    ->on('ra.beg_date', '=', 'latest.max_date');
-            })
-            ->select('ra.karyawan_id', 'ra.area')
+        $area = DB::table('md_karyawan')
+            ->where('md_karyawan.is_deleted', 0)
+            ->leftJoin('md_area', 'md_karyawan.area_id', '=', 'md_area.area_id')
+            ->select('md_karyawan.karyawan_id', 'md_area.area')
             ->get()
             ->keyBy('karyawan_id');
 
@@ -255,13 +253,21 @@ class KaryawanController extends Controller
         // Fetch lokasi data for dropdown
         $lokasiList = DB::table('md_lokasi')->where('is_deleted', 0)->get();
 
+        // Fetch jabatan list for dropdown
+        $jabatanList = DB::table('md_jabatan')->get();
+
+        // Fetch area list for dropdown
+        $areaList = DB::table('md_area')->where('is_deleted', 0)->get();
+
         return view('tambah-karyawan', [
             'dataP' => $dataP,
             'dataU' => $dataU,
             'paketList' => $paketList,
             'existingOsis' => $existingOsis,
             'existingKtp' => $existingKtp,
-            'lokasiList' => $lokasiList
+            'lokasiList' => $lokasiList,
+            'jabatanList' => $jabatanList,
+            'areaList' => $areaList
         ]);
     }
 
@@ -280,6 +286,9 @@ class KaryawanController extends Controller
             'asal' => 'nullable',
             'paket_id' => 'required|exists:md_paket,paket_id',
             'kode_lokasi' => 'required|exists:md_lokasi,kode_lokasi',
+            'kode_jabatan' => 'required|exists:md_jabatan,kode_jabatan',
+            'area_id' => 'required|exists:md_area,area_id',
+            'tipe_pekerjaan' => 'nullable|string|max:100',
         ], [
             'osis_id.unique' => 'OSIS ID sudah terdaftar.',
             'osis_id.digits' => 'OSIS ID harus 4 digit angka.',
@@ -335,6 +344,7 @@ class KaryawanController extends Controller
             'tanggal_pensiun' => $tanggal_pensiun,
             'status_aktif' => 'Aktif',
             'tanggal_bekerja' => $request->tanggal_bekerja ?? now()->format('Y-m-d'),
+            'area_id' => $request->area_id,
         ]);
 
         // Assign to Paket
@@ -351,10 +361,31 @@ class KaryawanController extends Controller
             'beg_date' => now()->format('Y-m-d'),
         ]);
 
+        // Auto-assign jabatan
+        DB::table('riwayat_jabatan')->insert([
+            'karyawan_id' => $karyawan->karyawan_id,
+            'kode_jabatan' => $request->kode_jabatan,
+            'beg_date' => now()->format('Y-m-d'),
+        ]);
+
         // Auto-assign lokasi kerja
         DB::table('riwayat_lokasi')->insert([
             'karyawan_id' => $karyawan->karyawan_id,
             'kode_lokasi' => $request->kode_lokasi,
+            'beg_date' => now()->format('Y-m-d'),
+        ]);
+
+        // Auto-assign default pakaian record
+        $currentNilaiJatah = \App\Models\Pakaian::where('is_deleted', 0)
+            ->orderBy('beg_date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->value('nilai_jatah') ?? 0;
+
+        DB::table('md_pakaian')->insert([
+            'karyawan_id' => $karyawan->karyawan_id,
+            'nilai_jatah' => $currentNilaiJatah,
+            'ukuran_baju' => '-',
+            'ukuran_celana' => '-',
             'beg_date' => now()->format('Y-m-d'),
         ]);
 

@@ -38,7 +38,8 @@ class Karyawan extends Model
         'tunjangan_penyesuaian',
         'is_deleted',
         'deleted_by',
-        'deleted_at'
+        'deleted_at',
+        'area_id'
     ];
 
     public function perusahaan()

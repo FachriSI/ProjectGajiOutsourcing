@@ -229,6 +229,7 @@
                 <thead class="table-light">
                     <tr>
                         <th class="text-center" width="5%">No.</th>
+                        <th class="text-center">ID Paket</th>
                         <th>Nama Paket</th>
                         <th class="text-center">Kuota (Orang)</th>
                         <th>Unit Kerja</th>
@@ -239,9 +240,10 @@
                     @foreach ($data as $item)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
+                            <td class="text-center"><span class="badge bg-secondary">{{ $item->paket_id }}</span></td>
                             <td class="fw-bold">{{ $item->paket }}</td>
                             <td class="text-center">{{ $item->kuota_paket }}</td>
-                            <td>{{ $item->unit_kerja }}</td>
+                            <td>{{ $item->unitKerja->unit_kerja ?? '-' }}</td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
                                     <a href="{{ url('/paket/' . $item->paket_id) }}"

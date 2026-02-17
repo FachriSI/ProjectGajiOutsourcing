@@ -73,7 +73,7 @@ class UmpController extends Controller
         $request->validate([
             'kode_lokasi' => 'required',
             'ump' => 'required',
-            'tahun' => 'required'
+            'tahun' => 'required|unique:md_ump,tahun,NULL,id,kode_lokasi,' . $request->kode_lokasi
         ]);
         
         $nilai = str_replace('.', '', $request->ump);
