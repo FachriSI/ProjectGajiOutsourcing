@@ -51,6 +51,7 @@
                     <thead class="table-light">
                         <tr>
                             <th width="5%" class="text-center">No.</th>
+                            <th width="10%" class="text-center">Kode</th>
                             <th>Departemen</th>
                             <th class="text-center">Is SI</th>
                             <th width="15%" class="text-center">Aksi</th>
@@ -60,6 +61,7 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center text-muted">{{ $item->departemen_id }}</td>
                                 <td class="fw-bold text-dark">{{ $item->departemen }}</td>
                                 <td class="text-center">
                                     @if($item->is_si == 1)

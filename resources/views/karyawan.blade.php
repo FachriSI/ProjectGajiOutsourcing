@@ -18,6 +18,11 @@
           </a>
         @endif
 
+        <!-- Export Excel -->
+        <a href="/karyawan/export" class="btn btn-success shadow-sm">
+          <i class="fas fa-file-excel me-1"></i> Export Excel
+        </a>
+
         <!-- Button Template & Import -->
         <button type="button" class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal"
           data-bs-target="#templateModal" title="Template & Import Data">
@@ -145,6 +150,42 @@
   <div class="card shadow border-0 mb-4">
 
     <div class="card-body">
+      <!-- Filter Bar -->
+      <div class="row mb-3 g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted text-uppercase">Status</label>
+          <select id="filterStatus" class="form-select form-select-sm">
+            <option value="">Semua Status</option>
+            <option value="Aktif" selected>Aktif</option>
+            <option value="Berhenti">Berhenti</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted text-uppercase">Perusahaan</label>
+          <select id="filterPerusahaan" class="form-select form-select-sm">
+            <option value="">Semua Perusahaan</option>
+            @foreach ($data->pluck('perusahaan.perusahaan')->unique()->sort() as $perusahaan)
+              @if($perusahaan)
+                <option value="{{ $perusahaan }}">{{ $perusahaan }}</option>
+              @endif
+            @endforeach
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted text-uppercase">Tipe Pekerjaan</label>
+          <select id="filterTipe" class="form-select form-select-sm">
+            <option value="">Semua Tipe</option>
+            <option value="Lapangan">Lapangan</option>
+            <option value="Non Lapangan">Non Lapangan</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button id="resetFilter" class="btn btn-outline-secondary btn-sm w-100">
+            <i class="fas fa-undo me-1"></i> Reset Filter
+          </button>
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="table table-bordered table-hover datatable" id="datatableSimple" width="100%" cellspacing="0">
           <thead class="table-light">
@@ -154,7 +195,9 @@
               <th>KTP</th>
               <th>Nama</th>
               <th>Perusahaan</th>
-              <th class="text-center" width="20%">Aksi</th>
+              <th>Status</th>
+              <th>Tipe</th>
+              <th class="text-center" width="18%">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -165,6 +208,14 @@
                 <td>{{ $item->ktp }}</td>
                 <td class="fw-bold">{{ $item->nama_tk }}</td>
                 <td>{{ $item->perusahaan->perusahaan }}</td>
+                <td>
+                  @if($item->status_aktif == 'Aktif')
+                    <span class="badge bg-success">Aktif</span>
+                  @else
+                    <span class="badge bg-danger">{{ $item->status_aktif ?? 'N/A' }}</span>
+                  @endif
+                </td>
+                <td>{{ $item->tipe_pekerjaan ?? '-' }}</td>
                 <td class="text-center">
                   <div class="d-flex gap-1 justify-content-center">
                     <a href="/detail-karyawan/{{ $item->karyawan_id }}" class="btn btn-sm btn-outline-primary"
@@ -489,6 +540,29 @@
             $('#nilai_saat_ini').text(nilai);
             $('#baju_saat_ini').text(baju);
             $('#celana_saat_ini').text(celana);
+        });
+
+        // DataTables Filter Logic
+        var table = $('#datatableSimple').DataTable();
+
+        // Apply default filter for Status = Aktif
+        table.column(5).search('Aktif').draw();
+
+        // Filter event handlers
+        $('#filterStatus').on('change', function() {
+            table.column(5).search(this.value).draw();
+        });
+        $('#filterPerusahaan').on('change', function() {
+            table.column(4).search(this.value).draw();
+        });
+        $('#filterTipe').on('change', function() {
+            table.column(6).search(this.value).draw();
+        });
+        $('#resetFilter').on('click', function() {
+            $('#filterStatus').val('');
+            $('#filterPerusahaan').val('');
+            $('#filterTipe').val('');
+            table.columns().search('').draw();
         });
     });
   </script>

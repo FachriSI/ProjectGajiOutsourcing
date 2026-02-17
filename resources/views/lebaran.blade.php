@@ -46,6 +46,7 @@
                     <thead class="table-light">
                         <tr>
                             <th class="text-center" width="5%">No</th>
+                            <th width="8%" class="text-center">Kode</th>
                             <th>Tahun</th>
                             <th>Tanggal Masehi</th>
                             <th>Tahun Hijriyah</th>
@@ -56,6 +57,7 @@
                         @foreach($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center text-muted">{{ $item->id }}</td>
                                 <td class="fw-bold text-center">{{ $item->tahun }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') }}</td>
                                 <td>{{ $item->tahun_hijriyah ?? '-' }}</td>

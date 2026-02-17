@@ -26,6 +26,7 @@ class Karyawan extends Model
         'status',
         'alamat',
         'asal',
+        'tipe_pekerjaan',
         'tanggal_bekerja',
         'tahun_pensiun',
         'tanggal_pensiun',

@@ -136,6 +136,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- New Row: Vendor Distribution -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+                        <div class="card-body">
+                            <h6 class="text-center font-weight-bold mb-3">Distribusi Karyawan per Vendor (Perusahaan)</h6>
+                            <div style="height: 350px;">
+                                <canvas id="vendorChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 2. Analisis Karyawan Tab (Consolidated) -->
@@ -603,6 +617,19 @@
 
                 // Initial Render
                 renderPacketCharts();
+
+                // 5. Vendor Distribution
+                makeBarChart('vendorChart',
+                    {!! json_encode(array_keys($vendorCount)) !!},
+                    {!! json_encode(array_values($vendorCount)) !!},
+                    'Jumlah Karyawan',
+                    {
+                        indexAxis: 'x',
+                        scales: { y: { beginAtZero: true } },
+                        backgroundColor: '#1cc88a', // Green
+                        borderColor: '#1cc88a'
+                    }
+                );
             });
         </script>
 @endsection

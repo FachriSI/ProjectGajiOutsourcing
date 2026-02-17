@@ -4,6 +4,8 @@
 
 @section('content')
     @php
+        use App\Services\GajiCalculatorService;
+
         $total_kontrak_all = 0;
         $total_kontrak_tahunan_all = 0;
         $total_thr_bln = 0;
@@ -13,71 +15,52 @@
         $total_fix_cost = 0;
         $total_seluruh_variabel = 0;
 
-        foreach ($data as $item) {
-            $ump = $item->lokasi['ump'][0]['ump'] ?? ($item->lokasi['ump']['ump'] ?? 0); // Fix array access if collection
-            $ump_sumbar = $item->ump_sumbar ?? 0;
-            
-            $upah_pokok = $ump_sumbar;
-            $tj_umum = 0; // Removed/Merged into Upah Pokok
+        // Pre-calculate for each employee using centralized service
+        $calcResults = [];
+        foreach ($data as $index => $item) {
+            $calc = GajiCalculatorService::calculate([
+                'ump_sumbar' => $item->ump_sumbar ?? 0,
+                'ump_lokasi' => $item->lokasi['ump'][0]['ump'] ?? ($item->lokasi['ump']['ump'] ?? 0),
+                'kode_lokasi' => $item->kode_lokasi ?? 12,
+                'tunjangan_jabatan' => $item->tunjangan_jabatan ?? 0,
+                'tunjangan_masakerja' => $item->tunjangan_masakerja ?? 0,
+                'tunjangan_penyesuaian' => $item->tunjangan_penyesuaian ?? 0,
+                'tunjangan_shift' => $item->harianshift['tunjangan_shift'] ?? 0,
+                'kode_resiko' => $item->kode_resiko ?? 2,
+                'tunjangan_resiko' => $item->resiko['tunjangan_resiko'] ?? 0,
+                'perusahaan_id' => $item->perusahaan_id ?? 0,
+                'kuota_jam' => $item->kuota ?? 0,
+                'nilai_jatah' => $item->nilai_jatah ?? 0,
+                'mcu' => $item->mcu ?? 0,
+            ]);
 
-            $selisih_ump = round($ump - $ump_sumbar);
-            $tj_lokasi = $item->kode_lokasi == 12 ? 0 : max($selisih_ump, 300000);
+            $calcResults[$index] = $calc;
 
-            $tj_jabatan = round($item->tunjangan_jabatan ?? 0);
-            $tj_masakerja = round($item->tunjangan_masakerja ?? 0);
-            $tj_suai = round($item->tunjangan_penyesuaian ?? 0);
-            $tj_harianshift = round($item->harianshift['tunjangan_shift'] ?? 0);
-            $tj_resiko = ($item->kode_resiko == 2) ? 0 : round($item->resiko['tunjangan_resiko'] ?? 0);
-            $tj_presensi = round($upah_pokok * 0.08);
-
-            $t_tdk_tetap = $tj_suai + $tj_harianshift + $tj_presensi + $tj_resiko;
-            $t_tetap = $tj_jabatan + $tj_masakerja;
-
-            $komponen_gaji = $upah_pokok + $t_tetap + $tj_lokasi;
-            $bpjs_kesehatan = round(0.04 * $komponen_gaji);
-            $bpjs_ketenagakerjaan = round(0.0689 * $komponen_gaji);
-
-            $uang_jasa = $item->perusahaan_id == 38
-                ? round(($upah_pokok + $t_tetap + $t_tdk_tetap) / 12)
-                : 0;
-
-            $kompensasi = round($komponen_gaji / 12);
-
-            $fix_cost = round($upah_pokok + $t_tetap + $t_tdk_tetap + $bpjs_kesehatan + $bpjs_ketenagakerjaan + $uang_jasa + $kompensasi);
-            $fee_fix_cost = round(0.10 * $fix_cost);
-            $jumlah_fix_cost = round($fix_cost + $fee_fix_cost);
-
-            $total_fix_cost += $fix_cost;
-            $total_jml_fix_cost += $jumlah_fix_cost;
-
-            // Lembur
-            $quota_jam_perkalian = 2 * ($item->kuota ?? 0);
-            $tarif_lembur = round((($upah_pokok + $t_tetap + $t_tdk_tetap) * 0.75) / 173);
-            $nilai_lembur = round($tarif_lembur * $quota_jam_perkalian);
-            $fee_lembur = round(0.025 * $nilai_lembur);
-            $total_variabel = $nilai_lembur + $fee_lembur;
-            $total_seluruh_variabel += $total_variabel;
-
-            $total_kontrak = $jumlah_fix_cost + $total_variabel;
-            $total_kontrak_tahunan = $total_kontrak * 12;
+            // Extract variables for backward compatibility with the rest of the view
+            $upah_pokok = $calc['upah_pokok'];
+            $tj_lokasi = $calc['tj_lokasi'];
+            $t_tetap = $calc['t_tetap'];
+            $t_tdk_tetap = $calc['t_tdk_tetap'];
+            $bpjs_kesehatan = $calc['bpjs_kesehatan'];
+            $bpjs_ketenagakerjaan = $calc['bpjs_ketenagakerjaan'];
+            $kompensasi = $calc['kompensasi'];
+            $fix_cost = $calc['fix_cost'];
+            $fee_fix_cost = $calc['fee_fix_cost'];
+            $jumlah_fix_cost = $calc['jumlah_fix_cost'];
+            $tarif_lembur = $calc['tarif_lembur'];
+            $nilai_lembur = $calc['nilai_lembur'];
+            $total_variabel = $calc['total_variabel'];
+            $total_kontrak = $calc['total_kontrak'];
+            $mcu = $calc['mcu'];
 
             $total_kontrak_all += $total_kontrak;
-            $total_kontrak_tahunan_all += $total_kontrak_tahunan;
-
-            // THR
-            $thr = round(($upah_pokok + $t_tetap) / 12);
-            $fee_thr = round($thr * 0.05);
-            $thr_bln = $thr + $fee_thr;
-            $thr_thn = $thr_bln * 12;
-
-            $total_thr_bln += $thr_bln;
-            $total_thr_thn += $thr_thn;
-
-            // Pakaian
-            $pakaian = $item->nilai_jatah ?? 0;
-            $fee_pakaian = round(0.05 * $pakaian);
-            $total_pakaian = $pakaian + $fee_pakaian;
-            $total_pakaian_all += $total_pakaian;
+            $total_kontrak_tahunan_all += $calc['total_kontrak_tahunan'];
+            $total_thr_bln += $calc['thr_bln'];
+            $total_thr_thn += $calc['thr_thn'];
+            $total_pakaian_all += $calc['total_pakaian'];
+            $total_jml_fix_cost += $jumlah_fix_cost;
+            $total_fix_cost += $fix_cost;
+            $total_seluruh_variabel += $total_variabel;
         }
     @endphp
 
@@ -94,6 +77,9 @@
                     <input type="month" name="periode" class="form-control form-control-sm me-2" 
                            value="{{ $selectedPeriode }}" onchange="this.form.submit()">
                 </form>
+                <a href="{{ route('paket.export', $paketList->first()->paket_id) }}?periode={{ $selectedPeriode }}" class="btn btn-outline-success shadow-sm">
+                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                </a>
                 <a href="/gettambah-karyawan?paket_id={{ $paketList->first()->paket_id ?? '' }}" class="btn btn-outline-primary shadow-sm">
                     <i class="fas fa-user-plus me-1"></i> Tambah Karyawan
                 </a>
@@ -242,7 +228,7 @@
     <!-- Outer container matches index page style (Shadow & Card) -->
     <div class="card mb-4 border-0 shadow">
         <div class="card-body">
-            <table id="datatablesSimple" class="table table-bordered table-hover display nowrap" style="width:100%">
+                <table id="datatablesSimple" class="table table-bordered table-hover display" style="width:100%; font-size: 13px;">
                 <thead class="table-light">
                     <tr>
                         <th style="width: 30px;"></th> <!-- Expand icon -->
@@ -250,19 +236,11 @@
                         <th>OSIS ID</th>
                         <th>Nama</th>
                         <th>Jabatan</th>
-                        <th>Vendor/Perusahaan</th>
+                        <th>Vendor</th>
                         <th>Aktif Mulai</th>
                         <th>Upah Pokok</th>
-                        <th>Tj. Tetap</th>
-                        <th>Tj. Tidak Tetap</th>
-                        <th>Tj. Lokasi</th>
-                        <th>BPJS Kesehatan</th>
-                        <th>BPJS Ketenagakerjaan</th>
-                        <th>Kompensasi</th>
-                        <th>Nilai Kontrak/Orang/Bln</th>
-                        <th>Tarif Lembur/Jam</th>
-                        <th>Nilai Lembur/Orang/Bln</th>
-                        <th>MCU</th>
+                        <th>Kontrak/Bln</th>
+                        <th>Lembur/Bln</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -340,7 +318,18 @@
             data-thr-thn="{{ number_format($thr_thn, 0, ',', '.') }}"
             data-total-pakaian="{{ number_format($total_pakaian, 0, ',', '.') }}"
             data-ukuran-baju="{{ $item->ukuran_baju ?? '-' }}"
-            data-ukuran-celana="{{ $item->ukuran_celana ?? '-' }}">
+            data-ukuran-celana="{{ $item->ukuran_celana ?? '-' }}"
+            data-lokasi-kerja="{{ $item->lokasi_aktif->lokasi->lokasi ?? '-' }}"
+            data-tipe-pekerjaan="{{ $item->tipe_pekerjaan ?? '-' }}"
+            data-upah-pokok="{{ number_format($upah_pokok, 0, ',', '.') }}"
+            data-tj-tetap="{{ number_format($t_tetap, 0, ',', '.') }}"
+            data-tj-tdk-tetap="{{ number_format($t_tdk_tetap, 0, ',', '.') }}"
+            data-tj-lokasi="{{ number_format($tj_lokasi, 0, ',', '.') }}"
+            data-bpjs-kesehatan="{{ number_format($bpjs_kesehatan, 0, ',', '.') }}"
+            data-bpjs-ketenagakerjaan="{{ number_format($bpjs_ketenagakerjaan, 0, ',', '.') }}"
+            data-kompensasi="{{ number_format($kompensasi, 0, ',', '.') }}"
+            data-tarif-lembur="{{ number_format($tarif_lembur, 0, ',', '.') }}"
+            data-mcu="{{ number_format($mcu, 0, ',', '.') }}">
             
             <td class="details-control" style="cursor: pointer; text-align: center;">
                 <button class="btn btn-sm btn-outline-primary toggle-details" style="font-size: 11px; padding: 2px 8px;">
@@ -354,16 +343,8 @@
             <td>{{$item->perusahaan}}</td>
             <td>{{$item->aktif_mulai}}</td>
             <td>{{ number_format($upah_pokok, 0, ',', '.') }}</td>
-            <td>{{ number_format($t_tetap, 0, ',', '.') }}</td>
-            <td>{{ number_format($t_tdk_tetap, 0, ',', '.') }}</td>
-            <td>{{ number_format($tj_lokasi, 0, ',', '.') }}</td>
-            <td>{{ number_format($bpjs_kesehatan, 0, ',', '.') }}</td>
-            <td>{{ number_format($bpjs_ketenagakerjaan, 0, ',', '.') }}</td>
-            <td>{{ number_format($kompensasi, 0, ',', '.') }}</td>
-            <td>{{ number_format($jumlah_fix_cost, 0, ',', '.') }}</td>
-            <td>{{ number_format($tarif_lembur, 0, ',', '.') }}</td>
+            <td class="fw-bold">{{ number_format($jumlah_fix_cost, 0, ',', '.') }}</td>
             <td>{{ number_format($nilai_lembur, 0, ',', '.') }}</td>
-            <td>{{ number_format($mcu, 0, ',', '.') }}</td>
         </tr>
 
                     @endforeach 
@@ -385,38 +366,65 @@
         return `
             <div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #007bff;">
                 <h5 class="mb-3"><i class="fas fa-info-circle"></i> Detail Breakdown Komponen</h5>
+
+                <div class="alert alert-light border border-primary text-primary mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-map-marker-alt me-1"></i> Lokasi Kerja:</strong> ${data.lokasiKerja}
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-hard-hat me-1"></i> Tipe Pekerjaan:</strong> ${data.tipePekerjaan}
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="row">
-                    <!-- Left Column: Tunjangan -->
-                    <div class="col-md-6">
-                        <h6 class="text-primary"><i class="fas fa-money-bill-wave"></i> Breakdown Tunjangan Tetap & Tidak Tetap</h6>
+                    <!-- Left Column: Ringkasan Gaji -->
+                    <div class="col-md-4">
+                        <h6 class="text-success"><i class="fas fa-wallet"></i> Ringkasan Gaji & Potongan</h6>
                         <table class="table table-sm table-bordered">
-                            <tr><td><strong>Tj. Umum</strong></td><td class="text-right">Rp${data.tjUmum}</td></tr>
-                            <tr><td><strong>Tj. Jabatan</strong></td><td class="text-right">Rp${data.tjJabatan}</td></tr>
-                            <tr><td><strong>Tj. Masa Kerja</strong></td><td class="text-right">Rp${data.tjMasakerja}</td></tr>
-                            <tr><td><strong>Tj. Penyesuaian</strong></td><td class="text-right">Rp${data.tjSuai}</td></tr>
-                            <tr><td><strong>Tj. Resiko</strong></td><td class="text-right">Rp${data.tjResiko}</td></tr>
-                            <tr><td><strong>Tj. Shift</strong></td><td class="text-right">Rp${data.tjShift}</td></tr>
-                            <tr><td><strong>Tj. Presensi</strong></td><td class="text-right">Rp${data.tjPresensi}</td></tr>
+                            <tr><td><strong>Upah Pokok</strong></td><td class="text-end">Rp${data.upahPokok}</td></tr>
+                            <tr><td><strong>Tj. Tetap</strong></td><td class="text-end">Rp${data.tjTetap}</td></tr>
+                            <tr><td><strong>Tj. Tidak Tetap</strong></td><td class="text-end">Rp${data.tjTdkTetap}</td></tr>
+                            <tr><td><strong>Tj. Lokasi</strong></td><td class="text-end">Rp${data.tjLokasi}</td></tr>
+                            <tr><td><strong>BPJS Kesehatan</strong></td><td class="text-end">Rp${data.bpjsKesehatan}</td></tr>
+                            <tr><td><strong>BPJS Ketenagakerjaan</strong></td><td class="text-end">Rp${data.bpjsKetenagakerjaan}</td></tr>
+                            <tr><td><strong>Kompensasi</strong></td><td class="text-end">Rp${data.kompensasi}</td></tr>
+                            <tr><td><strong>Tarif Lembur/Jam</strong></td><td class="text-end">Rp${data.tarifLembur}</td></tr>
+                            <tr><td><strong>MCU</strong></td><td class="text-end">Rp${data.mcuVal}</td></tr>
+                        </table>
+                    </div>
+
+                    <!-- Middle Column: Tunjangan -->
+                    <div class="col-md-4">
+                        <h6 class="text-primary"><i class="fas fa-money-bill-wave"></i> Breakdown Tunjangan</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr><td><strong>Tj. Umum</strong></td><td class="text-end">Rp${data.tjUmum}</td></tr>
+                            <tr><td><strong>Tj. Jabatan</strong></td><td class="text-end">Rp${data.tjJabatan}</td></tr>
+                            <tr><td><strong>Tj. Masa Kerja</strong></td><td class="text-end">Rp${data.tjMasakerja}</td></tr>
+                            <tr><td><strong>Tj. Penyesuaian</strong></td><td class="text-end">Rp${data.tjSuai}</td></tr>
+                            <tr><td><strong>Tj. Resiko</strong></td><td class="text-end">Rp${data.tjResiko}</td></tr>
+                            <tr><td><strong>Tj. Shift</strong></td><td class="text-end">Rp${data.tjShift}</td></tr>
+                            <tr><td><strong>Tj. Presensi</strong></td><td class="text-end">Rp${data.tjPresensi}</td></tr>
                         </table>
                     </div>
                     
                     <!-- Right Column: Cost & Fee -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <h6 class="text-primary"><i class="fas fa-calculator"></i> Breakdown Cost & Fee</h6>
                         <table class="table table-sm table-bordered">
-                            <tr><td><strong>Uang Jasa</strong></td><td class="text-right">Rp${data.uangJasa}</td></tr>
-                            <tr><td><strong>Fix Cost (sebelum fee)</strong></td><td class="text-right">Rp${data.fixCost}</td></tr>
-                            <tr><td><strong>Fee Fix Cost (10%)</strong></td><td class="text-right">Rp${data.feeFixCost}</td></tr>
-                            <tr><td><strong>Jumlah Fix Cost</strong></td><td class="text-right">Rp${data.jumlahFixCost}</td></tr>
+                            <tr><td><strong>Uang Jasa</strong></td><td class="text-end">Rp${data.uangJasa}</td></tr>
+                            <tr><td><strong>Fix Cost</strong></td><td class="text-end">Rp${data.fixCost}</td></tr>
+                            <tr><td><strong>Fee Fix Cost (10%)</strong></td><td class="text-end">Rp${data.feeFixCost}</td></tr>
+                            <tr><td><strong>Jumlah Fix Cost</strong></td><td class="text-end">Rp${data.jumlahFixCost}</td></tr>
                         </table>
                         
                         <h6 class="text-primary mt-3"><i class="fas fa-clock"></i> Detail Lembur</h6>
                         <table class="table table-sm table-bordered">
-                            <tr><td><strong>Quota Jam Perkalian</strong></td><td class="text-right">${data.quotaJam} jam</td></tr>
-                            <tr><td><strong>Nilai Lembur</strong></td><td class="text-right">Rp${data.nilaiLembur}</td></tr>
-                            <tr><td><strong>Fee Lembur (2.5%)</strong></td><td class="text-right">Rp${data.feeLembur}</td></tr>
-                            <tr><td><strong>Total Variabel</strong></td><td class="text-right">Rp${data.totalVariabel}</td></tr>
+                            <tr><td><strong>Quota Jam</strong></td><td class="text-end">${data.quotaJam} jam</td></tr>
+                            <tr><td><strong>Nilai Lembur</strong></td><td class="text-end">Rp${data.nilaiLembur}</td></tr>
+                            <tr><td><strong>Fee Lembur (2.5%)</strong></td><td class="text-end">Rp${data.feeLembur}</td></tr>
+                            <tr><td><strong>Total Variabel</strong></td><td class="text-end">Rp${data.totalVariabel}</td></tr>
                         </table>
                     </div>
                 </div>
@@ -547,7 +555,18 @@
                     thrThn: tr.attr('data-thr-thn'),
                     totalPakaian: tr.attr('data-total-pakaian'),
                     ukuranBaju: tr.attr('data-ukuran-baju'),
-                    ukuranCelana: tr.attr('data-ukuran-celana')
+                    ukuranCelana: tr.attr('data-ukuran-celana'),
+                    lokasiKerja: tr.attr('data-lokasi-kerja'),
+                    tipePekerjaan: tr.attr('data-tipe-pekerjaan'),
+                    upahPokok: tr.attr('data-upah-pokok'),
+                    tjTetap: tr.attr('data-tj-tetap'),
+                    tjTdkTetap: tr.attr('data-tj-tdk-tetap'),
+                    tjLokasi: tr.attr('data-tj-lokasi'),
+                    bpjsKesehatan: tr.attr('data-bpjs-kesehatan'),
+                    bpjsKetenagakerjaan: tr.attr('data-bpjs-ketenagakerjaan'),
+                    kompensasi: tr.attr('data-kompensasi'),
+                    tarifLembur: tr.attr('data-tarif-lembur'),
+                    mcuVal: tr.attr('data-mcu')
                 };
                 
                 row.child(formatChildRow(data)).show();

@@ -36,6 +36,7 @@
                     <thead class="table-light">
                         <tr>
                             <th width="5%" class="text-center">No.</th>
+                            <th width="8%" class="text-center">Kode</th>
                             <th>Karyawan</th>
                             <th class="text-end">Tunjangan Masa Kerja</th>
                             <th class="text-center">Tanggal Mulai</th>
@@ -46,6 +47,7 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center text-muted">{{ $item->id }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="icon-circle bg-light text-primary me-2">

@@ -170,6 +170,25 @@
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="mb-3">
+                            <label for="tipe_pekerjaan" class="form-label fw-bold text-dark">Tipe Pekerjaan <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" name="tipe_pekerjaan" id="tipe_pekerjaan" required>
+                                <option value="Lapangan" {{ old('tipe_pekerjaan') == 'Lapangan' ? 'selected' : '' }}>Lapangan</option>
+                                <option value="Non Lapangan" {{ old('tipe_pekerjaan') == 'Non Lapangan' ? 'selected' : '' }}>Non Lapangan</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tanggal_bekerja" class="form-label fw-bold text-dark">Tanggal Mulai Bekerja <span
+                                    class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="tanggal_bekerja" id="tanggal_bekerja"
+                                value="{{ old('tanggal_bekerja', date('Y-m-d')) }}" required>
+                            @error('tanggal_bekerja')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 

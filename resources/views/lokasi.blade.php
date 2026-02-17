@@ -41,6 +41,7 @@
                     <thead class="table-light">
                         <tr>
                             <th width="5%" class="text-center">No.</th>
+                            <th width="10%" class="text-center">Kode</th>
                             <th>Lokasi</th>
                             <th>Jenis</th>
                             <th width="15%" class="text-center">Aksi</th>
@@ -50,6 +51,7 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center text-muted">{{ $item->kode_lokasi }}</td>
                                 <td class="fw-bold text-dark">{{ $item->lokasi }}</td>
                                 <td><span class="badge bg-secondary text-white">{{ $item->jenis }}</span></td>
                                 <td class="text-center">

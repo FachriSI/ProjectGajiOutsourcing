@@ -119,6 +119,14 @@
                             </select>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="tipe_pekerjaan" class="form-label fw-bold text-dark">Tipe Pekerjaan</label>
+                            <select class="form-select" name="tipe_pekerjaan" id="tipe_pekerjaan">
+                                <option value="Lapangan" {{ ($dataM->tipe_pekerjaan ?? 'Lapangan') == 'Lapangan' ? 'selected' : '' }}>Lapangan</option>
+                                <option value="Non Lapangan" {{ ($dataM->tipe_pekerjaan ?? '') == 'Non Lapangan' ? 'selected' : '' }}>Non Lapangan</option>
+                            </select>
+                        </div>
+
                         <!-- Hidden inputs kept from original -->
                         <input type="hidden" class="form-control" name="tahun_pensiun" id="tahun_pensiun"
                             value="{{$dataM->tahun_pensiun}}">

@@ -98,7 +98,10 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="/karyawan" class="btn btn-outline-secondary me-md-2">
+                        <a href="{{ url('/detail-karyawan/'.$dataM->karyawan_id.'/pdf') }}" class="btn btn-danger me-md-2" target="_blank">
+                            <i class="fas fa-file-pdf me-2"></i>Cetak PDF
+                        </a>
+                        <a href="/karyawan" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>Kembali
                         </a>
                     </div>
@@ -106,4 +109,53 @@
             </div>
         </div>
     </div>
+
+    <!-- Riwayat Perubahan (Audit Log) -->
+    @if(isset($auditLogs) && $auditLogs->count() > 0)
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 mb-4 border-top border-warning border-4">
+                <div class="card-body">
+                    <h5 class="card-title text-warning fw-bold mb-4">
+                        <i class="fas fa-history me-2"></i>Riwayat Perubahan
+                    </h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="15%">Waktu</th>
+                                    <th width="12%">Aksi</th>
+                                    <th width="15%">Oleh</th>
+                                    <th>Detail</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($auditLogs as $log)
+                                <tr>
+                                    <td class="text-muted small">{{ \Carbon\Carbon::parse($log->waktu)->format('d M Y H:i') }}</td>
+                                    <td>
+                                        @if($log->aksi == 'Dibuat')
+                                            <span class="badge bg-success">{{ $log->aksi }}</span>
+                                        @elseif($log->aksi == 'Diubah')
+                                            <span class="badge bg-info">{{ $log->aksi }}</span>
+                                        @elseif($log->aksi == 'Dihapus')
+                                            <span class="badge bg-danger">{{ $log->aksi }}</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ $log->aksi }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="fw-bold">{{ $log->diubah_oleh }}</td>
+                                    <td>{{ $log->detail }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
 @endsection

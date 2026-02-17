@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Karyawan;
+use App\Models\AuditLog;
 use App\Models\Paketkaryawan;
 use App\Models\Riwayat_shift;
+use App\Exports\KaryawanExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Models\Perusahaan;
 use App\Models\UnitKerja;
+use PDF;
 use App\Models\MasterUkuran;
 
 
@@ -112,6 +116,91 @@ class KaryawanController extends Controller
     }
 
 
+    public function exportExcel()
+    {
+        $data = Karyawan::with(['perusahaan'])->where('is_deleted', 0)->get();
+
+        $paketKaryawan = DB::table('paket_karyawan as pk1')
+            ->join('md_paket as paket', 'pk1.paket_id', '=', 'paket.paket_id')
+            ->join(DB::raw('(
+                SELECT karyawan_id, MAX(beg_date) as max_date
+                FROM paket_karyawan
+                GROUP BY karyawan_id
+            ) as latest'), function ($join) {
+                $join->on('pk1.karyawan_id', '=', 'latest.karyawan_id')
+                    ->on('pk1.beg_date', '=', 'latest.max_date');
+            })
+            ->select('pk1.karyawan_id', 'paket.paket as nama_paket')
+            ->get()
+            ->keyBy('karyawan_id');
+
+        $harianShift = DB::table('riwayat_shift as rs')
+            ->join(DB::raw('(
+                SELECT karyawan_id, MAX(beg_date) as max_date
+                FROM riwayat_shift
+                GROUP BY karyawan_id
+            ) as latest'), function ($join) {
+                $join->on('rs.karyawan_id', '=', 'latest.karyawan_id')
+                    ->on('rs.beg_date', '=', 'latest.max_date');
+            })
+            ->join('md_harianshift as hs', 'rs.kode_harianshift', '=', 'hs.kode_harianshift')
+            ->select('rs.karyawan_id', 'hs.harianshift')
+            ->get()
+            ->keyBy('karyawan_id');
+
+        $jabatan = DB::table('riwayat_jabatan as rj')
+            ->join(DB::raw('(
+                SELECT karyawan_id, MAX(beg_date) as max_date
+                FROM riwayat_jabatan
+                GROUP BY karyawan_id
+            ) as latest'), function ($join) {
+                $join->on('rj.karyawan_id', '=', 'latest.karyawan_id')
+                    ->on('rj.beg_date', '=', 'latest.max_date');
+            })
+            ->join('md_jabatan as j', 'rj.kode_jabatan', '=', 'j.kode_jabatan')
+            ->select('rj.karyawan_id', 'j.jabatan')
+            ->get()
+            ->keyBy('karyawan_id');
+
+        $area = DB::table('riwayat_area as ra')
+            ->join(DB::raw('(
+                SELECT karyawan_id, MAX(beg_date) as max_date
+                FROM riwayat_area
+                GROUP BY karyawan_id
+            ) as latest'), function ($join) {
+                $join->on('ra.karyawan_id', '=', 'latest.karyawan_id')
+                    ->on('ra.beg_date', '=', 'latest.max_date');
+            })
+            ->select('ra.karyawan_id', 'ra.area')
+            ->get()
+            ->keyBy('karyawan_id');
+
+        return Excel::download(
+            new KaryawanExport($data, $paketKaryawan, $jabatan, $harianShift, $area),
+            'Data_Karyawan_' . date('Y-m-d') . '.xlsx'
+        );
+    }
+
+    public function cetakPdf($id)
+    {
+        $dataM = DB::table('md_karyawan')
+            ->where('karyawan_id', '=', $id)
+            ->first();
+
+        if (!$dataM) {
+            return redirect()->back()->with('error', 'Data Karyawan tidak ditemukan.');
+        }
+
+        $dataP = DB::table('md_perusahaan')->get();
+        
+        $pdf = PDF::loadView('pdf.detail_karyawan_pdf', [
+            'dataM' => $dataM,
+            'dataP' => $dataP
+        ]);
+
+        return $pdf->download('Detail_Karyawan_' . str_replace(' ', '_', $dataM->nama_tk) . '.pdf');
+    }
+
     public function trash()
     {
         $data = Karyawan::with(['perusahaan'])->where('is_deleted', 1)->get();
@@ -128,7 +217,12 @@ class KaryawanController extends Controller
         $dataU = Db::table('md_unit_kerja')
             ->get();
 
-        return view('detail-karyawan', ['dataM' => $dataM, 'dataP' => $dataP, 'dataU' => $dataU]);
+        $auditLogs = AuditLog::where('karyawan_id', $id)
+            ->orderBy('waktu', 'desc')
+            ->limit(20)
+            ->get();
+
+        return view('detail-karyawan', ['dataM' => $dataM, 'dataP' => $dataP, 'dataU' => $dataU, 'auditLogs' => $auditLogs]);
     }
 
     public function getTambah()
@@ -236,10 +330,11 @@ class KaryawanController extends Controller
             'status' => $request->status,
             'alamat' => $request->alamat,
             'asal' => $request->asal ?: null,
+            'tipe_pekerjaan' => $request->tipe_pekerjaan,
             'tahun_pensiun' => $tahun_pensiun,
             'tanggal_pensiun' => $tanggal_pensiun,
-            'status_aktif' => 'Aktif', // Set default active
-            'tanggal_bekerja' => now() // Set default join date to now, or add input field if needed
+            'status_aktif' => 'Aktif',
+            'tanggal_bekerja' => $request->tanggal_bekerja ?? now()->format('Y-m-d'),
         ]);
 
         // Assign to Paket
@@ -270,6 +365,15 @@ class KaryawanController extends Controller
         } catch (\Exception $e) {
             \Log::error('Auto-calculation failed after creating employee: ' . $e->getMessage());
         }
+
+        // Audit Log
+        AuditLog::create([
+            'karyawan_id' => $karyawan->karyawan_id,
+            'aksi' => 'Dibuat',
+            'diubah_oleh' => auth()->user()->username ?? 'System',
+            'detail' => 'Karyawan baru ditambahkan: ' . $karyawan->nama_tk,
+            'data_baru' => $karyawan->toArray(),
+        ]);
 
         return redirect('/karyawan')->with('success', 'Data Berhasil Tersimpan');
     }
@@ -313,14 +417,35 @@ class KaryawanController extends Controller
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'agama' => $request->agama,
                 'status' => $request->status,
-                'asal' => $request->asal
+                'asal' => $request->asal,
+                'tipe_pekerjaan' => $request->tipe_pekerjaan,
             ]);
+
+        // Audit Log
+        $karyawan = Karyawan::where('karyawan_id', $id)->first();
+        AuditLog::create([
+            'karyawan_id' => $id,
+            'aksi' => 'Diubah',
+            'diubah_oleh' => auth()->user()->username ?? 'System',
+            'detail' => 'Data karyawan diperbarui: ' . ($karyawan->nama_tk ?? $id),
+            'data_baru' => $karyawan ? $karyawan->toArray() : null,
+        ]);
 
         return redirect('/karyawan')->with('success', 'Data Berhasil Tersimpan');
     }
 
     public function destroy($id)
     {
+        // Audit Log
+        $karyawan = Karyawan::where('karyawan_id', $id)->first();
+        AuditLog::create([
+            'karyawan_id' => $id,
+            'aksi' => 'Dihapus',
+            'diubah_oleh' => auth()->user()->username ?? 'System',
+            'detail' => 'Karyawan dihapus (soft delete): ' . ($karyawan->nama_tk ?? $id),
+            'data_lama' => $karyawan ? $karyawan->toArray() : null,
+        ]);
+
         Karyawan::where('karyawan_id', $id)->update([
             'is_deleted' => 1,
             'deleted_by' => auth()->user() ? auth()->user()->username : 'System',

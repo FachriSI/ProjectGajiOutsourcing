@@ -397,6 +397,17 @@ class DashboardController extends Controller
             ->toArray();
 
 
+        // 7b. Vendor Distribution (Perusahaan) - NEW
+        $vendorCount = \DB::table('md_karyawan')
+            ->join('md_perusahaan', 'md_karyawan.perusahaan_id', '=', 'md_perusahaan.perusahaan_id')
+            ->select('md_perusahaan.perusahaan', \DB::raw('count(*) as total'))
+            ->where('md_karyawan.status_aktif', 'Aktif')
+            ->where('md_perusahaan.is_deleted', 0)
+            ->groupBy('md_perusahaan.perusahaan')
+            ->orderByDesc('total')
+            ->pluck('total', 'perusahaan')
+            ->toArray();
+
         return view('dashboard', compact(
             'genderCount',
             'statusAktifCount',
@@ -418,8 +429,9 @@ class DashboardController extends Controller
             'topPaketKosong',
             'unitKerjaCost',
             'contractTrend',
-            'totalPaket'
+            'totalPaket',
+            'perusahaanCount',
+            'vendorCount'
         ));
     }
-
 }

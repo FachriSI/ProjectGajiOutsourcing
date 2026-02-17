@@ -63,11 +63,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/gettambah-karyawan', [KaryawanController::class, 'getTambah']);
     Route::post('/tambah-karyawan', [KaryawanController::class, 'setTambah']);
     Route::get('/karyawan/sampah', [KaryawanController::class, 'trash']);
+    Route::get('/karyawan/export', [KaryawanController::class, 'exportExcel']);
     Route::get('/getupdate-karyawan/{id}', [KaryawanController::class, 'getUpdate']);
     Route::post('/update-karyawan/{id}', [KaryawanController::class, 'setUpdate']);
     Route::get('/delete-karyawan/{id}', [KaryawanController::class, 'destroy'])->name('delete-master-data');
     Route::get('/restore-karyawan/{id}', [KaryawanController::class, 'restore']);
     Route::get('/detail-karyawan/{id}', [KaryawanController::class, 'detail']);
+    Route::get('/detail-karyawan/{id}/pdf', [KaryawanController::class, 'cetakPdf']);
     Route::post('/mutasi-paket', [KaryawanController::class, 'simpanMutasi']);
     Route::post('/ganti-shift', [KaryawanController::class, 'simpanShift']);
     Route::post('/promosi-jabatan', [KaryawanController::class, 'simpanPromosi']);
@@ -271,6 +273,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/delete-paket/{id}', [PaketController::class, 'destroy']);
     Route::get('/restore-paket/{id}', [PaketController::class, 'restore']);
     Route::post('/paket/{id}/hitung', [PaketController::class, 'hitung'])->name('paket.hitung');
+    Route::get('/paket/{id}/export', [PaketController::class, 'exportDetail'])->name('paket.export');
 
     Route::get('/ump', [UmpController::class, 'index']);
     Route::get('/gettambah-ump-tahunan', [UmpController::class, 'getTambah']);

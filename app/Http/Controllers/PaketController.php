@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PaketDetailExport;
 use App\Models\Karyawan;
 use App\Models\Perusahaan;
 use App\Models\Riwayat_fungsi;
@@ -210,7 +212,7 @@ class PaketController extends Controller
             });
 
         // Filter: Only for this package
-        $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
+        $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan', 'paketKaryawan.karyawan.lokasi_aktif.lokasi'])->get();
 
         if ($paketList->isEmpty()) {
             return redirect('/paket')->with('error', 'Paket tidak ditemukan');
@@ -339,6 +341,92 @@ class PaketController extends Controller
         $total_mcu_paket = $totalActual * $mcu_cost; 
         
         return view('paket_detail', compact('data', 'paketList', 'contractHistory', 'selectedPeriode', 'total_mcu_paket'));
+    }
+
+    public function exportDetail($id)
+    {
+        // Reuse the same data retrieval logic from show()
+        $paketId = $id;
+        $data = [];
+
+        $selectedPeriode = request('periode', date('Y-m'));
+        $currentYear = \Carbon\Carbon::parse($selectedPeriode)->year;
+
+        $paketList = Paket::withoutGlobalScopes()->where('paket_id', $paketId)->with(['paketKaryawan.karyawan.perusahaan'])->get();
+
+        if ($paketList->isEmpty()) {
+            return redirect('/paket')->with('error', 'Paket tidak ditemukan');
+        }
+
+        $paketName = $paketList->first()->paket ?? 'Paket';
+        $calculatedKaryawanIds = [];
+
+        foreach ($paketList as $paket) {
+            foreach ($paket->paketKaryawan as $pk) {
+                if ($pk->karyawan) {
+                    $calculatedKaryawanIds[] = $pk->karyawan->karyawan_id;
+                }
+            }
+        }
+
+        // Fetch related data
+        $jabatanAll = Riwayat_jabatan::with('jabatan')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $shiftAll = Riwayat_shift::with('shift')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $resikoAll = Riwayat_resiko::with('resiko')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $fungsiAll = Riwayat_fungsi::with('fungsi')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $lokasiAll = Riwayat_lokasi::with(['lokasi.ump' => function ($query) use ($currentYear) {
+            $query->where('tahun', $currentYear);
+        }])->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $masakerjaAll = \App\Models\Masakerja::whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->keyBy('karyawan_id');
+        $kuotaJamAll = \App\Models\Kuotajam::whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->keyBy('karyawan_id');
+        $pakaianAll = \App\Models\Pakaian::whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->keyBy('karyawan_id');
+        $penyesuaianAll = Riwayat_penyesuaian::whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->keyBy('karyawan_id');
+        $umpSumbar = Ump::where('kode_lokasi', 12)->where('tahun', $currentYear)->first();
+        $mcu = \App\Models\MedicalCheckup::where('is_deleted', 0)->latest()->first();
+
+        foreach ($paketList as $paket) {
+            foreach ($paket->paketKaryawan as $pk) {
+                $karyawan = $pk->karyawan;
+                if (!$karyawan) continue;
+                $kid = $karyawan->karyawan_id;
+
+                $jabatan = $jabatanAll[$kid]->first() ?? null;
+                $shift = $shiftAll[$kid]->first() ?? null;
+                $resiko = $resikoAll[$kid]->first() ?? null;
+                $fungsi = $fungsiAll[$kid]->first() ?? null;
+                $lokasi = $lokasiAll[$kid]->first() ?? null;
+                $masakerja = $masakerjaAll[$kid] ?? null;
+                $kuotaJam = $kuotaJamAll[$kid] ?? null;
+                $pakaian = $pakaianAll[$kid] ?? null;
+                $penyesuaian = $penyesuaianAll[$kid] ?? null;
+
+                $karyawan->jabatan = $jabatan ? $jabatan->jabatan : null;
+                $karyawan->tunjangan_jabatan = $jabatan && $jabatan->jabatan ? $jabatan->jabatan->tunjangan_jabatan ?? 0 : 0;
+                $karyawan->shift = $shift ? $shift->shift : null;
+                $karyawan->tunjangan_shift = $shift && $shift->shift ? $shift->shift->tunjangan_harian ?? 0 : 0;
+                $karyawan->resiko = $resiko ? $resiko->resiko : null;
+                $karyawan->kode_resiko = $resiko ? $resiko->kode_resiko : null;
+                $karyawan->fungsi = $fungsi ? $fungsi->fungsi : null;
+                $karyawan->lokasi = $lokasi ? $lokasi->lokasi : null;
+                $karyawan->kode_lokasi = $lokasi ? $lokasi->kode_lokasi : null;
+                $karyawan->tunjangan_masakerja = $masakerja ? $masakerja->tunjangan_mk ?? 0 : 0;
+                $karyawan->kuota = $kuotaJam ? $kuotaJam->kuota_jam ?? 0 : 0;
+                $karyawan->nilai_jatah = $pakaian ? $pakaian->nilai_jatah ?? 0 : 0;
+                $karyawan->ukuran_baju = $pakaian ? $pakaian->ukuran_baju : null;
+                $karyawan->ukuran_celana = $pakaian ? $pakaian->ukuran_celana : null;
+                $karyawan->tunjangan_penyesuaian = $penyesuaian ? $penyesuaian->penyesuaian ?? 0 : 0;
+                $karyawan->ump_sumbar = $umpSumbar ? $umpSumbar->ump : 0;
+                $karyawan->perusahaan = $karyawan->perusahaan ? $karyawan->perusahaan->perusahaan : '-';
+                $karyawan->aktif_mulai = $karyawan->tanggal_bekerja ? \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->format('F Y') : '-';
+                $karyawan->mcu = $mcu->biaya ?? 0;
+
+                $data[] = $karyawan;
+            }
+        }
+
+        $data = collect($data);
+        $fileName = 'Detail_' . str_replace(' ', '_', $paketName) . '_' . $selectedPeriode . '.xlsx';
+        return Excel::download(new PaketDetailExport($data, $paketName), $fileName);
     }
 
     public function getTambah()
