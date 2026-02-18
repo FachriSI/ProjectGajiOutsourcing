@@ -42,6 +42,7 @@ Route::get('/login', [App\Http\Controllers\AuthController::class, 'index'])->nam
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'authenticate']);
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
+Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 
 // Public Routes (No Auth Required)
 Route::get('/verify-tagihan/{token}', [PaketController::class, 'verifyTagihan'])->name('tagihan.verify');
@@ -74,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/ganti-shift', [KaryawanController::class, 'simpanShift']);
     Route::post('/promosi-jabatan', [KaryawanController::class, 'simpanPromosi']);
     Route::post('/ganti-area', [KaryawanController::class, 'simpanArea']);
+    Route::post('/ganti-lokasi', [KaryawanController::class, 'simpanLokasi']);
     Route::post('/ganti-pakaian', [KaryawanController::class, 'simpanPakaian']);
 
 
@@ -313,5 +315,22 @@ Route::middleware(['auth'])->group(function () {
 
     // API untuk AJAX
     Route::get('/api/nilai-kontrak/calculate/{paket_id}', [App\Http\Controllers\NilaiKontrakController::class, 'apiCalculate'])->name('api.kalkulator.calculate');
+
+    // Force Delete (Hapus Permanen) Routes
+    Route::get('/force-delete-karyawan/{id}', [KaryawanController::class, 'forceDelete']);
+    Route::get('/force-delete-perusahaan/{id}', [PerusahaanController::class, 'forceDelete']);
+    Route::get('/force-delete-departemen/{id}', [DepartemenController::class, 'forceDelete']);
+    Route::get('/force-delete-fungsi/{id}', [FungsiController::class, 'forceDelete']);
+    Route::get('/force-delete-jabatan/{id}', [JabatanController::class, 'forceDelete']);
+    Route::get('/force-delete-lokasi/{id}', [LokasiController::class, 'forceDelete']);
+    Route::get('/force-delete-resiko/{id}', [ResikoController::class, 'forceDelete']);
+    Route::get('/force-delete-harianshift/{id}', [HarianshiftController::class, 'forceDelete']);
+    Route::get('/force-delete-kuotajam/{id}', [KuotajamController::class, 'forceDelete']);
+    Route::get('/force-delete-masakerja/{id}', [MasakerjaController::class, 'forceDelete']);
+    Route::get('/force-delete-penyesuaian/{id}', [PenyesuaianController::class, 'forceDelete']);
+    Route::get('/force-delete-unit/{id}', [UnitKerjaController::class, 'forceDelete']);
+    Route::get('/force-delete-paket/{id}', [PaketController::class, 'forceDelete']);
+    Route::get('/force-delete-ump/{id}', [UmpController::class, 'forceDelete']);
+    Route::get('/force-delete-lebaran/{id}', [App\Http\Controllers\LebaranController::class, 'forceDelete']);
 
 });

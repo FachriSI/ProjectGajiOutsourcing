@@ -28,7 +28,7 @@
         </div>
     @endif
 
-    <div class="card shadow border-0 mb-4">
+    <div class="card shadow border-0 mb-4 border-top border-primary border-4">
 
         <div class="card-body">
             <div class="table-responsive">

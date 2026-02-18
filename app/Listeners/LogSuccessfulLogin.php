@@ -30,7 +30,7 @@ class LogSuccessfulLogin
         ActivityLog::create([
             'user_id' => $event->user->id,
             'action' => 'Login',
-            'description' => 'User logged in',
+            'description' => 'Pengguna berhasil masuk',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);

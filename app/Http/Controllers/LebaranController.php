@@ -140,4 +140,10 @@ class LebaranController extends Controller
 
         return redirect('/lebaran')->with('success', 'Data Lebaran berhasil dipulihkan');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_lebaran')->where('id', $id)->delete();
+        return redirect('/lebaran/trash')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

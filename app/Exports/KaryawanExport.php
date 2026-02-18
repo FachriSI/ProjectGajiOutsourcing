@@ -14,15 +14,15 @@ class KaryawanExport implements FromArray, WithHeadings, ShouldAutoSize, WithSty
     protected $paketKaryawan;
     protected $jabatan;
     protected $harianShift;
-    protected $area;
+    protected $lokasi;
 
-    public function __construct($data, $paketKaryawan, $jabatan, $harianShift, $area)
+    public function __construct($data, $paketKaryawan, $jabatan, $harianShift, $lokasi)
     {
         $this->data = $data;
         $this->paketKaryawan = $paketKaryawan;
         $this->jabatan = $jabatan;
         $this->harianShift = $harianShift;
-        $this->area = $area;
+        $this->lokasi = $lokasi;
     }
 
     public function array(): array
@@ -44,7 +44,7 @@ class KaryawanExport implements FromArray, WithHeadings, ShouldAutoSize, WithSty
                 $this->jabatan[$kid]->jabatan ?? '-',
                 $this->harianShift[$kid]->harianshift ?? '-',
                 $this->paketKaryawan[$kid]->nama_paket ?? '-',
-                $this->area[$kid]->area ?? '-',
+                $this->lokasi[$kid]->lokasi ?? '-',
                 $item->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan',
                 $item->tanggal_lahir ?? '-',
                 $item->alamat ?? '-',
@@ -71,7 +71,7 @@ class KaryawanExport implements FromArray, WithHeadings, ShouldAutoSize, WithSty
             'Jabatan',
             'Shift',
             'Paket',
-            'Area',
+            'Lokasi',
             'Jenis Kelamin',
             'Tanggal Lahir',
             'Alamat',

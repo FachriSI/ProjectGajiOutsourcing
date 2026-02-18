@@ -283,6 +283,11 @@ class PaketController extends Controller
             
             // Need to fetch Karyawan models for these IDs to get names/dates etc
             $terpilih = Karyawan::whereIn('karyawan_id', $calculatedKaryawanIds)
+                        ->where(function ($q) {
+                            $q->where('status_aktif', '!=', 'Berhenti')
+                              ->orWhereNull('status_aktif');
+                        })
+                        
                         ->with('perusahaan')
                         // We might want to preserve the order or just standard sort
                         ->orderBy('nama_tk')
@@ -371,7 +376,7 @@ class PaketController extends Controller
 
         // Fetch related data
         $jabatanAll = Riwayat_jabatan::with('jabatan')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
-        $shiftAll = Riwayat_shift::with('shift')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
+        $shiftAll = Riwayat_shift::with('harianShift')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
         $resikoAll = Riwayat_resiko::with('resiko')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
         $fungsiAll = Riwayat_fungsi::with('fungsi')->whereIn('karyawan_id', $calculatedKaryawanIds)->latest('beg_date')->get()->groupBy('karyawan_id');
         $lokasiAll = Riwayat_lokasi::with(['lokasi.ump' => function ($query) use ($currentYear) {
@@ -390,15 +395,15 @@ class PaketController extends Controller
                 if (!$karyawan) continue;
                 $kid = $karyawan->karyawan_id;
 
-                $jabatan = $jabatanAll[$kid]->first() ?? null;
-                $shift = $shiftAll[$kid]->first() ?? null;
-                $resiko = $resikoAll[$kid]->first() ?? null;
-                $fungsi = $fungsiAll[$kid]->first() ?? null;
-                $lokasi = $lokasiAll[$kid]->first() ?? null;
-                $masakerja = $masakerjaAll[$kid] ?? null;
-                $kuotaJam = $kuotaJamAll[$kid] ?? null;
-                $pakaian = $pakaianAll[$kid] ?? null;
-                $penyesuaian = $penyesuaianAll[$kid] ?? null;
+                $jabatan = $jabatanAll->get($kid)?->first();
+                $shift = $shiftAll->get($kid)?->first();
+                $resiko = $resikoAll->get($kid)?->first();
+                $fungsi = $fungsiAll->get($kid)?->first();
+                $lokasi = $lokasiAll->get($kid)?->first();
+                $masakerja = $masakerjaAll->get($kid);
+                $kuotaJam = $kuotaJamAll->get($kid);
+                $pakaian = $pakaianAll->get($kid);
+                $penyesuaian = $penyesuaianAll->get($kid);
 
                 $karyawan->jabatan = $jabatan ? $jabatan->jabatan : null;
                 $karyawan->tunjangan_jabatan = $jabatan && $jabatan->jabatan ? $jabatan->jabatan->tunjangan_jabatan ?? 0 : 0;
@@ -414,7 +419,7 @@ class PaketController extends Controller
                 $karyawan->nilai_jatah = $pakaian ? $pakaian->nilai_jatah ?? 0 : 0;
                 $karyawan->ukuran_baju = $pakaian ? $pakaian->ukuran_baju : null;
                 $karyawan->ukuran_celana = $pakaian ? $pakaian->ukuran_celana : null;
-                $karyawan->tunjangan_penyesuaian = $penyesuaian ? $penyesuaian->penyesuaian ?? 0 : 0;
+                $karyawan->tunjangan_penyesuaian = $penyesuaian?->penyesuaian?->tunjangan_penyesuaian ?? 0;
                 $karyawan->ump_sumbar = $umpSumbar ? $umpSumbar->ump : 0;
                 $karyawan->perusahaan = $karyawan->perusahaan ? $karyawan->perusahaan->perusahaan : '-';
                 $karyawan->aktif_mulai = $karyawan->tanggal_bekerja ? \Carbon\Carbon::parse($karyawan->tanggal_bekerja)->format('F Y') : '-';
@@ -717,57 +722,19 @@ class PaketController extends Controller
             $qrSize = 120;
 
             // Use QRServer.com API instead of Google Charts (deprecated)
-            $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?' . http_build_query([
-                'size' => $qrSize . 'x' . $qrSize,
-                'data' => $verifyUrl,
-                'format' => 'png'
-            ]);
-
-            // Download QR image from Google API
-            try {
-                // Log attempt
-                \Log::info('Attempting to download QR code from: ' . $qrApiUrl);
-
-                // Use context to set proper headers
-                $context = stream_context_create([
-                    'http' => [
-                        'method' => 'GET',
-                        'header' => 'User-Agent: Mozilla/5.0',
-                        'timeout' => 10
-                    ]
-                ]);
-
-                $qrImageData = @file_get_contents($qrApiUrl, false, $context);
-
-                if ($qrImageData !== false && strlen($qrImageData) > 0) {
-                    // Convert to base64 for PDF embedding
-                    $qrCodeBase64 = base64_encode($qrImageData);
-                    $qrCodeImg = '<img src="data:image/png;base64,' . $qrCodeBase64 . '" alt="QR Code" style="width:120px;height:120px;display:block;margin:0 auto;" />';
-                    \Log::info('QR code downloaded successfully, size: ' . strlen($qrImageData) . ' bytes');
-                } else {
-                    // Fallback if download fails
-                    \Log::warning('QR code download returned empty or false');
-                    $qrCodeImg = '<div style="border:2px solid #000;padding:10px;width:120px;height:120px;text-align:center;font-size:7px;line-height:1.3;">
-                        <strong>Verifikasi Online</strong><br/><br/>
-                        Kunjungi:<br/>
-                        <span style="font-size:6px;word-break:break-all;">' . $verifyUrl . '</span>
-                    </div>';
-                }
-            } catch (\Exception $e) {
-                // Fallback on error with detailed logging
-                \Log::error('QR code generation failed: ' . $e->getMessage());
-                \Log::error('Error details: ' . print_r([
-                    'allow_url_fopen' => ini_get('allow_url_fopen'),
-                    'openssl_loaded' => extension_loaded('openssl'),
-                    'url' => $qrApiUrl
-                ], true));
-
-                $qrCodeImg = '<div style="border:2px solid #000;padding:10px;width:120px;height:120px;text-align:center;font-size:7px;line-height:1.3;">
-                    <strong>Verifikasi Online</strong><br/><br/>
-                    Kunjungi:<br/>
-                    <span style="font-size:6px;word-break:break-all;">' . $verifyUrl . '</span>
-                </div>';
-            }
+            // 5. Generate QR Code using Local Library (SimpleQrCode)
+            // Much faster and works offline/intranet
+            $validationUrl = route('tagihan.verify', $token);
+            
+            // Format to SVG then base64 to embed in PDF
+            // Using SVG format gives best quality for PDF and DOES NOT require Imagick extension
+            $qrCodeImage = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+                ->size(120)
+                ->margin(1)
+                ->generate($validationUrl);
+                
+            $qrCodeBase64 = base64_encode($qrCodeImage);
+            $qrCodeImg = '<img src="data:image/svg+xml;base64,' . $qrCodeBase64 . '" alt="QR Code" style="width:120px;height:120px;display:block;margin:0 auto;" />';
 
             // 6. Simpan ke tagihan_cetak dengan reference ke nilai_kontrak
             $tagihan = TagihanCetak::create([
@@ -791,15 +758,15 @@ class PaketController extends Controller
                 'token' => $token,
                 'tanggal_cetak' => now()->format('d F Y'),
                 'cetak_id' => $tagihan->cetak_id,
-                'contract_year' => $contractYear  // Year from contract period for signature
+                'contract_year' => $contractYear
             ]);
 
             $pdf->setPaper('A4', 'portrait');
 
-            // 7. Direct download PDF (no preview in browser)
+            // 7. Stream PDF to browser (view/print directly)
             $filename = 'BOQ_' . str_replace(' ', '_', $boqData['paket']->paket) . '_' . date('Ymd') . '.pdf';
 
-            return $pdf->download($filename);
+            return $pdf->stream($filename);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -930,4 +897,10 @@ class PaketController extends Controller
         }
     }
 
+
+    public function forceDelete($id)
+    {
+        DB::table('md_paket')->where('paket_id', $id)->delete();
+        return redirect('/paket/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

@@ -142,4 +142,10 @@ class UnitKerjaController extends Controller
         ]);
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_unit_kerja')->where('unit_id', $id)->delete();
+        return redirect('/unit-kerja/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

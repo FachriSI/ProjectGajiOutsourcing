@@ -87,4 +87,10 @@ class JabatanController extends Controller
         ]);
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_jabatan')->where('kode_jabatan', $id)->delete();
+        return redirect('/jabatan/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

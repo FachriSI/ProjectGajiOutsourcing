@@ -91,7 +91,7 @@
     <div class="row mb-4">
         <!-- Annual Stat: Total Kontrak / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
@@ -108,7 +108,7 @@
 
         <!-- Annual Stat: THR / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
@@ -124,7 +124,7 @@
 
         <!-- Annual Stat: MCU / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
@@ -140,7 +140,7 @@
 
         <!-- Annual Stat: Pakaian / Tahun -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
@@ -159,7 +159,7 @@
     <div class="row mb-4">
         <!-- Monthly 1: Fix Cost -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
@@ -175,7 +175,7 @@
         
         <!-- Monthly 2: Variabel -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
@@ -191,7 +191,7 @@
         
         <!-- Monthly 3: Total Kontrak/Bln -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 
@@ -207,7 +207,7 @@
         
         <!-- Monthly 4: THR/Bln -->
         <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary" 

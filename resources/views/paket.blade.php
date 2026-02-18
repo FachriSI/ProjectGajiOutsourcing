@@ -35,10 +35,10 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="templatePaketModalLabel"><i class="fas fa-file-excel me-2"></i>Template &
+                <div class="modal-header card-gradient-blue text-dark border-bottom-0">
+                    <h5 class="modal-title" id="templatePaketModalLabel"><i class="fas fa-file-excel me-2 text-primary"></i>Template &
                         Import Data Paket</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -71,11 +71,12 @@
         </div>
     </div>
 
-    <!-- ROW 1: ANNUAL OVERVIEW -->
+    <!-- METRICS DASHBOARD -->
     <div class="row mb-4">
-        <!-- Annual Stat: Total Kontrak / Tahun -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+        <!-- COLUMN 1: KONTRAK (Year & Month) -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Annual -->
+            <div class="card card-gradient-blue mb-3">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
@@ -88,94 +89,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Annual Stat: THR / Tahun -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
-                            style="width: 50px; height: 50px;">
-                            <i class="fas fa-gift fa-lg"></i>
-                        </div>
-                        <div class="text-uppercase fw-bold text-muted small">Total THR/Tahun</div>
-                    </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_thr_thn, 0, ',', '.') }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Annual Stat: MCU / Tahun -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
-                            style="width: 50px; height: 50px;">
-                            <i class="fas fa-heartbeat fa-lg"></i>
-                        </div>
-                        <div class="text-uppercase fw-bold text-muted small">Total MCU/Tahun</div>
-                    </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_mcu_all, 0, ',', '.') }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Annual Stat: Pakaian / Tahun -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
-                            style="width: 50px; height: 50px;">
-                            <i class="fas fa-tshirt fa-lg"></i>
-                        </div>
-                        <div class="text-uppercase fw-bold text-muted small">Total Pakaian/Tahun</div>
-                    </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_pakaian_all, 0, ',', '.') }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 2: MONTHLY BREAKDOWN -->
-    <div class="row mb-4">
-        <!-- Monthly 1: Fix Cost -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
-                            style="width: 50px; height: 50px;">
-                            <i class="fas fa-tags fa-lg"></i>
-                        </div>
-                        <div class="text-uppercase fw-bold text-muted small">Total Fix Cost/Bln</div>
-                    </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_jml_fix_cost, 0, ',', '.') }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Monthly 2: Variabel -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
-                            style="width: 50px; height: 50px;">
-                            <i class="fas fa-chart-area fa-lg"></i>
-                        </div>
-                        <div class="text-uppercase fw-bold text-muted small">Total Variabel/Bln</div>
-                    </div>
-                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_seluruh_variabel, 0, ',', '.') }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Monthly 3: Total Kontrak/Bln -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+            <!-- Monthly -->
+            <div class="card card-gradient-blue">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
@@ -189,9 +104,23 @@
             </div>
         </div>
 
-        <!-- Monthly 4: THR/Bln -->
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 card-hover">
+        <!-- COLUMN 2: THR (Year & Month) -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Annual -->
+            <div class="card card-gradient-blue mb-3">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-gift fa-lg"></i>
+                        </div>
+                        <div class="text-uppercase fw-bold text-muted small">Total THR/Tahun</div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_thr_thn, 0, ',', '.') }}</div>
+                </div>
+            </div>
+            <!-- Monthly -->
+             <div class="card card-gradient-blue">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
@@ -201,6 +130,66 @@
                         <div class="text-uppercase fw-bold text-muted small">Total THR/Bln</div>
                     </div>
                     <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_thr_bln, 0, ',', '.') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMN 3: MCU & FIX COST -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Annual: MCU -->
+            <div class="card card-gradient-blue mb-3">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-heartbeat fa-lg"></i>
+                        </div>
+                        <div class="text-uppercase fw-bold text-muted small">Total MCU/Tahun</div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_mcu_all, 0, ',', '.') }}</div>
+                </div>
+            </div>
+            <!-- Monthly: Fix Cost -->
+            <div class="card card-gradient-blue">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-tags fa-lg"></i>
+                        </div>
+                        <div class="text-uppercase fw-bold text-muted small">Total Fix Cost/Bln</div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_jml_fix_cost, 0, ',', '.') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMN 4: PAKAIAN & VARIABEL -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Annual: Pakaian -->
+            <div class="card card-gradient-blue mb-3">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-tshirt fa-lg"></i>
+                        </div>
+                        <div class="text-uppercase fw-bold text-muted small">Total Pakaian/Tahun</div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_pakaian_all, 0, ',', '.') }}</div>
+                </div>
+            </div>
+            <!-- Monthly: Variabel -->
+            <div class="card card-gradient-blue">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-light text-primary"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-chart-area fa-lg"></i>
+                        </div>
+                        <div class="text-uppercase fw-bold text-muted small">Total Variabel/Bln</div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">Rp{{ number_format($total_seluruh_variabel, 0, ',', '.') }}</div>
                 </div>
             </div>
         </div>
@@ -223,7 +212,7 @@
     </style>
 
     <!-- Data Table -->
-    <div class="card shadow border-0 mb-4">
+    <div class="card shadow border-0 mb-4 border-top border-primary border-4">
         <div class="card-body">
             <table class="table table-bordered table-hover display nowrap" id="datatablesSimple" style="width:100%">
                 <thead class="table-light">

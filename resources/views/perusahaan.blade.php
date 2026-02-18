@@ -37,10 +37,10 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="importTemplateBaruModalLabel"><i class="fas fa-file-excel me-2"></i>Template
+                <div class="modal-header card-gradient-blue text-dark border-bottom-0">
+                    <h5 class="modal-title fw-bold" id="importTemplateBaruModalLabel"><i class="fas fa-file-excel me-2 text-primary"></i>Template
                         & Import Data Perusahaan</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <div class="card shadow border-0 mb-4">
+    <div class="card shadow border-0 mb-4 border-top border-primary border-4">
 
         <div class="card-body">
             <div class="table-responsive">

@@ -3,13 +3,15 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
 
-                <!-- Dashboard (Standalone) -->
+                <!-- Dashboard -->
+                <div class="sb-sidenav-menu-heading">Ringkasan</div>
                 <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Laporan
                 </a>
 
-                <!-- SDM & Vendor (Dropdown) -->
+                <!-- SDM -->
+                <div class="sb-sidenav-menu-heading">Manajemen SDM</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSdm"
                     aria-expanded="false" aria-controls="collapseSdm">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
@@ -32,7 +34,8 @@
                     </nav>
                 </div>
 
-                <!-- Paket & Penempatan (Dropdown) -->
+                <!-- Paket -->
+                <div class="sb-sidenav-menu-heading">Operasional</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePaket"
                     aria-expanded="false" aria-controls="collapsePaket">
                     <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
@@ -59,11 +62,12 @@
                     </nav>
                 </div>
 
-                <!-- Organisasi (Dropdown) -->
+                <!-- Organisasi -->
+                <div class="sb-sidenav-menu-heading">Organisasi</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseOrganisasi"
                     aria-expanded="false" aria-controls="collapseOrganisasi">
                     <div class="sb-nav-link-icon"><i class="fas fa-sitemap"></i></div>
-                    Organisasi
+                    Struktur
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse {{ request()->is('departemen*') || request()->is('fungsi*') || request()->is('unit-kerja*') ? 'show' : '' }}"
@@ -87,9 +91,8 @@
                     </nav>
                 </div>
 
-
-
-                <!-- Tunjangan (Dropdown) -->
+                <!-- Tunjangan & Keuangan -->
+                <div class="sb-sidenav-menu-heading">Remunerasi</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTunjangan"
                     aria-expanded="false" aria-controls="collapseTunjangan">
                     <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
@@ -102,11 +105,11 @@
                         <a class="nav-link {{ request()->is('jabatan*') ? 'active' : '' }}"
                             href="{{ url('/jabatan') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-id-badge"></i></div>
-                            Tunjangan Jabatan
+                            Jabatan
                         </a>
                         <a class="nav-link {{ request()->is('resiko*') ? 'active' : '' }}" href="{{ url('/resiko') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                            Tunjangan Risiko
+                            Risiko
                         </a>
                         <a class="nav-link {{ request()->is('harianshift*') ? 'active' : '' }}"
                             href="{{ url('/harianshift') }}">
@@ -146,17 +149,16 @@
                     </nav>
                 </div>
 
-                <!-- UMP (Standalone) -->
+                <!-- UMP & Kontrak -->
                 <a class="nav-link {{ request()->is('ump*') ? 'active' : '' }}" href="{{ url('/ump') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-coins"></i></div>
-                    UMP
+                    UMP / UMK
                 </a>
 
-                <!-- Kontrak (Standalone) -->
                 <a class="nav-link {{ request()->is('kalkulator-kontrak*') ? 'active' : '' }}"
                     href="{{ url('/kalkulator-kontrak') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-file-contract"></i></div>
-                    Kontrak
+                    Hitung Kontrak
                 </a>
 
             </div>

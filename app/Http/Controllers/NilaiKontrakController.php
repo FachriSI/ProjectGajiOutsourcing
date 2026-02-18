@@ -29,7 +29,10 @@ class NilaiKontrakController extends Controller
      */
     public function index(Request $request)
     {
-        $pakets = Paket::with('unitKerja')->orderBy('paket')->get();
+        $pakets = Paket::with('unitKerja')->get()->sortBy(function($query) {
+            preg_match('/(\d+)/', $query->paket, $matches);
+            return (int) ($matches[1] ?? 999999);
+        });
         $currentPeriode = Carbon::now()->format('Y-m');
         
         // Get available periods for filter

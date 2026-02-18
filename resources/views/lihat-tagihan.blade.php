@@ -134,8 +134,8 @@
                 <a href="{{ route('kalkulator.cetak-thr', ['paket_id' => $boq['paket']->paket_id, 'periode' => \Carbon\Carbon::parse($boq['nilai_kontrak']->periode)->format('Y-m')]) }}" class="btn btn-outline-primary me-2" target="_blank">
                     <i class="fas fa-print me-1"></i> Cetak THR
                 </a>
-                <a href="{{ route('paket.pdf.download', $boq['paket']->paket_id) }}" class="btn btn-primary">
-                    <i class="fas fa-download me-1"></i> Download PDF
+                <a href="{{ route('paket.pdf.download', $boq['paket']->paket_id) }}" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-print me-1"></i> Cetak PDF
                 </a>
             </div>
         </div>

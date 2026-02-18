@@ -32,6 +32,10 @@
         </div>
 
         <input type="hidden" name="karyawan_sebelumnya_id" value="{{ $dataM->karyawan_id }}">
+        <input type="hidden" name="perusahaan_id" value="{{ $dataM->perusahaan_id }}">
+        <input type="hidden" name="paket" value="{{ $paketTerakhir->paket_id ?? '' }}">
+        <input type="hidden" name="lokasi" value="{{ $lokasiTerakhir->kode_lokasi ?? '' }}">
+        <input type="hidden" name="quota_jam_real" value="{{ $quotaJam->kuota ?? 0 }}">
 
         <div class="row">
             <!-- Kolom Kiri: Data Personal -->

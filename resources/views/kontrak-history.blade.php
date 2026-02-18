@@ -18,7 +18,7 @@
         </div>
 
         <!-- Paket Info -->
-        <div class="card mb-4">
+        <div class="card mb-4 border-top border-primary border-4 shadow-sm">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">

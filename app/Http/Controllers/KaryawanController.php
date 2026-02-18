@@ -86,10 +86,17 @@ class KaryawanController extends Controller
 
         $jabatanList = DB::table('md_jabatan')->get();
 
-        $area = DB::table('md_karyawan')
-            ->where('md_karyawan.is_deleted', 0)
-            ->leftJoin('md_area', 'md_karyawan.area_id', '=', 'md_area.area_id')
-            ->select('md_karyawan.karyawan_id', 'md_area.area')
+        $lokasi = DB::table('riwayat_lokasi as rl1')
+            ->join('md_lokasi', 'rl1.kode_lokasi', '=', 'md_lokasi.kode_lokasi')
+            ->join(DB::raw('(
+                SELECT karyawan_id, MAX(beg_date) as max_date
+                FROM riwayat_lokasi
+                GROUP BY karyawan_id
+            ) as latest'), function ($join) {
+                $join->on('rl1.karyawan_id', '=', 'latest.karyawan_id')
+                    ->on('rl1.beg_date', '=', 'latest.max_date');
+            })
+            ->select('rl1.karyawan_id', 'md_lokasi.lokasi as lokasi')
             ->get()
             ->keyBy('karyawan_id');
 
@@ -100,8 +107,8 @@ class KaryawanController extends Controller
 
         $hasDeleted = Karyawan::where('is_deleted', 1)->exists();
 
-        // Fetch area list for modal dropdown
-        $areaList = DB::table('md_area')->where('is_deleted', 0)->get();
+        // Fetch lokasi list for modal dropdown
+        $lokasiList = DB::table('md_lokasi')->where('is_deleted', 0)->get();
 
         return view('karyawan', [
             'data' => $data,
@@ -111,8 +118,8 @@ class KaryawanController extends Controller
             'jabatan' => $jabatan,
             'jabatanList' => $jabatanList,
 
-            'area' => $area,
-            'areaList' => $areaList,
+            'lokasi' => $lokasi,
+            'lokasiList' => $lokasiList,
             'masterUkuran' => $masterUkuran,
             'hasDeleted' => $hasDeleted
             // 'pakaian'      => $pakaian
@@ -120,9 +127,15 @@ class KaryawanController extends Controller
     }
 
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {
-        $data = Karyawan::with(['perusahaan'])->where('is_deleted', 0)->get();
+        $query = Karyawan::with(['perusahaan'])->where('is_deleted', 0);
+
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status_aktif', $request->status);
+        }
+
+        $data = $query->get();
 
         $paketKaryawan = DB::table('paket_karyawan as pk1')
             ->join('md_paket as paket', 'pk1.paket_id', '=', 'paket.paket_id')
@@ -166,15 +179,22 @@ class KaryawanController extends Controller
             ->get()
             ->keyBy('karyawan_id');
 
-        $area = DB::table('md_karyawan')
-            ->where('md_karyawan.is_deleted', 0)
-            ->leftJoin('md_area', 'md_karyawan.area_id', '=', 'md_area.area_id')
-            ->select('md_karyawan.karyawan_id', 'md_area.area')
+        $lokasi = DB::table('riwayat_lokasi as rl1')
+            ->join('md_lokasi', 'rl1.kode_lokasi', '=', 'md_lokasi.kode_lokasi')
+            ->join(DB::raw('(
+                SELECT karyawan_id, MAX(beg_date) as max_date
+                FROM riwayat_lokasi
+                GROUP BY karyawan_id
+            ) as latest'), function ($join) {
+                $join->on('rl1.karyawan_id', '=', 'latest.karyawan_id')
+                    ->on('rl1.beg_date', '=', 'latest.max_date');
+            })
+            ->select('rl1.karyawan_id', 'md_lokasi.lokasi as lokasi')
             ->get()
             ->keyBy('karyawan_id');
 
         return Excel::download(
-            new KaryawanExport($data, $paketKaryawan, $jabatan, $harianShift, $area),
+            new KaryawanExport($data, $paketKaryawan, $jabatan, $harianShift, $lokasi),
             'Data_Karyawan_' . date('Y-m-d') . '.xlsx'
         );
     }
@@ -504,6 +524,13 @@ class KaryawanController extends Controller
             'beg_date' => 'required',
         ]);
 
+        // Find OLD paket before mutation (to recalculate later)
+        $oldPaketKaryawan = DB::table('paket_karyawan')
+            ->where('karyawan_id', $request->karyawan_id)
+            ->orderByDesc('beg_date')
+            ->first();
+        $oldPaketId = $oldPaketKaryawan->paket_id ?? null;
+
         // Simpan mutasi
         DB::table('paket_karyawan')->insert([
             'karyawan_id' => $request->karyawan_id,
@@ -524,6 +551,14 @@ class KaryawanController extends Controller
             $currentPeriode = date('Y-m');
             if ($mutationPeriode !== $currentPeriode) {
                 $calculatorService->calculateForPaket($request->paket_id, $currentPeriode);
+            }
+
+            // 3. Recalculate OLD paket so employee disappears from it
+            if ($oldPaketId && $oldPaketId != $request->paket_id) {
+                $calculatorService->calculateForPaket($oldPaketId, $mutationPeriode);
+                if ($mutationPeriode !== $currentPeriode) {
+                    $calculatorService->calculateForPaket($oldPaketId, $currentPeriode);
+                }
             }
 
         } catch (\Exception $e) {
@@ -688,4 +723,53 @@ class KaryawanController extends Controller
     }
 
 
+
+    public function simpanLokasi(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'karyawan_id' => 'required',
+            'kode_lokasi' => 'required',
+            'beg_date' => 'required',
+        ]);
+
+        DB::table('riwayat_lokasi')->insert([
+            'karyawan_id' => $request->karyawan_id,
+            'kode_lokasi' => $request->kode_lokasi,
+            'beg_date' => $request->beg_date,
+        ]);
+
+        // Auto-Calculate for the Employee's Active Paket
+        try {
+            $activePaket = DB::table('paket_karyawan')
+                ->where('karyawan_id', $request->karyawan_id)
+                ->orderByDesc('beg_date')
+                ->first();
+
+            if ($activePaket) {
+                $calculatorService = app(\App\Services\ContractCalculatorService::class);
+                
+                // Calculate for the Change Period
+                $changePeriode = \Carbon\Carbon::parse($request->beg_date)->format('Y-m');
+                $calculatorService->calculateForPaket($activePaket->paket_id, $changePeriode);
+
+                // If Change Period is different from Current Period, calculate for Current as well
+                $currentPeriode = date('Y-m');
+                if ($changePeriode !== $currentPeriode) {
+                    $calculatorService->calculateForPaket($activePaket->paket_id, $currentPeriode);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Auto-calculation failed after location change: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Pergantian Lokasi berhasil disimpan, namun pembaharuan data kontrak gagal. Error: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Pergantian Lokasi berhasil disimpan.');
+    }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_karyawan')->where('karyawan_id', $id)->delete();
+        return redirect('/karyawan/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

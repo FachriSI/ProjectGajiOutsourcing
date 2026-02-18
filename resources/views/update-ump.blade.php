@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
-@section('title', 'UMP')
+@section('title', 'Update UMP / UMK')
 
 @section('content')
 
     <!-- Modern Page Header -->
     <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-warning border-5">
-        <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-edit me-2 text-warning"></i> Update UMP</h1>
+        <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-edit me-2 text-warning"></i> Update UMP / UMK</h1>
         <p class="text-muted small mb-0 mt-1">Perbarui informasi data upah minimum</p>
     </div>
 
@@ -15,7 +15,7 @@
             <div class="card shadow-sm border-0 mb-4 border-top border-warning border-4">
                 <div class="card-body">
                     <h5 class="card-title text-warning fw-bold mb-4">
-                        <i class="fas fa-edit me-2"></i>Edit Data UMP
+                        <i class="fas fa-edit me-2"></i>Edit Data UMP / UMK
                     </h5>
 
                     <form class="form-horizontal form-bordered" method="post" enctype="multipart/form-data"
@@ -49,7 +49,7 @@
                                 <i class="fas fa-arrow-left me-2"></i>Kembali
                             </a>
                             <button type="submit" class="btn btn-warning text-white px-4">
-                                <i class="fas fa-save me-2"></i>Update UMP
+                                <i class="fas fa-save me-2"></i>Update UMP / UMK
                             </button>
                         </div>
                     </form>

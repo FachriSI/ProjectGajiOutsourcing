@@ -20,7 +20,7 @@
 
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow border-0 mb-4">
+            <div class="card shadow border-0 mb-4 border-top border-primary border-4">
                 <div class="card-header bg-white py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Atur Nilai Jatah Pakaian</h6>
                 </div>

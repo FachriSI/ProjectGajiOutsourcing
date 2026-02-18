@@ -1,14 +1,14 @@
 @extends('layouts.main')
 
-@section('title', 'UMP')
+@section('title', 'UMP / UMK')
 
 @section('content')
     <!-- Modern Header -->
     <div class="bg-white p-4 rounded shadow-sm mb-4 mt-4 border-start border-primary border-5">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-money-bill-wave me-2 text-primary"></i> Data UMP</h1>
-                <p class="text-muted small mb-0 mt-1">Kelola data Upah Minimum Provinsi (UMP) per lokasi dan tahun</p>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-money-bill-wave me-2 text-primary"></i> Data UMP / UMK</h1>
+                <p class="text-muted small mb-0 mt-1">Kelola data Upah Minimum Provinsi (UMP) dan Kota (UMK) per lokasi dan tahun</p>
             </div>
             <div class="d-flex gap-2">
                 @if($hasDeleted)
@@ -17,7 +17,7 @@
                     </a>
                 @endif
                 <a href="/gettambah-ump" class="btn btn-primary shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Tambah UMP
+                    <i class="fas fa-plus me-1"></i> Tambah UMP / UMK
                 </a>
             </div>
         </div>
@@ -30,7 +30,7 @@
         </div>
     @endif
 
-    <div class="card shadow border-0 mb-4">
+    <div class="card shadow border-0 mb-4 border-top border-primary border-4">
 
         <div class="card-body">
             <div class="table-responsive">
@@ -39,7 +39,7 @@
                         <tr>
                             <th width="5%" class="text-center">No.</th>
                             <th>Lokasi</th>
-                            <th class="text-end">UMP</th>
+                            <th class="text-end">UMP / UMK</th>
                             <th class="text-center">Tahun</th>
                             <th width="15%" class="text-center">Aksi</th>
                         </tr>

@@ -18,10 +18,17 @@
           </a>
         @endif
 
-        <!-- Export Excel -->
-        <a href="/karyawan/export" class="btn btn-success shadow-sm">
-          <i class="fas fa-file-excel me-1"></i> Export Excel
-        </a>
+        <!-- Export Excel Dropdown -->
+        <div class="btn-group shadow-sm">
+          <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-file-excel me-1"></i> Export Excel
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/karyawan/export"><i class="fas fa-list me-2"></i>Semua Data</a></li>
+            <li><a class="dropdown-item" href="/karyawan/export?status=Aktif"><i class="fas fa-user-check me-2 text-success"></i>Hanya Aktif</a></li>
+            <li><a class="dropdown-item" href="/karyawan/export?status=Berhenti"><i class="fas fa-user-times me-2 text-danger"></i>Hanya Berhenti</a></li>
+          </ul>
+        </div>
 
         <!-- Button Template & Import -->
         <button type="button" class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal"
@@ -40,10 +47,10 @@
   <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="templateModalLabel"><i class="fas fa-file-excel me-2"></i>Template & Import Data
+        <div class="modal-header card-gradient-blue text-dark border-bottom-0">
+          <h5 class="modal-title fw-bold" id="templateModalLabel"><i class="fas fa-file-excel me-2 text-primary"></i>Template & Import Data
           </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <ul class="nav nav-tabs" id="importTabs" role="tablist">
@@ -147,7 +154,7 @@
     </div>
   </div>
 
-  <div class="card shadow border-0 mb-4">
+  <div class="card shadow border-0 mb-4 border-top border-primary border-4">
 
     <div class="card-body">
       <!-- Filter Bar -->
@@ -195,6 +202,7 @@
               <th>KTP</th>
               <th>Nama</th>
               <th>Perusahaan</th>
+              <th>Paket</th>
               <th>Status</th>
               <th>Tipe</th>
               <th class="text-center" width="18%">Aksi</th>
@@ -208,11 +216,12 @@
                 <td>{{ $item->ktp }}</td>
                 <td class="fw-bold">{{ $item->nama_tk }}</td>
                 <td>{{ $item->perusahaan->perusahaan }}</td>
+                <td>{{ $paketKaryawan[$item->karyawan_id]->nama_paket ?? '-' }}</td>
                 <td>
                   @if($item->status_aktif == 'Aktif')
-                    <span class="badge bg-success">Aktif</span>
+                    <span class="badge badge-soft-success">Aktif</span>
                   @else
-                    <span class="badge bg-danger">{{ $item->status_aktif ?? 'N/A' }}</span>
+                    <span class="badge badge-soft-danger">{{ $item->status_aktif ?? 'N/A' }}</span>
                   @endif
                 </td>
                 <td>{{ $item->tipe_pekerjaan ?? '-' }}</td>
@@ -230,6 +239,7 @@
                       class="btn btn-sm btn-outline-danger btn-delete" data-bs-toggle="tooltip" title="Hapus">
                       <i class="fas fa-trash"></i>
                     </a>
+
 
                     <div class="dropdown">
                       <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -262,11 +272,11 @@
                           </button>
                         </li>
                         <li>
-                          <button type="button" class="dropdown-item btn-edit-area" data-bs-toggle="modal"
-                            data-bs-target="#editAreaModal" data-id="{{ $item->karyawan_id }}"
+                          <button type="button" class="dropdown-item btn-edit-lokasi" data-bs-toggle="modal"
+                            data-bs-target="#editLokasiModal" data-id="{{ $item->karyawan_id }}"
                             data-nama="{{ $item->nama_tk }}"
-                            data-area="{{ $area[$item->karyawan_id]->area ?? 'Belum ada' }}">
-                            <i class="fas fa-map-marker-alt me-2 text-secondary"></i> Penempatan
+                            data-lokasi="{{ $lokasi[$item->karyawan_id]->lokasi ?? 'Belum ada' }}">
+                            <i class="fas fa-map-marker-alt me-2 text-secondary"></i> Pindah Lokasi
                           </button>
                         </li>
                         <li>
@@ -408,27 +418,31 @@
       </form>
     </div>
   </div>
-  <!-- Modal Area -->
-  <div class="modal fade" id="editAreaModal" tabindex="-1" aria-hidden="true">
+  <!-- Modal Lokasi -->
+  <div class="modal fade" id="editLokasiModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-      <form action="{{ url('/ganti-area') }}" method="POST">
+      <form action="{{ url('/ganti-lokasi') }}" method="POST">
         @csrf
-        <input type="hidden" name="karyawan_id" id="area_karyawan_id">
+        <input type="hidden" name="karyawan_id" id="lokasi_karyawan_id">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Edit Area - <span id="area_nama"></span></h5>
+            <h5 class="modal-title">Pindah Lokasi - <span id="lokasi_nama"></span></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p><strong>Area saat ini:</strong> <span id="area_saat_ini"></span></p>
+            <p><strong>Lokasi saat ini:</strong> <span id="lokasi_saat_ini"></span></p>
             <div class="mb-3">
-              <label class="form-label">Pilih Area Baru:</label>
-              <select name="area_id" class="form-select" required>
+              <label class="form-label">Pilih Lokasi Baru:</label>
+              <select name="kode_lokasi" class="form-select" required>
                 <option value="">-- Pilih --</option>
-                @foreach ($areaList as $areaItem)
-                  <option value="{{ $areaItem->area_id }}">{{ $areaItem->area }}</option>
+                @foreach ($lokasiList as $lokasiBox)
+                  <option value="{{ $lokasiBox->kode_lokasi }}">{{ $lokasiBox->lokasi }}</option>
                 @endforeach
               </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Tanggal Berlaku</label>
+              <input type="date" class="form-control" name="beg_date" required>
             </div>
           </div>
           <div class="modal-footer">
@@ -517,15 +531,15 @@
             $('#shift_karyawan_id').val(id);
         });
 
-        // Event delegation for Edit Area
-        $(document).on('click', '.btn-edit-area', function () {
+        // Event delegation for Edit Lokasi (formerly Area)
+        $(document).on('click', '.btn-edit-lokasi', function () {
             const nama = $(this).data('nama');
-            const area = $(this).data('area');
+            const lokasi = $(this).data('lokasi');
             const id = $(this).data('id');
 
-            $('#area_nama').text(nama);
-            $('#area_saat_ini').text(area);
-            $('#area_karyawan_id').val(id);
+            $('#lokasi_nama').text(nama);
+            $('#lokasi_saat_ini').text(lokasi);
+            $('#lokasi_karyawan_id').val(id);
         });
 
         // Event delegation for Edit Pakaian
@@ -547,17 +561,17 @@
         var table = $('#datatableSimple').DataTable();
 
         // Apply default filter for Status = Aktif
-        table.column(5).search('Aktif').draw();
+        table.column(6).search('Aktif').draw();
 
         // Filter event handlers
         $('#filterStatus').on('change', function() {
-            table.column(5).search(this.value).draw();
+            table.column(6).search(this.value).draw();
         });
         $('#filterPerusahaan').on('change', function() {
             table.column(4).search(this.value).draw();
         });
         $('#filterTipe').on('change', function() {
-            table.column(6).search(this.value).draw();
+            table.column(7).search(this.value).draw();
         });
         $('#resetFilter').on('click', function() {
             $('#filterStatus').val('');

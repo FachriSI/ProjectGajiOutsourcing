@@ -10,7 +10,7 @@ class GlobalActivityObserver
 {
     public function created(Model $model)
     {
-        $this->logActivity($model, 'Create', 'Created new ' . class_basename($model) . ': ' . $this->getModelIdentifier($model));
+        $this->logActivity($model, 'Create', 'Menambahkan data ' . class_basename($model) . ' baru: ' . $this->getModelIdentifier($model));
     }
 
     public function updated(Model $model)
@@ -30,13 +30,13 @@ class GlobalActivityObserver
             foreach ($changes as $key => $newValue) {
                 // If the field is in hidden list, just say it changed without showing value
                 if (in_array($key, $hiddenFields)) {
-                    $details[] = "$key: (Updated)";
+                    $details[] = "$key: (Diperbarui)";
                     continue;
                 }
 
                 // Handle non-scalar values (arrays/objects)
                 if (!is_scalar($newValue) && !is_null($newValue)) {
-                    $newValue = '(Complex Data)';
+                    $newValue = '(Data Kompleks)';
                 }
 
                 // Skip long text fields to avoid cluttering logs
@@ -48,18 +48,19 @@ class GlobalActivityObserver
 
                 if (!is_scalar($oldValue) && !is_null($oldValue)) {
                     // $oldValue = json_encode($oldValue);
-                     $oldValue = '(Complex Data)';
+                     $oldValue = '(Data Kompleks)';
                 }
                 
                  if (strlen((string)$oldValue) > 50) {
                     $oldValue = substr((string)$oldValue, 0, 50) . '...';
                 }
 
-                $details[] = "$key: '$oldValue' -> '$newValue'";
+                // Translate arrow to "menjadi"
+                $details[] = "$key: dari '$oldValue' menjadi '$newValue'";
             }
 
 
-            $description = 'Updated ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . '). Changes: ' . implode(', ', $details);
+            $description = 'Mengubah data ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . '). Perubahan: ' . implode(', ', $details);
             $this->logActivity($model, 'Update', $description);
         }
     }
@@ -73,17 +74,17 @@ class GlobalActivityObserver
              $action = 'Delete';
         }
 
-        $this->logActivity($model, $action, 'Deleted ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
+        $this->logActivity($model, $action, 'Menghapus data ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
     }
 
     public function restored(Model $model)
     {
-        $this->logActivity($model, 'Restore', 'Restored ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
+        $this->logActivity($model, 'Restore', 'Memulihkan data ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
     }
 
     public function forceDeleted(Model $model)
     {
-        $this->logActivity($model, 'Force Delete', 'Permanently deleted ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
+        $this->logActivity($model, 'Force Delete', 'Menghapus permanen data ' . class_basename($model) . ' (' . $this->getModelIdentifier($model) . ')');
     }
 
     protected function getModelIdentifier(Model $model)

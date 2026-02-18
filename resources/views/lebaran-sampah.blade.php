@@ -67,6 +67,11 @@
                                         onclick="return confirm('Apakah Anda yakin ingin memulihkan data ini?')">
                                         <i class="fas fa-trash-restore me-1"></i> Restore
                                     </a>
+                                    <a href="/force-delete-lebaran/{{ $item->id }}" class="btn btn-outline-danger btn-sm btn-force-delete"
+                                        title="Hapus Permanen"
+                                        onclick="return confirm('PERINGATAN: Data akan dihapus secara PERMANEN dan tidak dapat dikembalikan. Lanjutkan?')">
+                                        <i class="fas fa-times-circle me-1"></i> Hapus
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

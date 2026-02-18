@@ -93,4 +93,10 @@ class DepartemenController extends Controller
         ]);
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_departemen')->where('departemen_id', $id)->delete();
+        return redirect('/departemen/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

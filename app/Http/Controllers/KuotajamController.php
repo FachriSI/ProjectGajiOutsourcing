@@ -93,4 +93,10 @@ class KuotajamController extends Controller
         ]);
         return redirect('/kuotajam')->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_kuotajam')->where('kuota_id', $id)->delete();
+        return redirect('/kuotajam/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

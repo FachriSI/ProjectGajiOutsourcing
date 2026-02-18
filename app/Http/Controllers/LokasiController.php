@@ -82,4 +82,10 @@ class LokasiController extends Controller
         ]);
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_lokasi')->where('kode_lokasi', $id)->delete();
+        return redirect('/lokasi/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

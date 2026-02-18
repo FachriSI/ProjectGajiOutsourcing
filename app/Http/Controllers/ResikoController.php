@@ -82,4 +82,10 @@ class ResikoController extends Controller
         ]);
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_resiko')->where('kode_resiko', $id)->delete();
+        return redirect('/resiko/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

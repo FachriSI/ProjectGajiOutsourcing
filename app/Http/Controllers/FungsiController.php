@@ -91,4 +91,10 @@ class FungsiController extends Controller
         ]);
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_fungsi')->where('kode_fungsi', $id)->delete();
+        return redirect('/fungsi/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

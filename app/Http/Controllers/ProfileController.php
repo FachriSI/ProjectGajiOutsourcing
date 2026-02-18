@@ -22,4 +22,27 @@ class ProfileController extends Controller
 
         return view('profile.index', compact('user', 'logs'));
     }
+
+    public function update(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user->name = $request->name;
+
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        $user->save();
+
+        // Log Activity manually if needed, or rely on Observer (which handles 'updated' event)
+        // Since we have an observer, it should log automatically.
+
+        return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui!');
+    }
 }

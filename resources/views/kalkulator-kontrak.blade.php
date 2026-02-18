@@ -304,47 +304,62 @@
 
     <!-- Export Modal -->
     <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="exportModalLabel"><i class="fas fa-file-excel"></i> Export Laporan Kontrak
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                <div class="modal-header card-gradient-blue text-dark border-bottom-0 py-3 px-4">
+                    <h5 class="modal-title fw-bold" id="exportModalLabel">
+                        <i class="fas fa-file-excel me-2 text-primary"></i>Export Laporan Kontrak
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('kalkulator.export') }}" method="POST">
                     @csrf
-                    <div class="modal-body">
-                        <!-- Periode -->
-                        <div class="mb-3">
-                            <label for="exportPeriode" class="form-label">Periode</label>
-                            <input type="month" name="periode" id="exportPeriode" class="form-control"
-                                value="{{ $currentPeriode }}" required>
-                        </div>
-
-                        <!-- Scope Selection -->
-                        <div class="mb-3">
-                            <label class="form-label">Lingkup Laporan</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="scope" id="scopeAll" value="all" checked
-                                    onchange="togglePaketSelect(this.value)">
-                                <label class="form-check-label" for="scopeAll">
-                                    Semua Paket
-                                </label>
+                    <div class="modal-body p-4 bg-light">
+                        
+                        <!-- Top Filters: Periode & Scope -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-5">
+                                <label for="exportPeriode" class="form-label fw-bold text-dark small mb-1">Periode</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0 text-primary">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                    <input type="month" name="periode" id="exportPeriode"
+                                        class="form-control border-start-0 ps-0 form-control-sm" value="{{ $currentPeriode }}" required
+                                        style="font-weight: 600;">
+                                </div>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="scope" id="scopeSingle" value="single"
-                                    onchange="togglePaketSelect(this.value)">
-                                <label class="form-check-label" for="scopeSingle">
-                                    Per Paket
-                                </label>
+                            <div class="col-md-7">
+                                <label class="form-label fw-bold text-dark small mb-1">Lingkup Laporan</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="w-100 mb-0">
+                                            <input type="radio" name="scope" value="all" class="card-input-element"
+                                                checked onchange="togglePaketSelect(this.value)">
+                                            <div class="card-input d-flex align-items-center justify-content-center py-2 px-3" style="border-radius: 8px; border: 1px solid #dee2e6;">
+                                                <i class="fas fa-layer-group me-2 text-secondary"></i>
+                                                <span class="fw-bold small">Semua Paket</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="w-100 mb-0">
+                                            <input type="radio" name="scope" value="single" class="card-input-element"
+                                                onchange="togglePaketSelect(this.value)">
+                                            <div class="card-input d-flex align-items-center justify-content-center py-2 px-3" style="border-radius: 8px; border: 1px solid #dee2e6;">
+                                                <i class="fas fa-box-open me-2 text-secondary"></i>
+                                                <span class="fw-bold small">Per Paket</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Paket Select (Hidden by default) -->
                         <div class="mb-3" id="paketSelectDiv" style="display: none;">
-                            <label for="exportPaketId" class="form-label">Pilih Paket</label>
-                            <select name="paket_id" id="exportPaketId" class="form-select">
+                            <label for="exportPaketId" class="form-label fw-bold small mb-1">Pilih Paket</label>
+                            <select name="paket_id" id="exportPaketId" class="form-select form-select-sm">
                                 <option value="">-- Pilih Paket --</option>
                                 @foreach ($pakets as $paket)
                                     <option value="{{ $paket->paket_id }}">{{ $paket->paket }}</option>
@@ -352,129 +367,130 @@
                             </select>
                         </div>
 
-                        <hr>
-
-                        <!-- Column Selection -->
-                        <div class="mb-3">
-                            <label class="form-label">Pilih Kolom</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="paket_nama"
-                                            id="colPaket" checked>
-                                        <label class="form-check-label" for="colPaket">Nama Paket</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="unit_kerja"
-                                            id="colUnit" checked>
-                                        <label class="form-check-label" for="colUnit">Unit Kerja</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="periode"
-                                            id="colPeriode" checked>
-                                        <label class="form-check-label" for="colPeriode">Periode</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="total_nilai_kontrak" id="colTotal" checked>
-                                        <label class="form-check-label" for="colTotal">Total Nilai</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="ump_sumbar"
-                                            id="colUmp">
-                                        <label class="form-check-label" for="colUmp">UMP</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="jumlah_karyawan_total" id="colKaryawan" checked>
-                                        <label class="form-check-label" for="colKaryawan">Total Karyawan</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="jumlah_pengawas" id="colJmlPengawas">
-                                        <label class="form-check-label" for="colJmlPengawas">Jml Pengawas</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="jumlah_pelaksana" id="colJmlPelaksana">
-                                        <label class="form-check-label" for="colJmlPelaksana">Jml Pelaksana</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="total_pengawas" id="colBiayaPengawas">
-                                        <label class="form-check-label" for="colBiayaPengawas">Biaya Pengawas</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="total_pelaksana" id="colBiayaPelaksana">
-                                        <label class="form-check-label" for="colBiayaPelaksana">Biaya Pelaksana</label>
-                                    </div>
-                                </div>
+                        <!-- Column Selection (Compact Grid) -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white border-bottom fw-bold py-2 px-3 small">
+                                <i class="fas fa-columns me-2 text-primary"></i>Konfigurasi Kolom
                             </div>
-                            <div class="row mt-2">
-                                <div class="col-12">
-                                    <label class="form-label text-muted small fw-bold">Rincian Komponen (Bobot)</label>
+                            <div class="card-body p-3">
+                                <div class="row g-2">
+                                    <!-- Kolom Utama & Statistik (Merged) -->
+                                    <div class="col-md-12">
+                                        <span class="checkbox-group-label small mb-1 pb-1" style="font-size: 0.75rem;">Informasi Umum</span>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="paket_nama" id="colPaket" checked>
+                                                <label class="form-check-label small" for="colPaket">Nama Paket</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="unit_kerja" id="colUnit" checked>
+                                                <label class="form-check-label small" for="colUnit">Unit Kerja</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="periode" id="colPeriode" checked>
+                                                <label class="form-check-label small" for="colPeriode">Periode</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="total_nilai_kontrak" id="colTotal" checked>
+                                                <label class="form-check-label small" for="colTotal">Total Nilai</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="ump_sumbar" id="colUmp">
+                                                <label class="form-check-label small" for="colUmp">UMP</label>
+                                            </div>
+                                             <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_karyawan_total" id="colKaryawan" checked>
+                                                <label class="form-check-label small" for="colKaryawan">Total Karyawan</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_pengawas" id="colJmlPengawas">
+                                                <label class="form-check-label small" for="colJmlPengawas">Jml Pengawas</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="jumlah_pelaksana" id="colJmlPelaksana">
+                                                <label class="form-check-label small" for="colJmlPelaksana">Jml Pelaksana</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="total_pengawas" id="colBiayaPengawas">
+                                                <label class="form-check-label small" for="colBiayaPengawas">Biaya Pengawas</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-1">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="total_pelaksana" id="colBiayaPelaksana">
+                                                <label class="form-check-label small" for="colBiayaPelaksana">Biaya Pelaksana</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="upah_pokok"
-                                            id="colUpah">
-                                        <label class="form-check-label small" for="colUpah">Upah Pokok</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tetap"
-                                            id="colTjTetap">
-                                        <label class="form-check-label small" for="colTjTetap">Tj. Tetap</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="tj_tidak_tetap" id="colTjTidakTetap">
-                                        <label class="form-check-label small" for="colTjTidakTetap">Tj. Tidak Tetap</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="tj_lokasi"
-                                            id="colTjLokasi">
-                                        <label class="form-check-label small" for="colTjLokasi">Tj. Lokasi</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="bpjs_kesehatan" id="colBpjsKes">
-                                        <label class="form-check-label small" for="colBpjsKes">BPJS Kese.</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]"
-                                            value="bpjs_ketenagakerjaan" id="colBpjsTk">
-                                        <label class="form-check-label small" for="colBpjsTk">BPJS TK</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="kompensasi"
-                                            id="colKompen">
-                                        <label class="form-check-label small" for="colKompen">Kompensasi</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="uang_jasa"
-                                            id="colUangJasa">
-                                        <label class="form-check-label small" for="colUangJasa">Uang Jasa</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="columns[]" value="lembur"
-                                            id="colLembur">
-                                        <label class="form-check-label small" for="colLembur">Lembur</label>
+
+                                <!-- Rincian Komponen (Compact Grid) -->
+                                <div class="mt-2 p-2 bg-secondary bg-opacity-10 rounded-2">
+                                    <span class="checkbox-group-label border-bottom-0 mb-1 small pb-0" style="font-size: 0.75rem;">Rincian Komponen</span>
+                                    <div class="row g-1">
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="upah_pokok" id="colUpah">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colUpah">Upah Pokok</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tetap" id="colTjTetap">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colTjTetap">Tj. Tetap</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="tj_tidak_tetap" id="colTjTidakTetap">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colTjTidakTetap">Tj. Tdk Tetap</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="tj_lokasi" id="colTjLokasi">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colTjLokasi">Tj. Lokasi</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="bpjs_kesehatan" id="colBpjsKes">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colBpjsKes">BPJS Kes</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="bpjs_ketenagakerjaan" id="colBpjsTk">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colBpjsTk">BPJS TK</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="kompensasi" id="colKompensasi">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colKompensasi">Kompensasi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="uang_jasa" id="colUangJasa">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colUangJasa">Uang Jasa</label>
+                                            </div>
+                                        </div>
+                                         <div class="col-md-3 col-6">
+                                            <div class="form-check ps-1 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="columns[]" value="lembur" id="colLembur">
+                                                <label class="form-check-label small" style="font-size: 0.75rem;" for="colLembur">Lembur</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-file-export"></i> Export
-                            Excel</button>
+                    <div class="modal-footer bg-white border-top-0 py-2 px-4">
+                        <button type="button" class="btn btn-light btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-bold">
+                            <i class="fas fa-file-export me-1"></i>Export
+                        </button>
                     </div>
                 </form>
             </div>
@@ -501,7 +517,7 @@
                 serverSide: false,
                 lengthChange: false,
                 pageLength: 10,
-                order: [[1, 'asc']], // Sort by paket name
+                ordering: false, // Disable DataTables sorting to use backend sort order
                 language: {
                     "decimal": "",
                     "emptyTable": "Tidak ada data yang tersedia pada tabel ini",

@@ -84,4 +84,10 @@ class HarianshiftController extends Controller
         ]);
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_harianshift')->where('kode_harianshift', $id)->delete();
+        return redirect('/harianshift/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

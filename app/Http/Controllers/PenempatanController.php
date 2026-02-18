@@ -18,6 +18,7 @@ use App\Models\PaketKaryawan;
 use App\Models\Paket;
 use App\Models\Ump;
 use App\Models\Kuotajam;
+use App\Models\Karyawan;
 use App\Models\Masakerja;
 use App\Models\RiwayatKaryawan;
 
@@ -62,21 +63,19 @@ class PenempatanController extends Controller
 
             $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
 
-            $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
+            // Filter: only Aktif employees whose latest paket assignment is THIS paket
+            $paketIdCheck = $paket->paket_id;
+            // Filter: only active employees (excluding Berhenti/Sudah Diganti)
+            $paketIdCheck = $paket->paket_id;
+            $aktif = $karyawanPaket->filter(function ($item) {
+                if (!$item->karyawan) return false;
+                // Exclude Berhenti/Sudah Diganti, but include Aktif, NULL, and empty
+                return !in_array($item->karyawan->status_aktif, ['Berhenti', 'Sudah Diganti']);
+            });
             $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
-            $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
 
-            // Ambil karyawan sesuai kuota
-            $terpilih = collect();
-            if ($aktif->count() >= $kuota) {
-                $terpilih = $aktif->take($kuota);
-            } else {
-                $terpilih = $aktif;
-                $sisa = $kuota - $aktif->count();
-                $terpilih = $terpilih->concat($berhenti->take($sisa));
-                $sisa = $kuota - $terpilih->count();
-                $terpilih = $terpilih->concat($diganti->take($sisa));
-            }
+            // Ambil karyawan sesuai kuota - ONLY active employees
+            $terpilih = $aktif->take($kuota);
 
             $totalActual += $terpilih->count();
 
@@ -522,6 +521,21 @@ class PenempatanController extends Controller
             'tanggal_berhenti' => $request->tanggal_berhenti,
             'diberhentikan_oleh' => auth()->id(),
         ]);
+
+        // Auto-recalculate contract for affected paket
+        try {
+            $activePaket = DB::table('paket_karyawan')
+                ->where('karyawan_id', $request->id)
+                ->orderByDesc('beg_date')
+                ->first();
+
+            if ($activePaket) {
+                $calculatorService = app(\App\Services\ContractCalculatorService::class);
+                $calculatorService->calculateForPaket($activePaket->paket_id, date('Y-m'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Auto-recalculation failed after setBerhenti: ' . $e->getMessage());
+        }
 
         return response()->json(['message' => 'Karyawan berhasil diberhentikan']);
     }

@@ -36,7 +36,7 @@
     <div class="row mb-4">
         <!-- Total Karyawan -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card h-100">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="rounded-circle d-flex align-items-center justify-content-center me-4 card-icon-bg-white"
                         style="width: 60px; height: 60px; min-width: 60px;">
@@ -60,7 +60,7 @@
 
         <!-- Total Paket -->
         <div class="col-lg-6 col-md-6 mb-3">
-            <div class="card h-100">
+            <div class="card card-gradient-blue h-100">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="rounded-circle d-flex align-items-center justify-content-center me-4 card-icon-bg-white"
                         style="width: 60px; height: 60px; min-width: 60px;">

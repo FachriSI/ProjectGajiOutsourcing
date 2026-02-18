@@ -95,14 +95,14 @@
         <div class="row mb-4">
             <!-- Row 1: Monthly Stats -->
             <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-0 shadow-sm h-100 border-start border-primary border-4">
-                    <div class="card-body p-4 bg-white">
+                <div class="card card-gradient-blue h-100">
+                    <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <div class="text-muted small fw-bold text-uppercase mb-1">Total Jml Fix Cost/Bln</div>
                                 <div class="h5 mb-0 fw-bold text-dark">Rp {{ number_format($fixCost, 0, ',', '.') }}</div>
                             </div>
-                            <div class="bg-primary bg-opacity-10 rounded-circle p-2">
+                            <div class="bg-white bg-opacity-50 rounded-circle p-2">
                                 <i class="fas fa-tags fa-lg text-primary"></i>
                             </div>
                         </div>
@@ -110,29 +110,29 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-0 shadow-sm h-100 border-start border-secondary border-4">
-                    <div class="card-body p-4 bg-white">
+                <div class="card card-gradient-blue h-100">
+                    <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <div class="text-muted small fw-bold text-uppercase mb-1">Total Variabel Cost/Bln</div>
                                 <div class="h5 mb-0 fw-bold text-dark">Rp {{ number_format($variabelCost, 0, ',', '.') }}</div>
                             </div>
-                            <div class="bg-secondary bg-opacity-10 rounded-circle p-2">
-                                <i class="fas fa-chart-area fa-lg text-secondary"></i>
+                            <div class="bg-white bg-opacity-50 rounded-circle p-2">
+                                <i class="fas fa-chart-area fa-lg text-primary"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-0 shadow-sm h-100 border-start border-primary border-4">
-                    <div class="card-body p-4 bg-white">
+                <div class="card card-gradient-blue h-100">
+                    <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <div class="text-muted small fw-bold text-uppercase mb-1">Total Kontrak/Bln</div>
                                 <div class="h5 mb-0 fw-bold text-dark">Rp {{ number_format($totalKontrakBln, 0, ',', '.') }}</div>
                             </div>
-                            <div class="bg-primary bg-opacity-10 rounded-circle p-2">
+                            <div class="bg-white bg-opacity-50 rounded-circle p-2">
                                 <i class="fas fa-file-contract fa-lg text-primary"></i>
                             </div>
                         </div>
@@ -140,15 +140,15 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-0 shadow-sm h-100 border-start border-secondary border-4">
-                    <div class="card-body p-4 bg-white">
+                <div class="card card-gradient-blue h-100">
+                    <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <div class="text-muted small fw-bold text-uppercase mb-1">Total THR/Bln</div>
                                 <div class="h5 mb-0 fw-bold text-dark">Rp {{ number_format($totalThrBln, 0, ',', '.') }}</div>
                             </div>
-                            <div class="bg-secondary bg-opacity-10 rounded-circle p-2">
-                                <i class="fas fa-hand-holding-usd fa-lg text-secondary"></i>
+                            <div class="bg-white bg-opacity-50 rounded-circle p-2">
+                                <i class="fas fa-hand-holding-usd fa-lg text-primary"></i>
                             </div>
                         </div>
                     </div>
@@ -159,17 +159,17 @@
         <div class="row mb-4">
             <!-- Row 2: Annual Stats -->
             <div class="col-xl-4 col-md-6 mb-3">
-                <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+                <div class="card card-gradient-blue h-100">
                     <div class="card-body p-4 d-flex align-items-center">
                          <div class="row flex-fill align-items-center">
                             <div class="col-12">
                                 <div class="d-flex align-items-center mb-2">
-                                    <div class="bg-white rounded-circle p-3 me-3">
+                                    <div class="bg-white bg-opacity-50 rounded-circle p-3 me-3">
                                         <i class="fas fa-star fa-2x text-primary"></i>
                                     </div>
                                     <div>
-                                        <div class="text-white-50 small fw-bold text-uppercase">TOTAL KONTRAK / TAHUN</div>
-                                        <div class="h3 fw-bold text-white mb-0 mt-1">Rp {{ number_format($totalKontrakThn, 0, ',', '.') }}</div>
+                                        <div class="text-muted small fw-bold text-uppercase">TOTAL KONTRAK / TAHUN</div>
+                                        <div class="h3 fw-bold text-primary mb-0 mt-1">Rp {{ number_format($totalKontrakThn, 0, ',', '.') }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -179,13 +179,13 @@
             </div>
 
             <div class="col-xl-4 col-md-6 mb-3">
-                <div class="card border-0 shadow-sm h-100 border-start border-secondary border-4">
-                    <div class="card-body p-4 bg-white">
+                <div class="card card-gradient-blue h-100">
+                    <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start h-100 flex-column">
                             <div class="w-100 d-flex justify-content-between mb-2">
                                 <div class="text-muted small fw-bold text-uppercase">Total THR/Tahun</div>
-                                <div class="bg-secondary bg-opacity-10 rounded-circle p-2">
-                                    <i class="fas fa-gift fa-lg text-secondary"></i>
+                                <div class="bg-white bg-opacity-50 rounded-circle p-2">
+                                    <i class="fas fa-gift fa-lg text-primary"></i>
                                 </div>
                             </div>
                             <div class="mt-auto">
@@ -197,13 +197,13 @@
             </div>
 
             <div class="col-xl-4 col-md-6 mb-3">
-                <div class="card border-0 shadow-sm h-100 border-start border-secondary border-4">
-                    <div class="card-body p-4 bg-white">
+                <div class="card card-gradient-blue h-100">
+                    <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start h-100 flex-column">
                             <div class="w-100 d-flex justify-content-between mb-2">
                                 <div class="text-muted small fw-bold text-uppercase">Total Pakaian/Tahun</div>
-                                <div class="bg-secondary bg-opacity-10 rounded-circle p-2">
-                                    <i class="fas fa-tshirt fa-lg text-secondary"></i>
+                                <div class="bg-white bg-opacity-50 rounded-circle p-2">
+                                    <i class="fas fa-tshirt fa-lg text-primary"></i>
                                 </div>
                             </div>
                             <div class="mt-auto">

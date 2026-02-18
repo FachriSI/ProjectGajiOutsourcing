@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Masakerja;
 use App\Models\Ump;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UmpController extends Controller
 {
@@ -73,7 +74,15 @@ class UmpController extends Controller
         $request->validate([
             'kode_lokasi' => 'required',
             'ump' => 'required',
-            'tahun' => 'required|unique:md_ump,tahun,NULL,id,kode_lokasi,' . $request->kode_lokasi
+            'tahun' => [
+                'required',
+                Rule::unique('md_ump')->where(function ($query) use ($request) {
+                    return $query->where('kode_lokasi', $request->kode_lokasi)
+                                 ->where('is_deleted', 0);
+                })
+            ]
+        ], [
+            'tahun.unique' => 'Data UMP untuk lokasi dan tahun ini sudah ada (Double Data). Silakan cek kembali data yang ada.'
         ]);
         
         $nilai = str_replace('.', '', $request->ump);
@@ -142,5 +151,11 @@ class UmpController extends Controller
         return back()->with('success', 'Data berhasil dipulihkan!');
     }
 
+
+    public function forceDelete($id)
+    {
+        DB::table('md_ump')->where('id', $id)->delete();
+        return redirect('/ump/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }
 

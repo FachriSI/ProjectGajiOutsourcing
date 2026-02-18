@@ -75,22 +75,22 @@ class ContractCalculatorService
         $kuota = (int) $paket->kuota_paket;
         $karyawanPaket = $paket->paketKaryawan->sortByDesc('beg_date');
 
-        // Filter berdasarkan status
-        $aktif = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Aktif');
-        $berhenti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Berhenti');
-        $diganti = $karyawanPaket->filter(fn($item) => $item->karyawan && $item->karyawan->status_aktif === 'Sudah Diganti');
+        // Get all karyawan IDs whose LATEST paket_karyawan record is for THIS paket
+        $latestPaketPerKaryawan = DB::table('paket_karyawan')
+            ->select('karyawan_id', DB::raw('MAX(beg_date) as max_date'))
+            ->groupBy('karyawan_id')
+            ->get()
+            ->keyBy('karyawan_id');
 
-        // Ambil karyawan sesuai kuota
-        $terpilih = collect();
-        if ($aktif->count() >= $kuota) {
-            $terpilih = $aktif->take($kuota);
-        } else {
-            $terpilih = $aktif;
-            $sisa = $kuota - $aktif->count();
-            $terpilih = $terpilih->concat($berhenti->take($sisa));
-            $sisa = $kuota - $terpilih->count();
-            $terpilih = $terpilih->concat($diganti->take($sisa));
-        }
+        // Filter: only active employees (excluding Berhenti/Sudah Diganti)
+        $aktif = $karyawanPaket->filter(function ($item) {
+            if (!$item->karyawan) return false;
+            // Exclude Berhenti/Sudah Diganti, but include Aktif, NULL, and empty
+            return !in_array($item->karyawan->status_aktif, ['Berhenti', 'Sudah Diganti']);
+        });
+
+        // Ambil karyawan sesuai kuota - ONLY active employees with latest assignment here
+        $terpilih = $aktif->take($kuota);
 
         // Initialize totals untuk Pengawas dan Pelaksana
         $pengawas = [

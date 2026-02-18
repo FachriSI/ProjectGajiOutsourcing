@@ -107,6 +107,62 @@ h6 {
     border-radius: 12px !important;
 }
 
+/* --- UI Polish: Gradient Cards (Blue Theme) --- */
+.card-gradient-blue {
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+    /* White to very light sky blue */
+    border: 1px solid #bae6fd;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-gradient-blue:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.15);
+    /* Blue shadow */
+}
+
+/* --- UI Polish: Soft Badges --- */
+.badge-soft-primary {
+    background-color: #e0f2fe;
+    /* Sky 100 */
+    color: #0369a1;
+    /* Sky 700 */
+    padding: 0.5em 1em;
+    border-radius: 50rem;
+    /* Pill shape */
+    font-weight: 600;
+}
+
+.badge-soft-success {
+    background-color: #dcfce7;
+    /* Green 100 */
+    color: #15803d;
+    /* Green 700 */
+    padding: 0.5em 1em;
+    border-radius: 50rem;
+    font-weight: 600;
+}
+
+.badge-soft-danger {
+    background-color: #fee2e2;
+    /* Red 100 */
+    color: #b91c1c;
+    /* Red 700 */
+    padding: 0.5em 1em;
+    border-radius: 50rem;
+    font-weight: 600;
+}
+
+.badge-soft-warning {
+    background-color: #fef3c7;
+    /* Amber 100 */
+    color: #b45309;
+    /* Amber 700 */
+    padding: 0.5em 1em;
+    border-radius: 50rem;
+    font-weight: 600;
+}
+
 /* --- Sidebar (Dark Gradient - Unchanged) --- */
 #layoutSidenav_nav .sb-sidenav {
     background: linear-gradient(180deg, var(--sidebar-bg-start) 0%, var(--sidebar-bg-end) 100%) !important;
@@ -116,29 +172,38 @@ h6 {
 }
 
 #layoutSidenav_nav .sb-sidenav .sb-sidenav-menu-heading {
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 0.7rem;
+    /* Smaller font */
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 1.5rem 1.5rem 0.5rem;
+    letter-spacing: 0.1em;
+    padding: 1.25rem 1.25rem 0.5rem;
+    /* Reduced padding */
+    opacity: 0.8;
 }
 
 #layoutSidenav_nav .sb-sidenav .nav-link {
     color: var(--sidebar-text);
     font-weight: 500;
-    padding: 10px 20px;
-    margin: 4px 12px;
+    padding: 8px 16px;
+    /* Compact padding */
+    margin: 2px 12px;
+    /* Minimal vertical margin */
     border-radius: 6px;
     transition: all 0.2s ease;
     border-left: 3px solid transparent;
     display: flex;
     align-items: center;
+    font-size: 0.9rem;
+    /* Compact font size */
 }
 
 #layoutSidenav_nav .sb-sidenav .nav-link:hover {
-    color: #f1f5f9;
-    background-color: var(--sidebar-hover-bg);
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+    /* Subtle movement */
 }
 
 /* Active State - Blue Theme (Override Red) */
@@ -273,6 +338,64 @@ table.dataTable tbody td {
     border: 1px solid var(--sidebar-bg-start) !important;
 }
 
-.nav-pills .nav-link {
+
+/* --- Form Elements: Card Radio (Selectable Tiles) --- */
+.card-input-element {
+    display: none;
+}
+
+.card-input {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    height: 100%;
+    color: var(--text-secondary);
+}
+
+.card-input:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.card-input-element:checked+.card-input {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-color: #3b82f6;
+    color: #1e40af;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
+}
+
+.card-input-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: inherit;
+}
+
+/* --- Form Elements: Modern Checkbox Group --- */
+.checkbox-group-label {
+    font-weight: 600;
     color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    display: block;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+}
+
+.form-check-modern {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.15s ease;
+}
+
+.form-check-modern:hover {
+    background-color: #f1f5f9;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
 }

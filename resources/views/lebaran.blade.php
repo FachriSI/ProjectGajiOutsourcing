@@ -39,7 +39,7 @@
         </div>
     @endif
 
-    <div class="card shadow border-0 mb-4">
+    <div class="card shadow border-0 mb-4 border-top border-primary border-4">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover datatable" id="datatableSimple" width="100%" cellspacing="0">

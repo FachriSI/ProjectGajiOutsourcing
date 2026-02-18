@@ -95,4 +95,10 @@ class MasakerjaController extends Controller
         ]);
         return redirect('/masakerja')->with('success', 'Data berhasil dipulihkan!');
     }
+
+    public function forceDelete($id)
+    {
+        DB::table('md_masakerja')->where('id', $id)->delete();
+        return redirect('/masakerja/sampah')->with('success', 'Data berhasil dihapus permanen!');
+    }
 }

@@ -31,7 +31,7 @@ class LogSuccessfulLogout
             ActivityLog::create([
                 'user_id' => $event->user->id,
                 'action' => 'Logout',
-                'description' => 'User logged out',
+                'description' => 'Pengguna berhasil keluar',
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
